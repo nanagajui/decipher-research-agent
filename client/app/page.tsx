@@ -92,7 +92,15 @@ export default function Home() {
       <section className="relative px-4 pt-32 pb-20 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center">
           <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-primary/10 text-primary mb-8">
-            Powered by Brightdata
+            Powered by{" "}
+            <a
+              href="https://brightdata.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline ml-1"
+            >
+              Brightdata
+            </a>
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
             Research Smarter with <span className="text-primary">Decipher</span>
