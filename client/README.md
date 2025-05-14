@@ -1,24 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Decipher - AI-Powered Research Assistant
+
+Decipher is an AI-powered research assistant that transforms how you explore information. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.
+
+## Features
+
+- **Multi-Source Research** - Input any combination of documents, links, or topics. Our AI seamlessly integrates information from all your sources into a unified research space.
+- **AI-Powered Summaries** - Get instant, comprehensive summaries of your research materials. Our AI extracts key insights and presents them in clear, digestible formats.
+- **Interactive Q&A** - Chat with your research materials in natural language. Ask questions and get instant answers based on all your input sources.
+- **Smart FAQ Generation** - Automatically generate relevant FAQs from your research. Perfect for creating documentation, study guides, or knowledge bases.
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TailwindCSS 4
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Authentication**: Better Auth with Prisma
+- **Database**: PostgreSQL with Prisma ORM
+- **Deployment**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
+
+```bash
+git clone https://github.com/mtwn105/decipher-research-agent.git
+cd decipher-research-agent/client
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+pnpm install
+```
+
+3. Configure environment variables:
+   Create a `.env` file with the following variables:
+
+```
+DATABASE_URL="postgresql://username:password@localhost:5432/decipher"
+```
+
+4. Set up the database:
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate:dev
+```
+
+5. Run the development server:
 
 ```bash
 npm run dev
 # or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/` - Next.js app directory with page components and API routes
+- `components/` - Reusable UI components
+- `lib/` - Utility functions and shared code
+- `prisma/` - Database schema and migrations
+- `public/` - Static assets
+
+## Contributing
+
+This is an open-source project. Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is open source and available under the MIT license.
+
+## Created By
+
+Made with ❤️ by Amit Wani
 
 ## Learn More
 
