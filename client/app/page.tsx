@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Brain,
   Search,
@@ -18,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import Script from "next/script";
 
 interface Feature {
   name: string;
@@ -83,11 +82,32 @@ const steps: Step[] = [
   },
 ];
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Decipher Research Assistant",
+  applicationCategory: "Research Tool",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  description:
+    "AI-powered research assistant that transforms how you explore information. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
+  featureList: features.map((f) => f.name).join(", "),
+};
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <Header />
-
+      <Script
+        id="ld-json-seo"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       {/* Hero Section */}
       <section className="relative px-4 pt-32 pb-20 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center">
@@ -98,6 +118,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline ml-1"
+              aria-label="Brightdata website"
             >
               Brightdata
             </a>
@@ -129,7 +150,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Features Section */}
       <section
         id="features"
@@ -169,7 +189,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* How it Works Section */}
       <section
         id="how-it-works"
@@ -209,7 +228,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Final CTA Section */}
       <section className="py-24 sm:py-32" aria-labelledby="cta-heading">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -250,7 +268,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
