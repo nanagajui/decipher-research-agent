@@ -133,12 +133,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button size="lg" asChild>
-              <a
-                href="https://github.com/mtwn105/decipher-research-agent"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Get Started with Decipher"
-              >
+              <a href="/auth" aria-label="Get Started with Decipher">
                 Get Started
               </a>
             </Button>
