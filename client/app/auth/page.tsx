@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,6 +23,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -50,6 +53,23 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const router = useRouter();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: session } = await authClient.getSession();
+        if (session) {
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.error("Session check error:", error);
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -72,10 +92,28 @@ export default function AuthPage() {
   const onLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: Implement login logic
-      console.log(values);
-    } catch (error) {
+      const { error } = await authClient.signIn.email({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        toast.error(
+          error.message || "Failed to sign in. Please check your credentials."
+        );
+        return;
+      }
+
+      // Handle successful login
+      toast.success("Successfully signed in!");
+      router.push("/dashboard");
+    } catch (error: unknown) {
       console.error(error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to sign in. Please check your credentials.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -84,10 +122,29 @@ export default function AuthPage() {
   const onSignup = async (values: SignupFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: Implement signup logic
-      console.log(values);
-    } catch (error) {
+      const { error } = await authClient.signUp.email({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+      });
+
+      if (error) {
+        toast.error(
+          error.message || "Failed to create account. Please try again."
+        );
+        return;
+      }
+
+      toast.success("Account created successfully! Please sign in.");
+      setActiveTab("login");
+      signupForm.reset();
+    } catch (error: unknown) {
       console.error(error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create account. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
