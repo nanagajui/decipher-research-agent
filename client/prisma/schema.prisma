@@ -108,15 +108,16 @@ model Notebook {
 }
 
 model NotebookSource {
-  id         String                     @id @default(uuid())
-  notebookId String
-  sourceType NotebookDocumentSourceType
-  sourceUrl  String?
-  filePath   String?
-  filename   String?
-  content    String?                    @db.Text
-  createdAt  DateTime                   @default(now())
-  notebook   Notebook                   @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  id            String                     @id @default(uuid())
+  notebookId    String
+  sourceType    NotebookDocumentSourceType
+  sourceUrl     String?
+  sourceUrlText String?
+  filePath      String?
+  filename      String?
+  content       String?                    @db.Text
+  createdAt     DateTime                   @default(now())
+  notebook      Notebook                   @relation(fields: [notebookId], references: [id], onDelete: Cascade)
 
   @@index([notebookId])
   @@map("notebook_sources")
