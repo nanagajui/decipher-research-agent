@@ -17,6 +17,7 @@ import {
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Script from "next/script";
+import Link from "next/link";
 
 interface Feature {
   name: string;
@@ -113,7 +114,7 @@ export default function Home() {
         <div className="text-center">
           <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-primary/10 text-primary mb-8">
             Powered by{" "}
-            <a
+            <Link
               href="https://brightdata.com/"
               target="_blank"
               rel="noopener noreferrer"
@@ -121,7 +122,7 @@ export default function Home() {
               aria-label="Brightdata website"
             >
               Brightdata
-            </a>
+            </Link>
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
             Research Smarter with <span className="text-primary">Decipher</span>
@@ -133,14 +134,14 @@ export default function Home() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button size="lg" asChild>
-              <a href="/auth" aria-label="Get Started with Decipher">
+              <Link href="/auth" aria-label="Get Started with Decipher">
                 Get Started
-              </a>
+              </Link>
             </Button>
             <Button variant="link" asChild>
-              <a href="#features" aria-label="Learn more about Decipher">
+              <Link href="#features" aria-label="Learn more about Decipher">
                 Learn more →
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
@@ -240,24 +241,24 @@ export default function Home() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button size="lg" asChild>
-                <a
+                <Link
                   href="https://github.com/mtwn105/decipher-research-agent"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Star on GitHub"
                 >
                   Star on GitHub
-                </a>
+                </Link>
               </Button>
               <Button variant="link" asChild>
-                <a
+                <Link
                   href="https://github.com/mtwn105/decipher-research-agent/issues"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Report Issues"
                 >
                   Report Issues →
-                </a>
+                </Link>
               </Button>
             </div>
           </div>
