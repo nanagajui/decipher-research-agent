@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
+import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
 
 const statusConfig = {
   IN_QUEUE: {
@@ -53,6 +54,7 @@ export default async function NotebookPage({
     },
     include: {
       processingStatus: true,
+      sources: true,
     },
   });
 
@@ -86,7 +88,7 @@ export default async function NotebookPage({
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6 pt-0">
-          <div className="space-y-4">
+          <div className="space-y-6">
             {notebook.topic && (
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">
@@ -95,6 +97,7 @@ export default async function NotebookPage({
                 <p className="text-base sm:text-lg">{notebook.topic}</p>
               </div>
             )}
+
             {notebook.processingStatus?.message && (
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">
@@ -105,6 +108,12 @@ export default async function NotebookPage({
                 </p>
               </div>
             )}
+
+            <SourcesWrapper
+              notebookId={notebook.id}
+              initialSources={notebook.sources}
+            />
+
             <div className="text-xs sm:text-sm text-muted-foreground">
               Created on {new Date(notebook.createdAt).toLocaleDateString()}
             </div>

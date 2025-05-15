@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { topic } = await request.json();
+    const { topic, sources } = await request.json();
 
     const notebookCount = await prisma.notebook.count({
       where: {
@@ -67,6 +67,22 @@ export async function POST(request: Request) {
           topic: topic || null,
         },
       });
+
+      // Create sources if provided
+      if (sources && Array.isArray(sources) && sources.length > 0) {
+        await Promise.all(
+          sources.map((source) =>
+            tx.notebookSource.create({
+              data: {
+                notebookId: notebook.id,
+                sourceType: source.sourceType,
+                sourceUrl: source.sourceUrl || null,
+                content: source.content || null,
+              },
+            })
+          )
+        );
+      }
 
       const processingStatus = await tx.notebookProcessingStatus.create({
         data: {
