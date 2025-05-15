@@ -45,13 +45,13 @@ export function HeaderClient() {
         </div>
         <div className="flex gap-x-6">
           <Link
-            href="#features"
+            href="/#features"
             className="text-sm font-semibold leading-6 hover:text-primary"
           >
             Features
           </Link>
           <Link
-            href="#how-it-works"
+            href="/#how-it-works"
             className="text-sm font-semibold leading-6 hover:text-primary"
           >
             How it Works
