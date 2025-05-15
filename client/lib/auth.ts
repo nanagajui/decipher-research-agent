@@ -1,4 +1,4 @@
-
+import { jwt } from "better-auth/plugins"
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@/lib/generated/prisma";
@@ -12,4 +12,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [jwt()],
 });
