@@ -52,3 +52,5 @@ prisma/generated/
 
 # Important: DO NOT ignore migration files as they're needed for production deployments
 !prisma/migrations/
+
+.vscode/

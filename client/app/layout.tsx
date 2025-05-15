@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
-const oxanium = Oxanium();
+const oxanium = Oxanium({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Decipher - AI-Powered Research Assistant",
@@ -51,7 +53,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${oxanium.className} antialiased`}>
         <Header />
-        <main className="min-h-screen pt-20 pb-8">{children}</main>
+        <main className="min-h-screen pt-20">{children}</main>
         <Footer />
         <Toaster />
       </body>
