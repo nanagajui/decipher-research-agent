@@ -14,10 +14,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import Script from "next/script";
 import Link from "next/link";
+import { AuthAwareButton } from "@/components/auth-aware-button";
 
 interface Feature {
   name: string;
@@ -102,7 +101,6 @@ const structuredData = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-      <Header />
       <Script
         id="ld-json-seo"
         type="application/ld+json"
@@ -133,11 +131,7 @@ export default function Home() {
             research, and generate FAQs - all in one powerful platform.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Button size="lg" asChild>
-              <Link href="/auth" aria-label="Get Started with Decipher">
-                Get Started
-              </Link>
-            </Button>
+            <AuthAwareButton />
             <Button variant="link" asChild>
               <Link href="#features" aria-label="Learn more about Decipher">
                 Learn more →
@@ -264,7 +258,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <Footer />
     </div>
   );
 }

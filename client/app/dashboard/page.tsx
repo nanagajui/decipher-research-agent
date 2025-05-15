@@ -9,10 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { LogOut, User } from "lucide-react";
-import { toast } from "sonner";
+import { User } from "lucide-react";
 
 type UserProfile = {
   id: string;
@@ -52,27 +50,6 @@ export default function DashboardPage() {
     fetchUserData();
   }, [router]);
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await authClient.signOut();
-
-      if (error) {
-        toast.error(error.message || "Failed to sign out. Please try again.");
-        return;
-      }
-
-      toast.success("Successfully signed out!");
-      router.push("/auth");
-    } catch (error: unknown) {
-      console.error("Error signing out:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to sign out. Please try again.";
-      toast.error(errorMessage);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -85,10 +62,6 @@ export default function DashboardPage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <Button variant="outline" onClick={handleSignOut}>
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign Out
-        </Button>
       </div>
 
       <Card>

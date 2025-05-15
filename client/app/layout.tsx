@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Oxanium } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 
 const oxanium = Oxanium();
 
@@ -48,7 +50,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${oxanium.className} antialiased`}>
-        {children}
+        <Header />
+        <main className="min-h-screen pt-20 pb-8">{children}</main>
+        <Footer />
         <Toaster />
       </body>
     </html>
