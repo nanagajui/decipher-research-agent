@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Github, LogOut, User } from "lucide-react";
@@ -8,39 +7,9 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-type UserProfile = {
-  id: string;
-  email: string;
-  name?: string;
-};
-
 export function HeaderClient() {
-  const [user, setUser] = useState<UserProfile | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: session, error } = await authClient.getSession();
-
-        if (error || !session) {
-          setUser(null);
-          return;
-        }
-
-        setUser({
-          id: session.user?.id || "",
-          email: session.user?.email || "",
-          name: session.user?.name,
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setUser(null);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const { data: session, isPending } = authClient.useSession();
 
   const handleSignOut = async () => {
     try {
@@ -98,11 +67,13 @@ export function HeaderClient() {
           </Link>
         </div>
         <div className="flex flex-1 justify-end items-center gap-4">
-          {user ? (
+          {isPending ? (
+            <div className="h-8 w-20 animate-pulse bg-muted rounded" />
+          ) : session?.user ? (
             <>
               <div className="flex items-center gap-2 text-sm">
                 <User className="h-4 w-4" />
-                <span>{user.name || user.email}</span>
+                <span>{session.user.name || session.user.email}</span>
               </div>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-2" />
