@@ -78,6 +78,13 @@ model Jwks {
   @@map("jwks")
 }
 
+enum NotebookProcessingStatusValue {
+  IN_QUEUE
+  IN_PROGRESS
+  PROCESSED
+  ERROR
+}
+
 enum NotebookDocumentSourceType {
   UPLOAD
   URL
@@ -85,21 +92,22 @@ enum NotebookDocumentSourceType {
 }
 
 model Notebook {
-  id        String             @id @default(uuid())
-  userId    String
-  title     String?
-  topic     String?
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  documents NotebookDocument[]
-  output    NotebookOutput?
+  id               String                    @id @default(uuid())
+  userId           String
+  title            String?
+  topic            String?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  user             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sources          NotebookSource[]
+  output           NotebookOutput?
+  processingStatus NotebookProcessingStatus?
 
   @@index([userId])
-  @@map("notebook")
+  @@map("notebooks")
 }
 
-model NotebookDocument {
+model NotebookSource {
   id         String                     @id @default(uuid())
   notebookId String
   sourceType NotebookDocumentSourceType
@@ -111,7 +119,7 @@ model NotebookDocument {
   notebook   Notebook                   @relation(fields: [notebookId], references: [id], onDelete: Cascade)
 
   @@index([notebookId])
-  @@map("notebook_document")
+  @@map("notebook_sources")
 }
 
 model NotebookOutput {
@@ -121,5 +129,17 @@ model NotebookOutput {
   createdAt  DateTime @default(now())
   notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
 
-  @@map("notebook_output")
+  @@map("notebook_outputs")
+}
+
+model NotebookProcessingStatus {
+  id         String                        @id @default(cuid())
+  status     NotebookProcessingStatusValue @default(IN_QUEUE)
+  message    String?
+  createdAt  DateTime                      @default(now())
+  updatedAt  DateTime                      @updatedAt
+  notebookId String                        @unique
+  notebook   Notebook                      @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+
+  @@map("notebook_processing_status")
 }

@@ -23,6 +23,9 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        processingStatus: true,
+      },
     });
 
     return NextResponse.json(notebooks);
@@ -56,15 +59,27 @@ export async function POST(request: Request) {
       },
     });
 
-    const notebook = await prisma.notebook.create({
-      data: {
-        userId: session.user.id,
-        title: `New Notebook ${notebookCount + 1}`,
-        topic: topic || null,
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const notebook = await tx.notebook.create({
+        data: {
+          userId: session.user.id,
+          title: `New Notebook ${notebookCount + 1}`,
+          topic: topic || null,
+        },
+      });
+
+      const processingStatus = await tx.notebookProcessingStatus.create({
+        data: {
+          notebookId: notebook.id,
+          status: "IN_QUEUE",
+          message: "Notebook created and queued for processing",
+        },
+      });
+
+      return { notebook, processingStatus };
     });
 
-    return NextResponse.json(notebook);
+    return NextResponse.json(result.notebook);
   } catch (error) {
     console.error("Error creating notebook:", error);
     return NextResponse.json(
