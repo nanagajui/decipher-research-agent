@@ -108,7 +108,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       {/* Hero Section */}
-      <section className="relative px-4 pt-32 pb-20 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section className="relative px-4 pt-24 pb-20 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center">
           <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-primary/10 text-primary mb-8">
             Powered by{" "}

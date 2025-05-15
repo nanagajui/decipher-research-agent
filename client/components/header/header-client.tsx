@@ -1,107 +1,117 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Github, LogOut, User } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { LogOut, Menu, User } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export function HeaderClient() {
   const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
   const handleSignOut = async () => {
     try {
       const { error } = await authClient.signOut();
-
       if (error) {
-        toast.error(error.message || "Failed to sign out. Please try again.");
+        toast.error("Failed to sign out");
         return;
       }
-
-      toast.success("Successfully signed out!");
-      router.push("/auth");
-    } catch (error: unknown) {
-      console.error("Error signing out:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to sign out. Please try again.";
-      toast.error(errorMessage);
+      router.push("/login");
+      router.refresh();
+    } catch {
+      toast.error("Failed to sign out");
     }
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-      <nav
-        className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
-        aria-label="Global"
-      >
-        <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5 text-xl font-bold">
-            Decipher
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <div className="flex h-14 items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="font-bold text-xl">Decipher</span>
           </Link>
-        </div>
-        <div className="flex gap-x-6 items-center">
-          {!isPending && (
-            <>
-              {session?.user ? (
+
+          <nav className="flex items-center gap-4">
+            {session?.user ? (
+              <>
                 <Link
                   href="/dashboard"
-                  className="text-sm font-semibold leading-6 hover:text-primary"
+                  className="text-sm font-medium transition-colors hover:text-primary hidden sm:block"
                 >
                   Dashboard
                 </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/#features"
-                    className="text-sm font-semibold leading-6 hover:text-primary"
+                <div className="hidden sm:flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    {session.user.name || session.user.email}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm font-medium hidden sm:flex"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign out
+                </Button>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="sm:hidden">
+                      <Menu className="h-6 w-6" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent
+                    side="left"
+                    className="w-64 max-w-xs p-6 bg-background shadow-lg"
                   >
-                    Features
-                  </Link>
-                  <Link
-                    href="/#how-it-works"
-                    className="text-sm font-semibold leading-6 hover:text-primary"
-                  >
-                    How it Works
-                  </Link>
-                </>
-              )}
-            </>
-          )}
-          <Link
-            href="https://github.com/mtwn105/decipher-research-agent"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold leading-6 hover:text-primary flex items-center gap-2"
-          >
-            <Github className="h-4 w-4" />
-            GitHub
-          </Link>
-        </div>
-        <div className="flex flex-1 justify-end items-center gap-4">
-          {isPending ? (
-            <div className="h-8 w-20 animate-pulse bg-muted rounded" />
-          ) : session?.user ? (
-            <>
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4" />
-                <span>{session.user.name || session.user.email}</span>
-              </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                    <SheetHeader>
+                      <SheetTitle className="text-lg font-bold">
+                        Menu
+                      </SheetTitle>
+                    </SheetHeader>
+                    <div className="flex flex-col gap-6 mt-6">
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-3 text-base font-medium transition-colors hover:text-primary"
+                      >
+                        Dashboard
+                      </Link>
+                      <div className="flex items-center gap-3 text-base text-muted-foreground">
+                        <User className="h-5 w-5" />
+                        <span>{session.user.name || session.user.email}</span>
+                      </div>
+                      <div className="border-t border-muted my-2" />
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        className="flex items-center gap-3 text-base font-medium justify-start px-0"
+                        onClick={handleSignOut}
+                      >
+                        <LogOut className="h-5 w-5" />
+                        Sign out
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </>
+            ) : (
+              <Button asChild>
+                <Link href="/login">Get Started</Link>
               </Button>
-            </>
-          ) : (
-            <Button asChild>
-              <Link href="/auth">Get Started</Link>
-            </Button>
-          )}
+            )}
+          </nav>
         </div>
-      </nav>
+      </div>
     </header>
   );
 }

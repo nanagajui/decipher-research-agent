@@ -1,14 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -18,11 +25,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
 
 const notebookSchema = z.object({
@@ -32,34 +34,29 @@ const notebookSchema = z.object({
     .max(200, "Topic must be less than 200 characters"),
 });
 
-type NotebookFormValues = z.infer<typeof notebookSchema>;
-
 export function CreateNotebookDialog() {
-  const [open, setOpen] = useState(false);
   const router = useRouter();
-
-  const form = useForm<NotebookFormValues>({
+  const form = useForm<z.infer<typeof notebookSchema>>({
     resolver: zodResolver(notebookSchema),
     defaultValues: {
       topic: "",
     },
   });
 
-  const onSubmit = async (data: NotebookFormValues) => {
+  async function onSubmit(values: z.infer<typeof notebookSchema>) {
     try {
       const response = await fetch("/api/notebooks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(values),
       });
 
       if (!response.ok) {
         throw new Error("Failed to create notebook");
       }
 
-      setOpen(false);
       form.reset();
       toast.success("Notebook created successfully");
       router.push(`/notebook/${await response.json().then((data) => data.id)}`);
@@ -68,19 +65,22 @@ export function CreateNotebookDialog() {
       console.error("Error creating notebook:", error);
       toast.error("Failed to create notebook");
     }
-  };
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
           New Notebook
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Notebook</DialogTitle>
+          <DialogDescription>
+            Enter a topic for your new notebook.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -91,22 +91,30 @@ export function CreateNotebookDialog() {
                 <FormItem>
                   <FormLabel>Topic</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter notebook topic" {...field} />
+                    <Input
+                      placeholder="Enter notebook topic"
+                      {...field}
+                      className="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full sm:w-auto mr-2"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" className="w-full sm:w-auto">
+                Create Notebook
               </Button>
-              <Button type="submit">Create</Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

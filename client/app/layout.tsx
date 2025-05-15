@@ -53,7 +53,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${oxanium.className} antialiased`}>
         <Header />
-        <main className="min-h-screen pt-20">{children}</main>
+        <main className="min-h-screen pt-4">{children}</main>
         <Footer />
         <Toaster />
       </body>

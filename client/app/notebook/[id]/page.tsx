@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
 
 const statusConfig = {
   IN_QUEUE: {
@@ -34,6 +35,9 @@ export default async function NotebookPage({
 }: {
   params: { id: string };
 }) {
+  // Extract id from params at the beginning
+  const { id } = await params;
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -44,7 +48,7 @@ export default async function NotebookPage({
 
   const notebook = await prisma.notebook.findUnique({
     where: {
-      id: params.id,
+      id,
       userId: session.user.id,
     },
     include: {
@@ -61,30 +65,34 @@ export default async function NotebookPage({
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="container mx-auto py-8">
-      <Card className="w-full">
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-2xl">
+    <div className="container mx-auto px-4 py-6 sm:py-8">
+      <Card className="w-full relative group">
+        <NotebookPageDeleteMenu
+          notebookId={notebook.id}
+          className="absolute bottom-4 right-4 z-10"
+        />
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+            <CardTitle className="text-xl sm:text-2xl">
               {notebook.title || "Untitled Notebook"}
             </CardTitle>
             <Badge
               variant={statusInfo.variant}
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 w-fit"
             >
               <StatusIcon className="h-4 w-4" />
               {statusInfo.label}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6 pt-0">
           <div className="space-y-4">
             {notebook.topic && (
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">
                   Topic
                 </h3>
-                <p className="text-lg">{notebook.topic}</p>
+                <p className="text-base sm:text-lg">{notebook.topic}</p>
               </div>
             )}
             {notebook.processingStatus?.message && (
@@ -92,12 +100,12 @@ export default async function NotebookPage({
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">
                   Status Message
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   {notebook.processingStatus.message}
                 </p>
               </div>
             )}
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs sm:text-sm text-muted-foreground">
               Created on {new Date(notebook.createdAt).toLocaleDateString()}
             </div>
           </div>

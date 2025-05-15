@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { NotebookList } from "@/components/notebook/notebook-list";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { NotebookList } from "@/components/notebook/notebook-list";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -9,12 +10,15 @@ export default async function DashboardPage() {
   });
 
   if (!session) {
-    return <div>Not authenticated</div>;
+    redirect("/login");
   }
 
   const notebooks = await prisma.notebook.findMany({
     where: {
       userId: session.user.id,
+    },
+    include: {
+      processingStatus: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -22,12 +26,10 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div className="container mx-auto px-4 py-2 sm:py-4">
+      <div className="max-w-7xl mx-auto">
+        <NotebookList notebooks={notebooks} />
       </div>
-
-      <NotebookList notebooks={notebooks} />
     </div>
   );
 }
