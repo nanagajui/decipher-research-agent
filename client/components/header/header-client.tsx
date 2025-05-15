@@ -43,19 +43,34 @@ export function HeaderClient() {
             Decipher
           </Link>
         </div>
-        <div className="flex gap-x-6">
-          <Link
-            href="/#features"
-            className="text-sm font-semibold leading-6 hover:text-primary"
-          >
-            Features
-          </Link>
-          <Link
-            href="/#how-it-works"
-            className="text-sm font-semibold leading-6 hover:text-primary"
-          >
-            How it Works
-          </Link>
+        <div className="flex gap-x-6 items-center">
+          {!isPending && (
+            <>
+              {session?.user ? (
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-semibold leading-6 hover:text-primary"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/#features"
+                    className="text-sm font-semibold leading-6 hover:text-primary"
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    href="/#how-it-works"
+                    className="text-sm font-semibold leading-6 hover:text-primary"
+                  >
+                    How it Works
+                  </Link>
+                </>
+              )}
+            </>
+          )}
           <Link
             href="https://github.com/mtwn105/decipher-research-agent"
             target="_blank"
