@@ -2,11 +2,19 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  ChevronLeft,
+} from "lucide-react";
 import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
 import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 
 const statusConfig = {
   IN_QUEUE: {
@@ -67,59 +75,81 @@ export default async function NotebookPage({
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8">
-      <Card className="w-full relative group">
-        <NotebookPageDeleteMenu
-          notebookId={notebook.id}
-          className="absolute bottom-4 right-4 z-10"
-        />
-        <CardHeader className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-            <CardTitle className="text-xl sm:text-2xl">
-              {notebook.title || "Untitled Notebook"}
-            </CardTitle>
-            <Badge
-              variant={statusInfo.variant}
-              className="flex items-center gap-1 w-fit"
-            >
-              <StatusIcon className="h-4 w-4" />
-              {statusInfo.label}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 sm:p-6 pt-0">
-          <div className="space-y-6">
-            {notebook.topic && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                  Topic
-                </h3>
-                <p className="text-base sm:text-lg">{notebook.topic}</p>
-              </div>
-            )}
-
-            {notebook.processingStatus?.message && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                  Status Message
-                </h3>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  {notebook.processingStatus.message}
-                </p>
-              </div>
-            )}
-
-            <SourcesWrapper
-              notebookId={notebook.id}
-              initialSources={notebook.sources}
-            />
-
-            <div className="text-xs sm:text-sm text-muted-foreground">
-              Created on {new Date(notebook.createdAt).toLocaleDateString()}
+    <div className="container mx-auto px-4 py-2 sm:py-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="hover:opacity-70">
+              <ChevronLeft size={24} />
+            </Link>
+            <div className="flex flex-grow justify-between items-start gap-2">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {notebook.title || "Untitled Notebook"}
+              </h1>
+              <Badge
+                variant={statusInfo.variant}
+                className="flex items-center w-fit px-4 py-2 text-base font-semibold text-md"
+              >
+                <StatusIcon className="h-6 w-6 mr-1" />
+                {statusInfo.label}
+              </Badge>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          <Card className="w-full relative group">
+            <NotebookPageDeleteMenu
+              notebookId={notebook.id}
+              className="absolute bottom-4 right-4 z-10"
+            />
+
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="space-y-6">
+                {notebook.topic && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                      Topic
+                    </h3>
+                    <p className="text-base sm:text-lg">{notebook.topic}</p>
+                  </div>
+                )}
+
+                {notebook.processingStatus?.message && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                      Status Message
+                    </h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      {notebook.processingStatus.message}
+                    </p>
+                  </div>
+                )}
+
+                <SourcesWrapper
+                  notebookId={notebook.id}
+                  initialSources={notebook.sources}
+                />
+
+                <div className="text-xs sm:text-sm text-muted-foreground space-y-1">
+                  <div>
+                    Created{" "}
+                    {formatDistanceToNow(new Date(notebook.createdAt), {
+                      addSuffix: true,
+                    })}
+                  </div>
+                  {notebook.updatedAt &&
+                    notebook.updatedAt !== notebook.createdAt && (
+                      <div>
+                        Updated{" "}
+                        {formatDistanceToNow(new Date(notebook.updatedAt), {
+                          addSuffix: true,
+                        })}
+                      </div>
+                    )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

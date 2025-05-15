@@ -2,12 +2,24 @@ import { NotebookCard } from "@/components/notebook/notebook-card";
 import { CreateNotebookDialog } from "@/components/notebook/create-notebook-dialog";
 import { BookOpen } from "lucide-react";
 
+type NotebookSource = {
+  id: string;
+  sourceType: string;
+  sourceUrl?: string | null;
+  content?: string | null;
+};
+
 type Notebook = {
   id: string;
   title: string | null;
   topic: string | null;
   createdAt: Date;
   updatedAt: Date;
+  sources?: NotebookSource[];
+  processingStatus?: {
+    status: "IN_QUEUE" | "IN_PROGRESS" | "PROCESSED" | "ERROR";
+    message: string | null;
+  } | null;
 };
 
 type NotebookListProps = {

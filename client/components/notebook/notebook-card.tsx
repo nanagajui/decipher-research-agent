@@ -3,8 +3,21 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  FileText,
+} from "lucide-react";
 import { DeleteNotebookMenu } from "@/components/notebook/delete-notebook-menu";
+
+type NotebookSource = {
+  id: string;
+  sourceType: string;
+  sourceUrl?: string | null;
+  content?: string | null;
+};
 
 type Notebook = {
   id: string;
@@ -12,6 +25,7 @@ type Notebook = {
   topic: string | null;
   createdAt: Date;
   updatedAt: Date;
+  sources?: NotebookSource[];
   processingStatus?: {
     status: "IN_QUEUE" | "IN_PROGRESS" | "PROCESSED" | "ERROR";
     message: string | null;
@@ -82,9 +96,20 @@ export function NotebookCard({ notebook }: NotebookCardProps) {
               {notebook.processingStatus.message}
             </p>
           )}
-          <p className="text-xs text-muted-foreground mt-2">
-            Created on {new Date(notebook.createdAt).toLocaleDateString()}
-          </p>
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-muted-foreground">
+              Created on {new Date(notebook.createdAt).toLocaleDateString()}
+            </p>
+            {notebook.sources && notebook.sources.length > 0 && (
+              <div className="flex items-center text-xs text-muted-foreground gap-1">
+                <FileText className="h-3 w-3" />
+                <span>
+                  {notebook.sources.length} source
+                  {notebook.sources.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+          </div>
         </CardContent>
         <DeleteNotebookMenu
           notebookId={notebook.id}

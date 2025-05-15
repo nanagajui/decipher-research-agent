@@ -68,16 +68,26 @@ export async function PATCH(
         )
       );
 
-      // Update notebook status to IN_QUEUE
-      await tx.notebookProcessingStatus.update({
-        where: {
-          notebookId: id,
-        },
-        data: {
-          status: "IN_QUEUE",
-          message: "Notebook updated and queued for processing",
-        },
-      });
+      // Update notebook status to IN_QUEUE and update the notebook's updatedAt
+      await Promise.all([
+        tx.notebookProcessingStatus.update({
+          where: {
+            notebookId: id,
+          },
+          data: {
+            status: "IN_QUEUE",
+            message: "Notebook updated and queued for processing",
+          },
+        }),
+        tx.notebook.update({
+          where: {
+            id,
+          },
+          data: {
+            updatedAt: new Date(),
+          },
+        }),
+      ]);
 
       return { sources: createdSources };
     });
