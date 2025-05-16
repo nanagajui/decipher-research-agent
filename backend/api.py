@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Optional
 from contextlib import asynccontextmanager
 
-from services import task_manager
+from services import task_manager, initialize_db_pool, close_db_pool
 from models import (
     ResearchRequest,
     TaskResponse,
@@ -25,11 +25,17 @@ router = APIRouter(prefix="/api")
           summary="Submit a new research task",
           description="Submits a topic for research. The task runs in the background.")
 def submit_research_task(request: ResearchRequest):
-    logger.info(f"Submitting research task for topic: {request.topic}")
-    task_id = task_manager.submit_task(request.topic)
+    logger.info(f"Submitting research task for notebook: {request.notebook_id}" +
+               (f" on topic: {request.topic}" if request.topic else ""))
+    task_id = task_manager.submit_task(
+        notebook_id=request.notebook_id,
+        topic=request.topic,
+        sources=request.sources
+    )
     logger.debug(f"Research task submitted with ID: {task_id}")
     return TaskResponse(
         task_id=task_id,
+        notebook_id=request.notebook_id,
         status="queued",
         message="Research task submitted and will be processed."
     )
@@ -75,7 +81,7 @@ def cancel_single_task(task_id: str):
     if success:
         task_info = task_manager.get_task_status(task_id)
         logger.info(f"Task cancelled successfully: {task_id}")
-        return {"task_id": task_id, "status": task_info.get("status"), "message": "Task cancellation processed."}
+        return {"task_id": task_id, "notebook_id": task_info.get("notebook_id"), "status": task_info.get("status"), "message": "Task cancellation processed."}
     else:
         logger.warning(f"Task could not be cancelled: {task_id}")
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
@@ -91,8 +97,18 @@ def health_check():
 async def lifespan(app: FastAPI):
     # Startup logic
     logger.info("API server started")
+
+    # Initialize database connection pool
+    logger.info("Initializing database connection pool")
+    await initialize_db_pool()
+
     yield
+
     # Shutdown logic
+    # Close database connection pool
+    logger.info("Closing database connection pool")
+    await close_db_pool()
+
     logger.info("API server shutting down")
 
 # Create FastAPI app with lifespan

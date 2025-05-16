@@ -16,7 +16,7 @@ class TaskManager:
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
         logger.info(f"TaskManager initialized with {max_workers} workers")
 
-    def _execute_task(self, task_id: str, topic: str):
+    def _execute_task(self, task_id: str, topic: Optional[str], notebook_id: str, sources: Optional[List] = None):
         """Internal method to run the research task and update status."""
         max_retries = 3
         retry_count = 0
@@ -28,7 +28,8 @@ class TaskManager:
                     if retry_count > 0:
                         self._tasks[task_id]["retry_count"] = retry_count
 
-                logger.info(f"Task {task_id} started for topic: {topic}" +
+                logger.info(f"Task {task_id} started for notebook: {notebook_id}" +
+                           (f" on topic: {topic}" if topic else "") +
                            (f" (retry {retry_count}/{max_retries-1})" if retry_count > 0 else ""))
 
                 # Each thread needs its own event loop for asyncio tasks
@@ -37,7 +38,7 @@ class TaskManager:
 
                 # Use loguru's context feature to add task_id to all logs in this thread
                 with logger.contextualize(task_id=task_id):
-                    result = loop.run_until_complete(run_research_crew(topic))
+                    result = loop.run_until_complete(run_research_crew(topic, notebook_id=notebook_id, sources=sources))
 
                 loop.close()
 
@@ -64,12 +65,14 @@ class TaskManager:
                     self._tasks[task_id]["failed_at"] = datetime.now().isoformat()
                 return
 
-    def submit_task(self, topic: str) -> str:
+    def submit_task(self, notebook_id: str, topic: Optional[str] = None, sources: Optional[List] = None) -> str:
         """Submits a new research task and returns its ID."""
         task_id = str(uuid.uuid4())
         with self._lock:
             self._tasks[task_id] = {
+                "notebook_id": notebook_id,
                 "topic": topic,
+                "sources": sources,
                 "status": "queued",
                 "created_at": datetime.now().isoformat(),
                 "result": None,
@@ -77,8 +80,8 @@ class TaskManager:
                 "completed_at": None,
                 "failed_at": None
             }
-        self._executor.submit(self._execute_task, task_id, topic)
-        logger.info(f"Task {task_id} submitted for topic: {topic}")
+        self._executor.submit(self._execute_task, task_id, topic, notebook_id, sources)
+        logger.info(f"Task {task_id} submitted for notebook: {notebook_id}" + (f" on topic: {topic}" if topic else ""))
         return task_id
 
     def get_task_status(self, task_id: str) -> Optional[Dict[str, Any]]:
