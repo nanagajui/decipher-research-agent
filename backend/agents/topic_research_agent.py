@@ -4,9 +4,9 @@ from crewai_tools import MCPServerAdapter
 import os
 import logging
 from datetime import datetime
-
+from models import WebScrapingTaskResult, ResearchTaskResult, BlogTaskResult
 from config import llm, TOPIC_RESEARCH_AGENT_CONFIGS, TOPIC_RESEARCH_TASK_CONFIGS
-
+from typing import List
 server_params = StdioServerParameters(
     command="pnpm",
     args=["dlx", "@brightdata/mcp"],
@@ -26,7 +26,7 @@ async def run_research_crew(topic):
             verbose=True,
             tools=tools,
             llm=llm,
-            max_iterations=50
+            max_iter=50,
         )
 
         researcher = Agent(
@@ -49,7 +49,9 @@ async def run_research_crew(topic):
         web_scraping_task = Task(
             description=TOPIC_RESEARCH_TASK_CONFIGS["web_scraping"]["description"],
             expected_output=TOPIC_RESEARCH_TASK_CONFIGS["web_scraping"]["expected_output"],
-            agent=web_scraper
+            agent=web_scraper,
+            max_retries=5,
+            output_pydantic=WebScrapingTaskResult
         )
 
         research_task = Task(
@@ -57,13 +59,17 @@ async def run_research_crew(topic):
             expected_output=TOPIC_RESEARCH_TASK_CONFIGS["research_analysis"]["expected_output"],
             agent=researcher,
             context=[web_scraping_task],
+            max_retries=5,
+            output_pydantic=ResearchTaskResult
         )
 
         content_task = Task(
             description=TOPIC_RESEARCH_TASK_CONFIGS["content_creation"]["description"],
             expected_output=TOPIC_RESEARCH_TASK_CONFIGS["content_creation"]["expected_output"],
             agent=content_writer,
-            context=[research_task]
+            context=[research_task],
+            max_retries=5,
+            output_pydantic=BlogTaskResult
         )
 
         # Create and run the crew
@@ -79,6 +85,15 @@ async def run_research_crew(topic):
             "current_time": current_time
         })
 
+        # Tasks results
+        web_scraping_result = web_scraping_task.output
+        research_result = research_task.output
+        content_result = content_task.output
+
+        # Log the results
         logging.info(f"Crew result: {result}")
+        logging.info(f"Web scraping result: {web_scraping_result}")
+        logging.info(f"Research result: {research_result}")
+        logging.info(f"Content result: {content_result}")
 
         return result
