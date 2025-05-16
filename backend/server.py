@@ -1,13 +1,12 @@
 import uvicorn
-import logging
 from dotenv import load_dotenv
+from loguru import logger
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Import and setup logging configuration
+from config.logging import setup_logging
+
+# Configure logging with loguru
+setup_logging(console_level="INFO", file_level="DEBUG")
 
 # Load environment variables
 logger.info("Loading environment variables")
@@ -16,6 +15,7 @@ logger.info("Environment variables loaded")
 
 if __name__ == "__main__":
     logger.info("Starting Decipher Research Agent API server")
+    # Note: uvicorn's internal logging will be intercepted by our loguru setup
     uvicorn.run(
         "api:app",
         host="0.0.0.0",

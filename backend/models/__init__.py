@@ -6,8 +6,8 @@ from .task_models import (
     TaskList
 )
 from .topic_research_models import (
-    WebScrapingTaskResult,
-    ResearchTaskResult,
+    # WebScrapingTaskResult,
+    # ResearchTaskResult,
     BlogTaskResult
 )
 
@@ -17,7 +17,7 @@ __all__ = [
     'TaskStatusResponse',
     'TaskListItem',
     'TaskList',
-    'WebScrapingTaskResult',
-    'ResearchTaskResult',
+    # 'WebScrapingTaskResult',
+    # 'ResearchTaskResult',
     'BlogTaskResult'
 ]

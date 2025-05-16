@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Query, Depends, status, APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import logging
+from loguru import logger
 from datetime import datetime
 from typing import Optional
+from contextlib import asynccontextmanager
 
 from services import task_manager
 from models import (
@@ -13,13 +14,6 @@ from models import (
     TaskListItem,
     TaskList
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Create router for API endpoints
 router = APIRouter(prefix="/api")
@@ -31,7 +25,9 @@ router = APIRouter(prefix="/api")
           summary="Submit a new research task",
           description="Submits a topic for research. The task runs in the background.")
 def submit_research_task(request: ResearchRequest):
+    logger.info(f"Submitting research task for topic: {request.topic}")
     task_id = task_manager.submit_task(request.topic)
+    logger.debug(f"Research task submitted with ID: {task_id}")
     return TaskResponse(
         task_id=task_id,
         status="queued",
@@ -43,8 +39,10 @@ def submit_research_task(request: ResearchRequest):
          summary="Get research task status by ID",
          description="Retrieves the status and result (if available) of a specific research task.")
 def get_task_details(task_id: str):
+    logger.debug(f"Getting details for task ID: {task_id}")
     task_info = task_manager.get_task_status(task_id)
     if not task_info:
+        logger.warning(f"Task not found: {task_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found.")
     return TaskStatusResponse(**task_info, task_id=task_id)
 
@@ -55,7 +53,9 @@ def get_task_details(task_id: str):
 def get_all_tasks(
     status_filter: Optional[str] = Query(None, alias="status", description="Filter tasks by status (e.g., queued, running, completed, failed)")
 ):
+    logger.debug(f"Listing all tasks with status filter: {status_filter}")
     all_tasks_details = task_manager.list_all_tasks(filter_status=status_filter)
+    logger.debug(f"Found {len(all_tasks_details)} matching tasks")
     return TaskList(
         tasks=[TaskListItem(**task) for task in all_tasks_details],
         total=len(all_tasks_details)
@@ -66,26 +66,41 @@ def get_all_tasks(
             summary="Cancel a research task",
             description="Attempts to cancel a queued task. Running tasks will be marked for cancellation but may complete.")
 def cancel_single_task(task_id: str):
+    logger.info(f"Attempting to cancel task: {task_id}")
     if not task_manager.get_task_status(task_id):
+         logger.warning(f"Task not found for cancellation: {task_id}")
          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found.")
 
     success = task_manager.cancel_task(task_id)
     if success:
         task_info = task_manager.get_task_status(task_id)
+        logger.info(f"Task cancelled successfully: {task_id}")
         return {"task_id": task_id, "status": task_info.get("status"), "message": "Task cancellation processed."}
     else:
+        logger.warning(f"Task could not be cancelled: {task_id}")
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail="Task cannot be cancelled (e.g., already completed or failed).")
 
 @router.get("/health", summary="API Health Check")
 def health_check():
+    logger.debug("Health check requested")
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
-# Create FastAPI app
+# Define lifespan context manager for startup/shutdown events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
+    logger.info("API server started")
+    yield
+    # Shutdown logic
+    logger.info("API server shutting down")
+
+# Create FastAPI app with lifespan
 app = FastAPI(
     title="Decipher Research Agent",
     description="API for running intelligent research agents in the background",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # Add CORS middleware (adjust origins for production)
