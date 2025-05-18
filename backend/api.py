@@ -24,7 +24,6 @@ async def submit_research_task(request: ResearchRequest):
     logger.info(f"Submitting research task for notebook: {request.notebook_id}" +
                (f" on topic: {request.topic}" if request.topic else ""))
 
-    # Use the async version to avoid event loop conflicts
     task_id = await task_manager.submit_task_async(
         notebook_id=request.notebook_id,
         topic=request.topic,

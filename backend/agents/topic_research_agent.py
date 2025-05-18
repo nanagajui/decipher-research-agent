@@ -2,7 +2,7 @@ from crewai import Agent, Crew, Task, Process
 from mcp import StdioServerParameters
 from crewai_tools import MCPServerAdapter
 import os
-import logging
+from loguru import logger
 from datetime import datetime
 import time
 from models.topic_research_models import WebScrapingPlannerTaskResult, WebScrapingLinkCollectorTaskResult, WebLink
@@ -21,7 +21,7 @@ async def run_research_crew(topic: str):
     with MCPServerAdapter(server_params) as tools:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        logging.info(f"Tools: {tools}")
+        logger.info(f"Tools: {tools}")
 
         web_scraping_link_collector_tools = [
             "search_engine",
@@ -166,20 +166,20 @@ async def run_research_crew(topic: str):
             "current_time": current_time
         })
 
-        logging.info(f"Planning crew result: {planning_crew_result}")
+        logger.info(f"Planning crew result: {planning_crew_result}")
 
         search_queries = planning_crew_result["search_queries"]
 
-        logging.info(f"Search queries: {search_queries}")
+        logger.info(f"Search queries: {search_queries}")
 
         scraped_data = []
         links: List[WebLink] = []
 
-        logging.info(f"Running web scraping link collector crew for {len(search_queries)} search queries")
+        logger.info(f"Running web scraping link collector crew for {len(search_queries)} search queries")
 
         for search_query in search_queries:
 
-            logging.info(f"Running web scraping link collector crew for search query {search_query}")
+            logger.info(f"Running web scraping link collector crew for search query {search_query}")
 
             web_scraping_link_collector_crew_result = await web_scraping_link_collector_crew.kickoff_async(inputs={
                 "topic": topic,
@@ -187,7 +187,7 @@ async def run_research_crew(topic: str):
                 "current_time": current_time,
             })
 
-            logging.info(f"Web scraping link collector crew result for search query {search_query}: {web_scraping_link_collector_crew_result}")
+            logger.info(f"Web scraping link collector crew result for search query {search_query}: {web_scraping_link_collector_crew_result}")
 
             links = web_scraping_link_collector_crew_result["links"]
 
@@ -195,9 +195,9 @@ async def run_research_crew(topic: str):
                 if link.url not in [l.url for l in links]:
                     links.append(link)
 
-        logging.info(f"Unique Links Collected: {links}")
+        logger.info(f"Unique Links Collected: {links}")
 
-        logging.info(f"Running web scraping crew for {len(links)} links")
+        logger.info(f"Running web scraping crew for {len(links)} links")
 
         for link in links:
             web_scraping_crew_result = await web_scraping_crew.kickoff_async(inputs={
@@ -206,7 +206,7 @@ async def run_research_crew(topic: str):
                 "current_time": current_time,
             })
 
-            logging.info(f"Web scraping crew result for link {link}: {web_scraping_crew_result}")
+            logger.info(f"Web scraping crew result for link {link}: {web_scraping_crew_result}")
 
             scraped_data.append({
                 "url": link.url,
@@ -214,7 +214,7 @@ async def run_research_crew(topic: str):
                 "content": web_scraping_crew_result.raw
             })
 
-        logging.info(f"Scraped data: {scraped_data}")
+        logger.info(f"Scraped data: {scraped_data}")
 
         research_content_crew_result = await research_content_crew.kickoff_async(inputs={
             "topic": topic,
@@ -222,9 +222,9 @@ async def run_research_crew(topic: str):
             "current_time": current_time,
         })
 
-        logging.info(f"Research and content creation crew result: {research_content_crew_result}")
+        logger.info(f"Research and content creation crew result: {research_content_crew_result}")
 
-        logging.info(f"Time taken: {round(time.time() - start_time, 2)} seconds")
+        logger.info(f"Time taken: {round(time.time() - start_time, 2)} seconds")
 
         return {
             "blog_post": research_content_crew_result.raw,
