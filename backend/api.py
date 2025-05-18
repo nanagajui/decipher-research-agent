@@ -1,18 +1,14 @@
-from fastapi import FastAPI, HTTPException, Query, Depends, status, APIRouter
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from datetime import datetime
-from typing import Optional
 from contextlib import asynccontextmanager
 
 from services import task_manager, initialize_db_pool, close_db_pool
-from models import (
+from models.task_models import (
     ResearchRequest,
     TaskResponse,
-    TaskStatusResponse,
-    TaskListItem,
-    TaskList
+    TaskStatusResponse
 )
 
 # Create router for API endpoints
@@ -24,14 +20,17 @@ router = APIRouter(prefix="/api")
           status_code=status.HTTP_202_ACCEPTED,
           summary="Submit a new research task",
           description="Submits a topic for research. The task runs in the background.")
-def submit_research_task(request: ResearchRequest):
+async def submit_research_task(request: ResearchRequest):
     logger.info(f"Submitting research task for notebook: {request.notebook_id}" +
                (f" on topic: {request.topic}" if request.topic else ""))
-    task_id = task_manager.submit_task(
+
+    # Use the async version to avoid event loop conflicts
+    task_id = await task_manager.submit_task_async(
         notebook_id=request.notebook_id,
         topic=request.topic,
         sources=request.sources
     )
+
     logger.debug(f"Research task submitted with ID: {task_id}")
     return TaskResponse(
         task_id=task_id,
@@ -44,51 +43,19 @@ def submit_research_task(request: ResearchRequest):
          response_model=TaskStatusResponse,
          summary="Get research task status by ID",
          description="Retrieves the status and result (if available) of a specific research task.")
-def get_task_details(task_id: str):
+async def get_task_details(task_id: str):
     logger.debug(f"Getting details for task ID: {task_id}")
-    task_info = task_manager.get_task_status(task_id)
+
+    # Use the async version to avoid event loop conflicts
+    task_info = await task_manager.get_task_status_async(task_id)
+
     if not task_info:
         logger.warning(f"Task not found: {task_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found.")
     return TaskStatusResponse(**task_info, task_id=task_id)
 
-@router.get("/tasks",
-         response_model=TaskList,
-         summary="List all research tasks",
-         description="Retrieves a list of all submitted tasks, optionally filtered by status.")
-def get_all_tasks(
-    status_filter: Optional[str] = Query(None, alias="status", description="Filter tasks by status (e.g., queued, running, completed, failed)")
-):
-    logger.debug(f"Listing all tasks with status filter: {status_filter}")
-    all_tasks_details = task_manager.list_all_tasks(filter_status=status_filter)
-    logger.debug(f"Found {len(all_tasks_details)} matching tasks")
-    return TaskList(
-        tasks=[TaskListItem(**task) for task in all_tasks_details],
-        total=len(all_tasks_details)
-    )
-
-@router.delete("/research/{task_id}",
-            status_code=status.HTTP_200_OK,
-            summary="Cancel a research task",
-            description="Attempts to cancel a queued task. Running tasks will be marked for cancellation but may complete.")
-def cancel_single_task(task_id: str):
-    logger.info(f"Attempting to cancel task: {task_id}")
-    if not task_manager.get_task_status(task_id):
-         logger.warning(f"Task not found for cancellation: {task_id}")
-         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found.")
-
-    success = task_manager.cancel_task(task_id)
-    if success:
-        task_info = task_manager.get_task_status(task_id)
-        logger.info(f"Task cancelled successfully: {task_id}")
-        return {"task_id": task_id, "notebook_id": task_info.get("notebook_id"), "status": task_info.get("status"), "message": "Task cancellation processed."}
-    else:
-        logger.warning(f"Task could not be cancelled: {task_id}")
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail="Task cannot be cancelled (e.g., already completed or failed).")
-
 @router.get("/health", summary="API Health Check")
-def health_check():
+async def health_check():
     logger.debug("Health check requested")
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
@@ -101,6 +68,17 @@ async def lifespan(app: FastAPI):
     # Initialize database connection pool
     logger.info("Initializing database connection pool")
     await initialize_db_pool()
+
+    # Create tables if they don't exist
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from services.db_service import DATABASE_URL
+    from models.db import Base
+
+    engine = create_async_engine(DATABASE_URL)
+    async with engine.begin() as conn:
+        logger.info("Creating database tables if they don't exist")
+        await conn.run_sync(Base.metadata.create_all)
+    await engine.dispose()
 
     yield
 

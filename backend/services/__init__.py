@@ -1,17 +1,30 @@
 from .task_service import task_manager
-from models import (
+from models.task_models import (
     ResearchRequest,
     TaskResponse,
     TaskStatusResponse,
     TaskListItem,
     TaskList
 )
+from .db_service import (
+    initialize_db_pool,
+    close_db_pool,
+    get_db_session,
+    execute_query
+)
+from .task_repository import task_repository
 
 __all__ = [
     'task_manager',
+    'task_repository',
     'ResearchRequest',
     'TaskResponse',
     'TaskStatusResponse',
     'TaskListItem',
-    'TaskList'
+    'TaskList',
+    # Database service
+    'initialize_db_pool',
+    'close_db_pool',
+    'get_db_session',
+    'execute_query'
 ]
