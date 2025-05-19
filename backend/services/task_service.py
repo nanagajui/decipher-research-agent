@@ -5,7 +5,9 @@ from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 
 from agents.topic_research_agent import run_research_crew
+from models.db import NotebookProcessingStatusValue
 from .task_repository import task_repository
+from .notebook_repository import notebook_repository
 
 class TaskManager:
     def __init__(self, max_workers=5):
@@ -18,6 +20,13 @@ class TaskManager:
         """Internal method to run the research task and update status."""
         max_retries = 1
         retry_count = 0
+
+        # Update notebook status to IN_PROGRESS
+        await notebook_repository.update_notebook_status(
+            notebook_id,
+            NotebookProcessingStatusValue.IN_PROGRESS,
+            "Research task started"
+        )
 
         while retry_count < max_retries:
             try:
@@ -34,6 +43,24 @@ class TaskManager:
 
                 # Update task as completed with result
                 await task_repository.update_task_result(task_id, result, "completed")
+
+                # Save research result to notebook output
+                if result and isinstance(result, dict) and "blog_post" in result:
+                    await notebook_repository.save_notebook_output(notebook_id, result["blog_post"])
+                elif result and isinstance(result, str):
+                    # Handle case where result is a string
+                    await notebook_repository.save_notebook_output(notebook_id, result)
+                elif result:
+                    # Fallback: convert result to string if it's not in expected format
+                    await notebook_repository.save_notebook_output(notebook_id, str(result))
+
+                # Update notebook status to PROCESSED
+                await notebook_repository.update_notebook_status(
+                    notebook_id,
+                    NotebookProcessingStatusValue.PROCESSED,
+                    "Research completed successfully"
+                )
+
                 logger.success(f"Task {task_id} completed successfully")
                 return  # Exit function on success
 
@@ -49,6 +76,13 @@ class TaskManager:
 
                 # Update task as failed with error
                 await task_repository.update_task_error(task_id, str(e))
+
+                # Update notebook status to ERROR
+                await notebook_repository.update_notebook_status(
+                    notebook_id,
+                    NotebookProcessingStatusValue.ERROR,
+                    f"Research failed. Please try again."
+                )
                 return
 
     async def submit_task_async(self, notebook_id: str, topic: Optional[str] = None, sources: Optional[List] = None) -> str:

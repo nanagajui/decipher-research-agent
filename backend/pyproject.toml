@@ -9,6 +9,7 @@ dependencies = [
     "crewai>=0.120.1",
     "crewai-tools[mcp]>=0.45.0",
     "fastapi>=0.115.12",
+    "langtrace-python-sdk>=3.8.18",
     "loguru>=0.7.3",
     "pydantic>=2.11.4",
     "python-dotenv>=1.1.0",

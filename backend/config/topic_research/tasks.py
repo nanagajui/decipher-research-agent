@@ -154,7 +154,17 @@ TASK_CONFIGS = {
            When citing sources use:
            > "Quote text" - [Source Title](url)
 
+        4. **Output Format**
+           - JSON object with the following keys:
+             - "blog_post": the blog post in markdown format without '```' or '```markdown'
+             - "title": the title of the blog post
+           - Output should be well-structured, engaging long blog post that effectively communicates the research findings with proper citations
+           - The output should be a JSON object with the following keys: 'blog_post' and 'title'
+           - The 'blog_post' should be in markdown format without '```' or '```markdown'
+           - The 'title' should be a string
+           - JSON object should be formatted as a JSON object without '```' or '```json'
+
         Today's date and time is {current_time}""",
-        "expected_output": "A well-structured, engaging long blog post that effectively communicates the research findings with proper citations in markdown format without '```' or '```markdown'. The content should be organized into logical sections based on the research material, with clear attribution of sources throughout."
+        "expected_output": "A well-structured, engaging long blog post that effectively communicates the research findings with proper citations in markdown format without '```' or '```markdown'. The content should be organized into logical sections based on the research material, with clear attribution of sources throughout. The output should be a JSON object with the following keys: 'blog_post' and 'title'. The JSON object should be formatted as a JSON object without '```' or '```json'"
     }
 }

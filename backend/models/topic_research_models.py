@@ -11,6 +11,11 @@ class WebScrapingPlannerTaskResult(BaseModel):
 class WebScrapingLinkCollectorTaskResult(BaseModel):
     links: List[WebLink] = Field(description="A list of links that were collected from the web.")
 
+class BlogPostTaskResult(BaseModel):
+    blog_post: str
+    title: str
+
+
 # class WebScrapingTaskSingleResult(BaseModel):
 #     source: WebSource = Field(description="The source of the web page that was scraped.")
 #     content: str = Field(description="The content of the web page that was scraped.")

@@ -68,17 +68,6 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database connection pool")
     await initialize_db_pool()
 
-    # Create tables if they don't exist
-    from sqlalchemy.ext.asyncio import create_async_engine
-    from services.db_service import DATABASE_URL
-    from models.db import Base
-
-    engine = create_async_engine(DATABASE_URL)
-    async with engine.begin() as conn:
-        logger.info("Creating database tables if they don't exist")
-        await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
-
     yield
 
     # Shutdown logic
