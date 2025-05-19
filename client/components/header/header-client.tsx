@@ -25,7 +25,7 @@ export function HeaderClient() {
         toast.error("Failed to sign out");
         return;
       }
-      router.push("/login");
+      router.push("/auth");
       router.refresh();
     } catch {
       toast.error("Failed to sign out");
@@ -106,7 +106,7 @@ export function HeaderClient() {
               </>
             ) : (
               <Button asChild>
-                <Link href="/login">Get Started</Link>
+                <Link href="/auth">Get Started</Link>
               </Button>
             )}
           </nav>

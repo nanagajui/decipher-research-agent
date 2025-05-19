@@ -95,6 +95,40 @@ export async function POST(request: Request) {
       return { notebook, processingStatus };
     });
 
+    // Call the research API
+    if (result.notebook && result.notebook.topic) {
+      try {
+        const researchApiUrl = process.env.BACKEND_API_URL;
+        const researchApiResponse = await fetch(`${researchApiUrl}/api/research`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            topic: result.notebook.topic,
+            notebook_id: result.notebook.id,
+          }),
+        });
+
+        if (!researchApiResponse.ok) {
+          throw new Error(`Research API call failed with status: ${researchApiResponse.status}`);
+        }
+
+      } catch (researchApiError) {
+        console.error("Error calling research API or BACKEND_API_URL not set:", researchApiError);
+
+        await prisma.notebook.delete({
+          where: { id: result.notebook.id },
+        });
+        console.log(`Successfully deleted notebook ${result.notebook.id} after research API failure.`);
+
+        return NextResponse.json(
+          { error: "Notebook creation failed. Please try again." },
+          { status: 500 }
+        );
+      }
+    }
+
     return NextResponse.json(result.notebook);
   } catch (error) {
     console.error("Error creating notebook:", error);

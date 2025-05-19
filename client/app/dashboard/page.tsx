@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/auth");
   }
 
   const notebooks = await prisma.notebook.findMany({

@@ -33,11 +33,13 @@ export type NotebookSource = {
 type EditNotebookSourcesProps = {
   notebookId: string;
   initialSources: NotebookSource[];
+  disabled?: boolean;
 };
 
 export function EditNotebookSources({
   notebookId,
   initialSources,
+  disabled = false,
 }: EditNotebookSourcesProps) {
   const router = useRouter();
   const [sources, setSources] = useState<NotebookSource[]>(initialSources);
@@ -139,6 +141,7 @@ export function EditNotebookSources({
             variant="outline"
             size="sm"
             onClick={() => setIsEditing(true)}
+            disabled={disabled}
           >
             Edit Sources
           </Button>

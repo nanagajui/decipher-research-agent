@@ -15,6 +15,9 @@ import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-dele
 import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { MarkdownComponents } from "@/components/ui/markdown-components";
 
 const statusConfig = {
   IN_QUEUE: {
@@ -52,7 +55,7 @@ export default async function NotebookPage({
   });
 
   if (!session) {
-    redirect("/login");
+    redirect("/auth");
   }
 
   const notebook = await prisma.notebook.findUnique({
@@ -63,6 +66,7 @@ export default async function NotebookPage({
     include: {
       processingStatus: true,
       sources: true,
+      output: true,
     },
   });
 
@@ -73,6 +77,7 @@ export default async function NotebookPage({
   const status = notebook.processingStatus?.status || "IN_QUEUE";
   const statusInfo = statusConfig[status];
   const StatusIcon = statusInfo.icon;
+  const isProcessing = status === "IN_QUEUE" || status === "IN_PROGRESS";
 
   return (
     <div className="container mx-auto px-4 py-2 sm:py-4">
@@ -99,6 +104,7 @@ export default async function NotebookPage({
             <NotebookPageDeleteMenu
               notebookId={notebook.id}
               className="absolute bottom-4 right-4 z-10"
+              disabled={isProcessing}
             />
 
             <CardContent className="p-4 sm:p-6 pt-0">
@@ -126,6 +132,7 @@ export default async function NotebookPage({
                 <SourcesWrapper
                   notebookId={notebook.id}
                   initialSources={notebook.sources}
+                  disabled={isProcessing}
                 />
 
                 <div className="text-xs sm:text-sm text-muted-foreground space-y-1">
@@ -148,6 +155,24 @@ export default async function NotebookPage({
               </div>
             </CardContent>
           </Card>
+
+          {notebook.output?.summary && (
+            <Card className="w-full">
+              <CardContent className="p-4 sm:p-6">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 text-primary">
+                  Deciphered Summary
+                </h2>
+                <div className="markdown-container">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={MarkdownComponents}
+                  >
+                    {notebook.output.summary}
+                  </ReactMarkdown>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

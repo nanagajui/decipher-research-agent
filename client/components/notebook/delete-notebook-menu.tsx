@@ -22,11 +22,13 @@ import { toast } from "sonner";
 interface DeleteNotebookMenuProps {
   notebookId: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function DeleteNotebookMenu({
   notebookId,
   className,
+  disabled = false,
 }: DeleteNotebookMenuProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -67,6 +69,7 @@ export function DeleteNotebookMenu({
             variant="ghost"
             size="icon"
             className="h-7 w-7 p-0 opacity-70 group-hover:opacity-100"
+            disabled={disabled}
           >
             <MoreVertical className="h-4 w-4" />
           </Button>
@@ -78,6 +81,7 @@ export function DeleteNotebookMenu({
               setShowDialog(true);
             }}
             className="text-destructive"
+            disabled={disabled}
           >
             Delete
           </DropdownMenuItem>
