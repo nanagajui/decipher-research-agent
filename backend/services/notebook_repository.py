@@ -119,5 +119,50 @@ class NotebookRepository:
 
             return notebook.to_dict()
 
+    async def update_notebook(
+        self,
+        notebook_id: str,
+        title: Optional[str] = None,
+        topic: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Update an existing notebook.
+
+        Args:
+            notebook_id: The ID of the notebook to update.
+            title: Optional new title for the notebook.
+            topic: Optional new topic for the notebook.
+
+        Returns:
+            A dictionary representation of the updated notebook, or None if not found.
+        """
+        async with get_db_session() as session:
+            stmt = select(Notebook).where(Notebook.id == notebook_id)
+            result = await session.execute(stmt)
+            notebook = result.scalar_one_or_none()
+
+            if not notebook:
+                logger.warning(f"Notebook with ID {notebook_id} not found for update.")
+                return None
+
+            updated_fields = False
+            if title is not None:
+                notebook.title = title
+                updated_fields = True
+
+            if topic is not None:
+                notebook.topic = topic
+                updated_fields = True
+
+            if updated_fields:
+                notebook.updated_at = datetime.now() # Manually update timestamp as onupdate might not trigger for all ORM scenarios
+                await session.commit()
+                await session.refresh(notebook)
+                logger.info(f"Updated notebook with ID: {notebook.id}")
+            else:
+                logger.info(f"No fields to update for notebook with ID: {notebook.id}")
+
+            return notebook.to_dict()
+
 # Singleton instance
 notebook_repository = NotebookRepository()

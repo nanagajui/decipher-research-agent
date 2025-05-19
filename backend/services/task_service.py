@@ -4,7 +4,7 @@ from typing import Dict, Optional, List, Any
 from concurrent.futures import ThreadPoolExecutor
 from loguru import logger
 
-from agents.topic_research_agent import run_research_crew
+from agents import topic_research_agent
 from models.db import NotebookProcessingStatusValue
 from .task_repository import task_repository
 from .notebook_repository import notebook_repository
@@ -39,7 +39,7 @@ class TaskManager:
 
                 # Use loguru's context feature to add task_id to all logs in this thread
                 with logger.contextualize(task_id=task_id):
-                    result = await run_research_crew(topic)
+                    result = await topic_research_agent.run_research_crew(topic)
 
                 # Update task as completed with result
                 await task_repository.update_task_result(task_id, result, "completed")
@@ -59,6 +59,17 @@ class TaskManager:
                     notebook_id,
                     NotebookProcessingStatusValue.PROCESSED,
                     "Research completed successfully"
+                )
+
+                title = None
+                if result and isinstance(result, dict) and "title" in result:
+                    title = result["title"]
+
+                # Update notebook title and topic
+                await notebook_repository.update_notebook(
+                    notebook_id,
+                    title=title,
+                    topic=topic
                 )
 
                 logger.success(f"Task {task_id} completed successfully")
