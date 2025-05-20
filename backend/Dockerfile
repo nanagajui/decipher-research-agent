@@ -13,15 +13,17 @@ RUN uv pip install --system -e .
 # Final image - ultra slim
 FROM python:3.12-slim-bookworm
 
-# Install runtime dependencies, Node.js and PNPM
+# Install runtime dependencies, Node.js, PNPM and PostgreSQL client libraries
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl && \
+    apt-get install -y --no-install-recommends ca-certificates curl \
+    libpq-dev postgresql-client && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     npm install -g pnpm && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    npm cache clean --force
+    npm cache clean --force && \
+    pip install --no-cache-dir psycopg2-binary
 
 # Copy Python packages from the builder stage
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
