@@ -53,7 +53,7 @@ class TaskManager:
                         try:
                             # Save sources in Qdrant
                             logger.info(f"Embedding blog post for notebook: {notebook_id}")
-                            qdrant_service.add_source(
+                            await qdrant_service.add_source(
                                 content=result["blog_post"],
                                 notebook_id=notebook_id,
                                 metadata={
@@ -63,7 +63,7 @@ class TaskManager:
 
                             logger.info(f"Embedding scraped data for notebook: {notebook_id}")
                             for source in result["scraped_data"]:
-                                qdrant_service.add_source(
+                                await qdrant_service.add_source(
                                     content=source["content"],
                                     notebook_id=notebook_id,
                                     metadata={

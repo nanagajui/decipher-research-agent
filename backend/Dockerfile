@@ -1,29 +1,44 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+FROM python:3.12-slim-bookworm AS builder
 
-# Enable bytecode compilation
-ENV UV_COMPILE_BYTECODE=1
+# Install uv
+RUN pip install --no-cache-dir uv
 
-# Copy from the cache instead of linking since it's a mounted volume
-ENV UV_LINK_MODE=copy
+# Copy dependency files
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
 
-# Install Node.js (using the NodeSource repository for a more recent version)
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && \
+# Install dependencies into the system Python
+RUN uv pip install --system -e .
+
+# Final image - ultra slim
+FROM python:3.12-slim-bookworm
+
+# Install runtime dependencies, Node.js and PNPM
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates curl && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
+    apt-get install -y --no-install-recommends nodejs && \
     npm install -g pnpm && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    npm cache clean --force
 
-# Copy the project into the image
-ADD . /app
+# Copy Python packages from the builder stage
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
-# Sync the project into a new environment, asserting the lockfile is up to date
+# Copy application code (only what's needed)
 WORKDIR /app
-RUN uv sync --locked
+COPY app/ app/
+COPY agents/ agents/
+COPY config/ config/
+COPY models/ models/
+COPY routers/ routers/
+COPY services/ services/
+COPY api.py server.py ./
 
-# Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
+# Create log directory with appropriate permissions
+RUN mkdir -p logs && chmod 777 logs
 
 EXPOSE 8001
 
-CMD ["uv", "run", "server.py"]
+CMD ["python", "server.py"]

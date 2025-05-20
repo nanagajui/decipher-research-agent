@@ -8,7 +8,7 @@ import time
 from models.topic_research_models import WebScrapingPlannerTaskResult, WebScrapingLinkCollectorTaskResult, WebLink, BlogPostTaskResult
 from typing import List
 from config import llm, TOPIC_RESEARCH_AGENT_CONFIGS, TOPIC_RESEARCH_TASK_CONFIGS
-
+import asyncio
 server_params = StdioServerParameters(
     command="pnpm",
     args=["dlx", "@brightdata/mcp"],
@@ -175,21 +175,27 @@ async def run_research_crew(topic: str):
 
             logger.info(f"Running web scraping link collector crew for {len(search_queries)} search queries")
 
+            # Create tasks for parallel execution
+            link_collector_tasks = []
             for search_query in search_queries:
+                logger.info(f"Creating task for search query {search_query}")
+                link_collector_tasks.append(
+                    web_scraping_link_collector_crew.kickoff_async(inputs={
+                        "topic": topic,
+                        "search_query": search_query,
+                        "current_time": current_time,
+                    })
+                )
 
-                logger.info(f"Running web scraping link collector crew for search query {search_query}")
+            # Execute all tasks in parallel
+            link_collector_results = await asyncio.gather(*link_collector_tasks)
 
-                web_scraping_link_collector_crew_result = await web_scraping_link_collector_crew.kickoff_async(inputs={
-                    "topic": topic,
-                    "search_query": search_query,
-                    "current_time": current_time,
-                })
-
-                logger.info(f"Web scraping link collector crew result for search query {search_query}: {web_scraping_link_collector_crew_result}")
-
-                links = web_scraping_link_collector_crew_result["links"]
-
-                for link in links:
+            # Process results and collect unique links
+            links = []
+            for result in link_collector_results:
+                logger.info(f"Processing link collector result: {result}")
+                result_links = result["links"]
+                for link in result_links:
                     if link.url not in [l.url for l in links]:
                         links.append(link)
 
@@ -197,19 +203,27 @@ async def run_research_crew(topic: str):
 
             logger.info(f"Running web scraping crew for {len(links)} links")
 
+            # Create tasks for parallel web scraping
+            web_scraping_tasks = []
             for link in links:
-                web_scraping_crew_result = await web_scraping_crew.kickoff_async(inputs={
-                    "topic": topic,
-                    "url": link.url,
-                    "current_time": current_time,
-                })
+                web_scraping_tasks.append(
+                    web_scraping_crew.kickoff_async(inputs={
+                        "topic": topic,
+                        "url": link.url,
+                        "current_time": current_time,
+                    })
+                )
 
-                logger.info(f"Web scraping crew result for link {link}: {web_scraping_crew_result}")
+            # Execute all web scraping tasks in parallel
+            web_scraping_results = await asyncio.gather(*web_scraping_tasks)
 
+            # Process results and collect scraped data
+            for link, result in zip(links, web_scraping_results):
+                logger.info(f"Web scraping crew result for link {link}: {result}")
                 scraped_data.append({
                     "url": link.url,
                     "page_title": link.title,
-                    "content": web_scraping_crew_result.raw
+                    "content": result.raw
                 })
 
             logger.info(f"Scraped data: {scraped_data}")
