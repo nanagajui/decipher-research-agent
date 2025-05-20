@@ -23,13 +23,11 @@ async def receive_chat_message(chat_input: ChatMessageInput):
     try:
         logger.info(f"Received chat message for notebook: {chat_input.notebook_id}")
 
-        await run_chat_agent(chat_input.notebook_id, chat_input.messages)
+        response = await run_chat_agent(chat_input.notebook_id, chat_input.messages)
 
         return {
             "status": "success",
-            "message": "Chat message received",
-            "timestamp": datetime.now().isoformat(),
-            "notebook_id": chat_input.notebook_id
+            "response": response,
         }
     except Exception as e:
         logger.opt(exception=e).error(f"Error processing chat message: {str(e)}")
