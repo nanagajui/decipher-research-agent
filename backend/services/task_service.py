@@ -6,7 +6,7 @@ from agents import topic_research_agent
 from models.db import NotebookProcessingStatusValue
 from .task_repository import task_repository
 from .notebook_repository import notebook_repository
-
+from .qdrant_service import qdrant_service
 class TaskManager:
 
     async def _execute_task(self, task_id: str, topic: Optional[str], notebook_id: str, sources: Optional[List] = None):
@@ -35,20 +35,46 @@ class TaskManager:
                         return
                     elif topic and topic != "" and (not sources or len(sources) == 0):
                         # Run topic research agent
+                        logger.info(f"Running topic research agent for topic: {topic}")
                         result = await topic_research_agent.run_research_crew(topic)
                         # Save notebook output
+                        logger.info(f"Saving notebook output for notebook: {notebook_id}")
                         await notebook_repository.save_notebook_output(notebook_id, result["blog_post"])
 
-                        # # Save sources
-                        # await notebook_repository.save_notebook_sources(notebook_id, result["scraped_data"])
-
                         # Update notebook title and topic
+                        logger.info(f"Updating notebook title and topic for notebook: {notebook_id}")
                         title = result["title"]
                         await notebook_repository.update_notebook(
                             notebook_id,
                             title=title,
                             topic=topic
                         )
+
+                        try:
+                            # Save sources in Qdrant
+                            logger.info(f"Embedding blog post for notebook: {notebook_id}")
+                            qdrant_service.add_source(
+                                content=result["blog_post"],
+                                notebook_id=notebook_id,
+                                metadata={
+                                    "title": result["title"],
+                                }
+                            )
+
+                            logger.info(f"Embedding scraped data for notebook: {notebook_id}")
+                            for source in result["scraped_data"]:
+                                qdrant_service.add_source(
+                                    content=source["content"],
+                                    notebook_id=notebook_id,
+                                    metadata={
+                                        "url": source["url"],
+                                        "page_title": source["page_title"],
+                                    }
+                                )
+                        except Exception as e:
+                            logger.error(f"Error embedding sources for notebook: {notebook_id}")
+                            logger.error(e)
+
                     elif  sources and len(sources) > 0:
                         logger.error("Sources research not implemented yet")
                         return

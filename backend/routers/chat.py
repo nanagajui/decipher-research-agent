@@ -29,6 +29,15 @@ async def receive_chat_message(chat_input: ChatMessageInput):
     try:
         logger.info(f"Received chat message for notebook: {chat_input.notebook_id}")
 
+        results = qdrant_service.search(
+            query=chat_input.message,
+            notebook_id=chat_input.notebook_id,
+            limit=5
+        )
+
+        logger.info(f"Found {len(results)} matching results")
+
+        logger.info(f"Results: {results}")
 
 
         return {
@@ -38,7 +47,7 @@ async def receive_chat_message(chat_input: ChatMessageInput):
             "notebook_id": chat_input.notebook_id
         }
     except Exception as e:
-        logger.error(f"Error processing chat message: {str(e)}")
+        logger.opt(exception=e).error(f"Error processing chat message: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to process chat message"

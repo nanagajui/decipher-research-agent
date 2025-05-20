@@ -135,27 +135,21 @@ class QdrantSourceStore:
 
     def add_source(
         self,
-        url: str,
-        page_title: str,
         content: str,
-        summary: str,
         notebook_id: str,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> List[str]:
         """Add source document to Qdrant.
 
         Args:
-            url: Source URL
-            page_title: Page title
             content: Source content
-            summary: Source summary
             notebook_id: Notebook ID for filtering
             metadata: Additional metadata
 
         Returns:
             List of IDs for the stored chunks
         """
-        logger.info(f"Adding source document: {url} for notebook {notebook_id}")
+        logger.info(f"Adding source document for notebook {notebook_id}")
 
         if metadata is None:
             metadata = {}
@@ -175,12 +169,9 @@ class QdrantSourceStore:
 
             # Create payload
             payload = {
-                "url": url,
-                "page_title": page_title,
                 "content_chunk": chunk,
                 "chunk_index": i,
                 "total_chunks": len(chunks),
-                "summary": summary,
                 "notebook_id": notebook_id,
                 **metadata,
             }
@@ -201,7 +192,7 @@ class QdrantSourceStore:
                 ],
             )
 
-        logger.info(f"Added source with {len(chunks)} chunks: {url}")
+        logger.info(f"Added source with {len(chunks)} chunks for notebook {notebook_id}")
         return chunk_ids
 
     def search(
@@ -244,7 +235,7 @@ class QdrantSourceStore:
             collection_name=self.collection_name,
             query_vector=query_embedding,
             limit=limit,
-            filter=filter_param,
+            query_filter=filter_param,
         )
 
         # Format results
@@ -253,11 +244,9 @@ class QdrantSourceStore:
             results.append({
                 "id": scored_point.id,
                 "score": scored_point.score,
-                "url": scored_point.payload.get("url"),
-                "page_title": scored_point.payload.get("page_title"),
                 "content_chunk": scored_point.payload.get("content_chunk"),
-                "summary": scored_point.payload.get("summary"),
                 "notebook_id": scored_point.payload.get("notebook_id"),
+                "metadata": scored_point.payload.get("metadata"),
             })
 
         logger.info(f"Found {len(results)} matching results")
