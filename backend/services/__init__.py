@@ -13,6 +13,7 @@ from .db_service import (
     execute_query
 )
 from .task_repository import task_repository
+from .qdrant_service import qdrant_service
 
 __all__ = [
     'task_manager',
@@ -26,5 +27,7 @@ __all__ = [
     'initialize_db_pool',
     'close_db_pool',
     'get_db_session',
-    'execute_query'
+    'execute_query',
+    # Qdrant service
+    'qdrant_service'
 ]

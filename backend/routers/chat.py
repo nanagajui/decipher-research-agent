@@ -3,6 +3,7 @@ from loguru import logger
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+from services import qdrant_service
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -28,8 +29,7 @@ async def receive_chat_message(chat_input: ChatMessageInput):
     try:
         logger.info(f"Received chat message for notebook: {chat_input.notebook_id}")
 
-        # Here you would process the message, store in database, etc.
-        # Placeholder for actual implementation
+
 
         return {
             "status": "success",
