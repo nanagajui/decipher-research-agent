@@ -11,7 +11,7 @@ from loguru import logger
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.db import Notebook, NotebookProcessingStatus, NotebookOutput, NotebookProcessingStatusValue
+from models.db import Notebook, NotebookProcessingStatus, NotebookOutput, NotebookProcessingStatusValue, NotebookSource, NotebookDocumentSourceType
 from services.db_service import get_db_session
 
 class NotebookRepository:
@@ -98,6 +98,38 @@ class NotebookRepository:
 
             await session.commit()
             logger.info(f"Saved output summary for notebook {notebook_id}")
+
+    async def save_notebook_sources(self, notebook_id: str, sources: List[Dict[str, Any]]) -> None:
+        """
+        Save or update notebook sources.
+
+        Args:
+            notebook_id: The notebook ID
+            sources: List of source dictionaries
+        """
+        async with get_db_session() as session:
+            # Create new source entries
+            new_sources = [
+                NotebookSource(
+                    notebook_id=notebook_id,
+                    source_type=NotebookDocumentSourceType.URL,
+                    source_url=source["url"],
+                    source_url_text=source["page_title"],
+                    content=source["content"],
+                    created_at=datetime.now()
+                )
+                for source in sources
+            ]
+            session.add_all(new_sources)
+
+            # Update notebook updated_at timestamp
+            notebook_stmt = update(Notebook).where(
+                Notebook.id == notebook_id
+            ).values(updated_at=datetime.now())
+            await session.execute(notebook_stmt)
+
+            await session.commit()
+            logger.info(f"Saved {len(new_sources)} sources for notebook {notebook_id}")
 
     async def get_notebook(self, notebook_id: str) -> Optional[Dict[str, Any]]:
         """

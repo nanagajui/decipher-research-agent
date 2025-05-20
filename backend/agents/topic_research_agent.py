@@ -225,7 +225,8 @@ async def run_research_crew(topic: str):
             return {
                 "blog_post": research_content_crew_result["blog_post"],
                 "title": research_content_crew_result["title"],
-                "links": [link.model_dump() for link in links]
+                "links": [link.model_dump() for link in links],
+                "scraped_data": scraped_data
             }
     except Exception as e:
         logger.error(f"Error in topic research agent: {e}")
