@@ -1,12 +1,12 @@
 from typing import List, Dict, Any, Optional
 import uuid
 from loguru import logger
-from openai import OpenAI
-from qdrant_client import QdrantClient
+from openai import AsyncOpenAI
+from qdrant_client import AsyncQdrantClient
 from qdrant_client.http import models as rest
 from qdrant_client.http.models import Distance, VectorParams
 import os
-
+import asyncio
 class QdrantSourceStore:
     """Service for storing and retrieving source documents using Qdrant and OpenAI embeddings."""
 
@@ -37,10 +37,11 @@ class QdrantSourceStore:
         self.embedding_model = embedding_model
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self._initialized = False
 
         # Initialize Qdrant client
         logger.info(f"Connecting to Qdrant at {qdrant_url}")
-        self.qdrant_client = QdrantClient(
+        self.qdrant_client = AsyncQdrantClient(
             url=qdrant_url,
             api_key=qdrant_api_key,
             prefer_grpc=True,
@@ -48,24 +49,29 @@ class QdrantSourceStore:
 
         # Initialize OpenAI client
         logger.info("Initializing OpenAI client")
-        self.openai_client = OpenAI(api_key=openai_api_key)
+        self.openai_client = AsyncOpenAI(api_key=openai_api_key)
 
-        # Create collection if it doesn't exist
-        self._create_collection_if_not_exists()
+    async def initialize(self) -> None:
+        """Initialize the Qdrant collection asynchronously."""
+        if not self._initialized:
+            await self._create_collection_if_not_exists()
+            self._initialized = True
 
-    def _create_collection_if_not_exists(self) -> None:
+    async def _create_collection_if_not_exists(self) -> None:
         """Create collection if it doesn't exist."""
         logger.info("Checking if collection exists")
-        collections = self.qdrant_client.get_collections().collections
+        collections_response = await self.qdrant_client.get_collections()
+        collections = collections_response.collections
+
         collection_names = [collection.name for collection in collections]
 
         if self.collection_name not in collection_names:
             logger.info(f"Collection {self.collection_name} does not exist, creating...")
             # Get vector size from embedding model
-            vector_size = self._get_embedding_size()
+            vector_size = await self._get_embedding_size()
 
             # Create collection
-            self.qdrant_client.create_collection(
+            await self.qdrant_client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
                     size=vector_size,
@@ -75,7 +81,7 @@ class QdrantSourceStore:
 
             # Create payload index for notebook_id for faster filtering
             logger.info("Creating payload index for notebook_id")
-            self.qdrant_client.create_payload_index(
+            await self.qdrant_client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="notebook_id",
                 field_schema=rest.PayloadSchemaType.KEYWORD,
@@ -83,20 +89,22 @@ class QdrantSourceStore:
 
             logger.info(f"Created collection: {self.collection_name}")
 
-    def _get_embedding(self, text: str) -> List[float]:
+    async def _get_embedding(self, text: str) -> List[float]:
         """Get embedding for text using OpenAI."""
+        if not self._initialized:
+            await self.initialize()
         logger.info(f"Getting embedding using model {self.embedding_model}")
-        response = self.openai_client.embeddings.create(
+        response = await self.openai_client.embeddings.create(
             input=text,
             model=self.embedding_model,
         )
         return response.data[0].embedding
 
-    def _get_embedding_size(self) -> int:
+    async def _get_embedding_size(self) -> int:
         """Get embedding size for the model."""
         # Simple text to get embedding size
         test_text = "Test"
-        embedding = self.openai_client.embeddings.create(
+        embedding = await self.openai_client.embeddings.create(
             input=test_text,
             model=self.embedding_model,
         )
@@ -133,7 +141,7 @@ class QdrantSourceStore:
         logger.info(f"Created {len(chunks)} chunks")
         return chunks
 
-    def add_source(
+    async def add_source(
         self,
         content: str,
         notebook_id: str,
@@ -149,6 +157,8 @@ class QdrantSourceStore:
         Returns:
             List of IDs for the stored chunks
         """
+        if not self._initialized:
+            await self.initialize()
         logger.info(f"Adding source document for notebook {notebook_id}")
 
         if metadata is None:
@@ -177,11 +187,11 @@ class QdrantSourceStore:
             }
 
             # Get embedding
-            embedding = self._get_embedding(chunk)
+            embedding = await self._get_embedding(chunk)
 
             # Store in Qdrant
             logger.info(f"Storing chunk {i+1}/{len(chunks)} in Qdrant")
-            self.qdrant_client.upsert(
+            await self.qdrant_client.upsert(
                 collection_name=self.collection_name,
                 points=[
                     rest.PointStruct(
@@ -195,7 +205,7 @@ class QdrantSourceStore:
         logger.info(f"Added source with {len(chunks)} chunks for notebook {notebook_id}")
         return chunk_ids
 
-    def search(
+    async def search(
         self,
         query: str,
         notebook_id: Optional[str] = None,
@@ -211,10 +221,12 @@ class QdrantSourceStore:
         Returns:
             List of matching sources with scores
         """
+        if not self._initialized:
+            await self.initialize()
         logger.info(f"Searching for: '{query}' in notebook: {notebook_id}")
 
         # Get query embedding
-        query_embedding = self._get_embedding(query)
+        query_embedding = await self._get_embedding(query)
 
         # Set up filter if notebook_id is provided
         filter_param = None
@@ -231,7 +243,7 @@ class QdrantSourceStore:
 
         # Search in Qdrant
         logger.info(f"Executing search with limit: {limit}")
-        search_result = self.qdrant_client.search(
+        search_result = await self.qdrant_client.search(
             collection_name=self.collection_name,
             query_vector=query_embedding,
             limit=limit,
@@ -252,7 +264,7 @@ class QdrantSourceStore:
         logger.info(f"Found {len(results)} matching results")
         return results
 
-    def delete_by_notebook_id(self, notebook_id: str) -> int:
+    async def delete_by_notebook_id(self, notebook_id: str) -> int:
         """Delete all sources for a specific notebook ID.
 
         Args:
@@ -261,6 +273,8 @@ class QdrantSourceStore:
         Returns:
             Number of deleted points
         """
+        if not self._initialized:
+            await self.initialize()
         logger.info(f"Deleting all sources for notebook: {notebook_id}")
 
         filter_param = rest.Filter(
@@ -272,7 +286,7 @@ class QdrantSourceStore:
             ]
         )
 
-        result = self.qdrant_client.delete(
+        result = await self.qdrant_client.delete(
             collection_name=self.collection_name,
             points_selector=rest.FilterSelector(filter=filter_param),
         )
@@ -280,6 +294,7 @@ class QdrantSourceStore:
         logger.info(f"Deleted {result.status.deleted} points for notebook {notebook_id}")
         return result.status.deleted
 
+# Create an instance without initialization
 qdrant_service = QdrantSourceStore(
     qdrant_url=os.getenv("QDRANT_API_URL"),
     qdrant_api_key=os.getenv("QDRANT_API_KEY"),

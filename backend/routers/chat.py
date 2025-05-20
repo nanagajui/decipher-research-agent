@@ -1,19 +1,13 @@
 from fastapi import APIRouter, status, Depends, HTTPException
 from loguru import logger
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from services import qdrant_service
+from models.chat_models import ChatMessageInput
+from agents.chat_agent import run_chat_agent
 
 router = APIRouter(prefix="/chat", tags=["chat"])
-
-
-class ChatMessageInput(BaseModel):
-    """Schema for chat message input"""
-    message: str = Field(..., description="The chat message content")
-    notebook_id: str = Field(..., description="The ID of the notebook this message belongs to")
-    metadata: Optional[dict] = Field(default=None, description="Additional metadata for the message")
-
 
 @router.post("/message", status_code=status.HTTP_201_CREATED)
 async def receive_chat_message(chat_input: ChatMessageInput):
@@ -21,7 +15,7 @@ async def receive_chat_message(chat_input: ChatMessageInput):
     Endpoint to receive a new chat message
 
     Args:
-        chat_input: The chat message data including message text and notebook ID
+        chat_input: The chat message data including list of messages and notebook ID
 
     Returns:
         dict: A response with message details and status
@@ -29,16 +23,7 @@ async def receive_chat_message(chat_input: ChatMessageInput):
     try:
         logger.info(f"Received chat message for notebook: {chat_input.notebook_id}")
 
-        results = qdrant_service.search(
-            query=chat_input.message,
-            notebook_id=chat_input.notebook_id,
-            limit=5
-        )
-
-        logger.info(f"Found {len(results)} matching results")
-
-        logger.info(f"Results: {results}")
-
+        await run_chat_agent(chat_input.notebook_id, chat_input.messages)
 
         return {
             "status": "success",
