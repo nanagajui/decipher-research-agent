@@ -1,64 +1,15 @@
-from fastapi import FastAPI, HTTPException, status, APIRouter
+from fastapi import FastAPI, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from datetime import datetime
 from contextlib import asynccontextmanager
 
-from services import task_manager, initialize_db_pool, close_db_pool
-from models.task_models import (
-    ResearchRequest,
-    TaskResponse,
-    TaskStatusResponse
-)
+from services import initialize_db_pool, close_db_pool
+from routers.research import router as research_router
+from routers.chat import router as chat_router
 
 # Create router for API endpoints
 router = APIRouter(prefix="/api")
-
-# API Endpoints
-@router.post("/research",
-          response_model=TaskResponse,
-          status_code=status.HTTP_202_ACCEPTED,
-          summary="Submit a new research task",
-          description="Submits a topic for research. The task runs in the background.")
-async def submit_research_task(request: ResearchRequest):
-    logger.info(f"Submitting research task for notebook: {request.notebook_id}" +
-               (f" on topic: {request.topic}" if request.topic else ""))
-
-    if not request.notebook_id or request.notebook_id == "":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Notebook ID is required.")
-
-    if (not request.topic or request.topic == "") and (not request.sources or len(request.sources) == 0):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Either topic or sources must be provided.")
-
-    task_id = await task_manager.submit_task_async(
-        notebook_id=request.notebook_id,
-        topic=request.topic,
-        sources=request.sources
-    )
-
-    logger.debug(f"Research task submitted with ID: {task_id}")
-
-    return TaskResponse(
-        task_id=task_id,
-        notebook_id=request.notebook_id,
-        status="IN_QUEUE",
-        message="Research task submitted and will be processed."
-    )
-
-@router.get("/research/{task_id}",
-         response_model=TaskStatusResponse,
-         summary="Get research task status by ID",
-         description="Retrieves the status and result (if available) of a specific research task.")
-async def get_task_details(task_id: str):
-    logger.debug(f"Getting details for task ID: {task_id}")
-
-    # Use the async version to avoid event loop conflicts
-    task_info = await task_manager.get_task_status_async(task_id)
-
-    if not task_info:
-        logger.warning(f"Task not found: {task_id}")
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found.")
-    return TaskStatusResponse(**task_info, task_id=task_id)
 
 @router.get("/health", summary="API Health Check")
 async def health_check():
@@ -101,5 +52,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the router
+# Include the routers
 app.include_router(router)
+app.include_router(research_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
