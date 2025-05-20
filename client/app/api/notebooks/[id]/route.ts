@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Extract id from params at the beginning
   const { id } = await params;
 
@@ -27,8 +27,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -36,9 +38,6 @@ export async function GET(
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  // Extract id from params at the beginning
-  const { id } = await params;
 
   try {
     const notebook = await prisma.notebook.findUnique({

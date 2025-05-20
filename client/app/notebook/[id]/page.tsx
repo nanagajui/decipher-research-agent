@@ -22,9 +22,8 @@ async function getNotebook(id: string, userId: string) {
 export default async function NotebookPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  // Extract id from params at the beginning
   const { id } = await params;
 
   const session = await auth.api.getSession({

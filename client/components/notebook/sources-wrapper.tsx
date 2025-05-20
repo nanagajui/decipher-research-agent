@@ -11,24 +11,24 @@ const EditNotebookSources = dynamic(
 );
 
 type SourcesWrapperProps = {
-  notebookId: string;
+  // notebookId: string;
   initialSources: NotebookSource[];
-  disabled?: boolean;
+  // disabled?: boolean;
 };
 
 export function SourcesWrapper({
-  notebookId,
+  // notebookId,
   initialSources,
-  disabled,
+  // disabled,
 }: SourcesWrapperProps) {
   return (
     <Suspense
       fallback={<div className="p-4 text-center">Loading sources...</div>}
     >
       <EditNotebookSources
-        notebookId={notebookId}
+        // notebookId={notebookId}
         initialSources={initialSources}
-        disabled={disabled}
+        // disabled={disabled}
       />
     </Suspense>
   );

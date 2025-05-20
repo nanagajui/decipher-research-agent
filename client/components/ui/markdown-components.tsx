@@ -1,4 +1,5 @@
 import type { Components } from "react-markdown";
+import Image from "next/image";
 
 // Markdown styling components for ReactMarkdown
 export const MarkdownComponents: Components = {
@@ -69,12 +70,44 @@ export const MarkdownComponents: Components = {
       {...props}
     />
   ),
-  img: ({ src, alt, ...props }) => (
-    <img
-      src={src || ""}
-      alt={alt || ""}
-      className="max-w-full h-auto my-4 rounded"
-      {...props}
-    />
-  ),
+  img: ({ src, alt }) => {
+    if (!src) return null;
+
+    // Use default image if src is not a valid URL
+    let imageSrc = "";
+    try {
+      imageSrc = src.toString();
+      // Simple URL validation
+      new URL(imageSrc);
+    } catch {
+      // If URL is invalid, use a placeholder Image instead of <img>
+      return (
+        <div className="my-4 relative">
+          <Image
+            src="/placeholder-image.jpg" // Placeholder image
+            alt={alt || ""}
+            width={700}
+            height={350}
+            className="max-w-full h-auto rounded"
+            style={{ objectFit: "contain" }}
+            unoptimized
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="my-4 relative">
+        <Image
+          src={imageSrc}
+          alt={alt || ""}
+          width={700}
+          height={350}
+          className="max-w-full h-auto rounded"
+          style={{ objectFit: "contain" }}
+          unoptimized
+        />
+      </div>
+    );
+  },
 };

@@ -4,7 +4,7 @@
 set -e
 
 # Configuration
-IMAGE_NAME="decipher"
+IMAGE_NAME="decipher-client"
 DOCKER_REGISTRY="mtwn105"
 VERSION=$(git describe --tags --always)
 

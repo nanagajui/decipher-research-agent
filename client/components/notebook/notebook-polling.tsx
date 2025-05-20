@@ -239,7 +239,6 @@ export function NotebookPolling({
   ]);
 
   useEffect(() => {
-    // Only poll if processing
     if (!isProcessing || !notebook) return;
 
     const intervalId = setInterval(async () => {
@@ -263,7 +262,7 @@ export function NotebookPolling({
     }, 5000); // Poll every 5 seconds
 
     return () => clearInterval(intervalId);
-  }, [notebook?.id, isProcessing]);
+  }, [notebook, isProcessing, setNotebook]);
 
   const handleSendMessage = async (inputMessage: string) => {
     if (!inputMessage.trim()) return;
@@ -397,9 +396,9 @@ export function NotebookPolling({
                 )}
 
                 <SourcesWrapper
-                  notebookId={notebook.id}
+                  // notebookId={notebook.id}
                   initialSources={notebook.sources}
-                  disabled={isProcessing}
+                  // disabled={isProcessing}
                 />
 
                 <div className="text-xs sm:text-sm text-muted-foreground space-y-1">

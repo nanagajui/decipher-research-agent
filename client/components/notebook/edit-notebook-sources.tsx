@@ -12,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 // Match the Prisma enum
 export type NotebookDocumentSourceType = "UPLOAD" | "URL" | "MANUAL";
@@ -31,20 +29,14 @@ export type NotebookSource = {
 };
 
 type EditNotebookSourcesProps = {
-  notebookId: string;
   initialSources: NotebookSource[];
-  disabled?: boolean;
 };
 
 export function EditNotebookSources({
-  notebookId,
   initialSources,
-  disabled = false,
 }: EditNotebookSourcesProps) {
-  const router = useRouter();
   const [sources, setSources] = useState<NotebookSource[]>(initialSources);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing] = useState(false);
   const [currentSource, setCurrentSource] = useState<"URL" | "TEXT">("URL");
   const [sourceValue, setSourceValue] = useState("");
   const [sourceError, setSourceError] = useState("");
@@ -91,70 +83,10 @@ export function EditNotebookSources({
     }
   };
 
-  const saveSources = async () => {
-    try {
-      setIsSaving(true);
-
-      const response = await fetch(`/api/notebooks/${notebookId}/sources`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sources: sources.map((source) => ({
-            id: source.id.startsWith("temp-") ? undefined : source.id,
-            sourceType: source.sourceType,
-            sourceUrl: source.sourceUrl || null,
-            content: source.content || null,
-          })),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update sources");
-      }
-
-      toast.success("Sources updated successfully");
-      setIsEditing(false);
-      router.refresh();
-    } catch (error) {
-      console.error("Error updating sources:", error);
-      toast.error("Failed to update sources");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const cancelEditing = () => {
-    setSources(initialSources);
-    setIsEditing(false);
-    setSourceValue("");
-    setSourceError("");
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-sm font-medium text-muted-foreground">Sources</h3>
-        {/* {!isEditing ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditing(true)}
-            disabled={disabled}
-          >
-            Edit Sources
-          </Button>
-        ) : (
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" onClick={cancelEditing}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={saveSources} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        )} */}
       </div>
 
       {isEditing && (
