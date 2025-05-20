@@ -136,7 +136,7 @@ export function EditNotebookSources({
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-sm font-medium text-muted-foreground">Sources</h3>
-        {!isEditing ? (
+        {/* {!isEditing ? (
           <Button
             variant="outline"
             size="sm"
@@ -154,7 +154,7 @@ export function EditNotebookSources({
               {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
-        )}
+        )} */}
       </div>
 
       {isEditing && (

@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import {
+  ChevronLeft,
+  Loader2,
+  MessageSquare,
+  BookOpen,
+  Send,
+} from "lucide-react";
 import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
 import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
 import Link from "next/link";
@@ -13,6 +19,151 @@ import remarkGfm from "remark-gfm";
 import { MarkdownComponents } from "@/components/ui/markdown-components";
 import { toast } from "sonner";
 import { statusConfig, NotebookWithDetails } from "@/lib/notebook-types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+
+// Chat message type
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+// API response type
+type ChatApiResponse = {
+  status: "success" | "error";
+  response: string;
+};
+
+// Memoized message component to prevent re-renders
+const ChatMessage = memo(({ message }: { message: Message }) => (
+  <div
+    className={`flex ${
+      message.role === "user" ? "justify-end" : "justify-start"
+    }`}
+  >
+    <div
+      className={`max-w-[80%] px-4 py-2 rounded-lg ${
+        message.role === "user"
+          ? "bg-primary text-primary-foreground"
+          : "bg-muted"
+      }`}
+    >
+      {message.role === "assistant" ? (
+        <div className="markdown-container prose prose-sm max-w-none dark:prose-invert">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={MarkdownComponents}
+          >
+            {message.content}
+          </ReactMarkdown>
+        </div>
+      ) : (
+        message.content
+      )}
+    </div>
+  </div>
+));
+
+ChatMessage.displayName = "ChatMessage";
+
+// Memoized ChatInterface component to prevent unnecessary re-renders
+const ChatInterface = memo(
+  ({
+    messages,
+    isLoading,
+    onSendMessage,
+  }: {
+    messages: Message[];
+    isLoading: boolean;
+    onSendMessage: (message: string) => void;
+  }) => {
+    // Local state for input to avoid parent component re-renders when typing
+    const [localInput, setLocalInput] = useState("");
+
+    // Use callback ref for textarea to ensure focus
+    const textareaRef = useCallback((textareaElement: HTMLTextAreaElement) => {
+      if (textareaElement) {
+        // Focus the textarea on mount
+        textareaElement.focus();
+      }
+    }, []);
+
+    // Ref for the messages container to control scrolling
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to bottom when messages change
+    useEffect(() => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop =
+          messagesContainerRef.current.scrollHeight;
+      }
+    }, [messages, isLoading]);
+
+    const handleSubmit = () => {
+      if (!localInput.trim()) return;
+      onSendMessage(localInput);
+      setLocalInput("");
+    };
+
+    return (
+      <div className="w-full">
+        <div
+          ref={messagesContainerRef}
+          className="flex flex-col space-y-4 mb-4 h-[400px] overflow-y-auto p-4 border rounded-md"
+        >
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              Start a conversation with your notebook
+            </div>
+          ) : (
+            messages.map((message, index) => (
+              <ChatMessage key={index} message={message} />
+            ))
+          )}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] px-4 py-2 rounded-lg bg-muted flex items-center">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Thinking...
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex space-x-2">
+          <Textarea
+            ref={textareaRef}
+            rows={1}
+            value={localInput}
+            onChange={(e) => setLocalInput(e.target.value)}
+            placeholder={`Decipher anything about this notebook...`}
+            className="resize-none"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+          />
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading || !localInput.trim()}
+            className="px-4"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+);
+
+ChatInterface.displayName = "ChatInterface";
 
 export function NotebookPolling({
   initialNotebook,
@@ -26,6 +177,9 @@ export function NotebookPolling({
     notebook?.processingStatus?.status
   );
   const [loadingDots, setLoadingDots] = useState("");
+  const [activeTab, setActiveTab] = useState("summary");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const status = notebook?.processingStatus?.status || "IN_QUEUE";
   const statusInfo = statusConfig[status as keyof typeof statusConfig];
@@ -111,6 +265,64 @@ export function NotebookPolling({
     return () => clearInterval(intervalId);
   }, [notebook?.id, isProcessing]);
 
+  const handleSendMessage = async (inputMessage: string) => {
+    if (!inputMessage.trim()) return;
+
+    // Add user message to chat
+    const userMessage: Message = {
+      role: "user",
+      content: inputMessage,
+    };
+
+    // Update messages state with user message
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+
+    try {
+      // Prepare all messages for the API call
+      const allMessages = [...messages, userMessage];
+
+      // Make API call with all messages and notebook ID
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: allMessages,
+          notebook_id: notebook.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get response from chat API");
+      }
+
+      const data: ChatApiResponse = await response.json();
+
+      if (data.status === "success") {
+        // Add assistant response to messages
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: data.response,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        // Handle error response
+        toast.error("Error from chat API", {
+          description: data.response || "Unknown error occurred",
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!notebook) {
     return <div>Loading...</div>;
   }
@@ -154,6 +366,7 @@ export function NotebookPolling({
               </Badge>
             </div>
           </div>
+
           <Card className="w-full relative group">
             <NotebookPageDeleteMenu
               notebookId={notebook.id}
@@ -215,17 +428,45 @@ export function NotebookPolling({
           ) : notebook.output?.summary ? (
             <Card className="w-full">
               <CardContent className="p-4 sm:p-6">
-                <h2 className="text-xl sm:text-2xl font-bold mb-4 text-primary">
-                  Deciphered Summary
-                </h2>
-                <div className="markdown-container">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={MarkdownComponents}
-                  >
-                    {notebook.output.summary}
-                  </ReactMarkdown>
-                </div>
+                <Tabs
+                  defaultValue="summary"
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                >
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsTrigger value="summary" className="flex items-center">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Deciphered Summary
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="chat"
+                      className="flex items-center"
+                      disabled={status === "ERROR"}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Decipher with Chat
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="summary">
+                    <div className="markdown-container">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={MarkdownComponents}
+                      >
+                        {notebook.output.summary}
+                      </ReactMarkdown>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="chat">
+                    <ChatInterface
+                      messages={messages}
+                      isLoading={isLoading}
+                      onSendMessage={handleSendMessage}
+                    />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           ) : null}
