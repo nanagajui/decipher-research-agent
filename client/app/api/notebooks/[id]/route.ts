@@ -24,3 +24,45 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return NextResponse.json({ error: "Failed to delete notebook" }, { status: 500 });
   }
 }
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Extract id from params at the beginning
+  const { id } = await params;
+
+  try {
+    const notebook = await prisma.notebook.findUnique({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+      include: {
+        processingStatus: true,
+        sources: true,
+        output: true,
+      },
+    });
+
+    if (!notebook) {
+      return NextResponse.json({ error: "Notebook not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(notebook);
+  } catch (error) {
+    console.error("Error fetching notebook:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch notebook" },
+      { status: 500 }
+    );
+  }
+}
