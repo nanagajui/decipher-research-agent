@@ -50,30 +50,41 @@ class TaskManager:
                             topic=topic
                         )
 
-                        try:
-                            # Save sources in Qdrant
-                            logger.info(f"Embedding blog post for notebook: {notebook_id}")
-                            await qdrant_service.add_source(
-                                content=result["blog_post"],
-                                notebook_id=notebook_id,
-                                metadata={
-                                    "title": result["title"],
-                                }
-                            )
+                        max_embedding_retries = 3
+                        embedding_retry_count = 0
 
-                            logger.info(f"Embedding scraped data for notebook: {notebook_id}")
-                            for source in result["scraped_data"]:
+                        while embedding_retry_count < max_embedding_retries:
+                            try:
+                                # Save sources in Qdrant
+                                logger.info(f"Embedding blog post for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
                                 await qdrant_service.add_source(
-                                    content=source["content"],
+                                    content=result["blog_post"],
                                     notebook_id=notebook_id,
                                     metadata={
-                                        "url": source["url"],
-                                        "page_title": source["page_title"],
+                                        "title": result["title"],
                                     }
                                 )
-                        except Exception as e:
-                            logger.error(f"Error embedding sources for notebook: {notebook_id}")
-                            logger.error(e)
+
+                                logger.info(f"Embedding scraped data for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
+                                for source in result["scraped_data"]:
+                                    await qdrant_service.add_source(
+                                        content=source["content"],
+                                        notebook_id=notebook_id,
+                                        metadata={
+                                            "url": source["url"],
+                                            "page_title": source["page_title"],
+                                        }
+                                    )
+                                break  # Success - exit retry loop
+
+                            except Exception as e:
+                                embedding_retry_count += 1
+                                if embedding_retry_count < max_embedding_retries:
+                                    logger.warning(f"Error embedding sources for notebook: {notebook_id} (attempt {embedding_retry_count}/{max_embedding_retries})")
+                                    logger.warning(e)
+                                    continue
+                                logger.error(f"Error embedding sources for notebook: {notebook_id} after {max_embedding_retries} attempts")
+                                logger.error(e)
 
                     elif  sources and len(sources) > 0:
                         logger.error("Sources research not implemented yet")
