@@ -1,16 +1,26 @@
-import { betterFetch } from "@better-fetch/fetch";
-import type { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-type Session = typeof auth.$Infer.Session;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
 export async function middleware(request: NextRequest) {
-  const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
-    baseURL: request.nextUrl.origin,
+
+  console.log("Host: ", BASE_URL);
+
+  const url = `${BASE_URL}/api/auth/get-session`;
+
+  console.log("URL: ", url);
+
+  const response = await fetch(url, {
     headers: {
-      cookie: request.headers.get("cookie") || "", // Forward the cookies from the request
+      cookie: request.headers.get("cookie") || "",
     },
   });
+
+  if (!response.ok) {
+    return NextResponse.redirect(new URL("/auth", request.url));
+  }
+
+  const session = await response.json();
 
   if (!session) {
     return NextResponse.redirect(new URL("/auth", request.url));
@@ -20,5 +30,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard"], // Apply middleware to specific routes
+  matcher: ["/dashboard", "/notebook/:path*"],
 };

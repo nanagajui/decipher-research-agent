@@ -23,6 +23,8 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
+ENV NEXT_PUBLIC_BASE_URL=https://decipherit.xyz
+
 # Generate Prisma Client
 RUN corepack enable pnpm && pnpm prisma generate
 
@@ -55,7 +57,9 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV NODE_OPTIONS="--no-warnings"
+
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
-CMD ["node", "server.js"]
+CMD ["node", "--trace-warnings", "server.js"]
