@@ -37,7 +37,7 @@ export function HeaderClient() {
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold text-xl">Decipher</span>
+            <span className="font-bold text-xl">DecipherIt</span>
           </Link>
 
           <nav className="flex items-center gap-4">

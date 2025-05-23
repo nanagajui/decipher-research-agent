@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex flex-col items-center md:items-start gap-2">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Decipher. All rights reserved.
+              &copy; {new Date().getFullYear()} DecipherIt. All rights reserved.
             </p>
           </div>
           <div className="flex flex-col items-center md:items-end gap-2">

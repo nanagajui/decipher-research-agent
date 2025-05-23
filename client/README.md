@@ -1,6 +1,6 @@
-# Decipher - AI-Powered Research Assistant
+# DecipherIt - AI-Powered Research Assistant
 
-Decipher is an AI-powered research assistant that transforms how you explore information. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.
+DecipherIt is an AI-powered research assistant that transforms how you explore information. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.
 
 ## Features
 

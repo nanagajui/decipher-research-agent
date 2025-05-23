@@ -85,7 +85,7 @@ const steps: Step[] = [
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Decipher Research Assistant",
+  name: "DecipherIt Research Assistant",
   applicationCategory: "Research Tool",
   operatingSystem: "Web",
   offers: {
@@ -123,7 +123,8 @@ export default function Home() {
             </Link>
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-            Research Smarter with <span className="text-primary">Decipher</span>
+            Research Smarter with{" "}
+            <span className="text-primary">DecipherIt</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-2xl mx-auto">
             Your AI-powered research assistant that transforms how you explore
@@ -133,7 +134,7 @@ export default function Home() {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <AuthAwareButton />
             <Button variant="link" asChild>
-              <Link href="#features" aria-label="Learn more about Decipher">
+              <Link href="#features" aria-label="Learn more about DecipherIt">
                 Learn more →
               </Link>
             </Button>
@@ -191,7 +192,7 @@ export default function Home() {
               id="how-it-works-heading"
               className="text-3xl font-bold tracking-tight sm:text-4xl"
             >
-              How Decipher Works
+              How DecipherIt Works
             </h2>
           </div>
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">

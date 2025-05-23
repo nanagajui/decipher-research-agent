@@ -10,16 +10,16 @@ const oxanium = Oxanium({
 });
 
 export const metadata: Metadata = {
-  title: "Decipher - AI-Powered Research Assistant",
+  title: "DecipherIt - AI-Powered Research Assistant",
   description:
-    "Transform your research process with Decipher. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
+    "Transform your research process with DecipherIt. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
   keywords:
     "AI research, research assistant, document analysis, AI summaries, research tools, knowledge management",
-  authors: [{ name: "Decipher Team" }],
+  authors: [{ name: "DecipherIt Team" }],
   openGraph: {
-    title: "Decipher - AI-Powered Research Assistant",
+    title: "DecipherIt - AI-Powered Research Assistant",
     description:
-      "Transform your research process with Decipher. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
+      "Transform your research process with DecipherIt. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
     type: "website",
     url: "https://decipher-research.com",
     images: [
@@ -27,15 +27,15 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Decipher Research Assistant",
+        alt: "DecipherIt Research Assistant",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Decipher - AI-Powered Research Assistant",
+    title: "DecipherIt - AI-Powered Research Assistant",
     description:
-      "Transform your research process with Decipher. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
+      "Transform your research process with DecipherIt. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.",
     images: ["/og-image.jpg"],
   },
   robots: {
