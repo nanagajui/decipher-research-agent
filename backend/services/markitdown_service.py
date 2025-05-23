@@ -97,7 +97,7 @@ class MarkdownConverter:
                 async with session.get(url, timeout=self.timeout) as response:
                     response.raise_for_status()
 
-                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                    with tempfile.NamedTemporaryFile(delete_on_close=True) as temp_file:
                         temp_file_path = temp_file.name
                         async for chunk in response.content.iter_chunked(8192):
                             temp_file.write(chunk)
