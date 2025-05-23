@@ -23,7 +23,7 @@ TASK_CONFIGS = {
         "expected_output": "Complete raw text content with the page title and URL from the URL, with no modifications or summarization."
     },
     "research_analysis": {
-        "description": """Synthesize research findings into a comprehensive and detailed final document using both the raw data gathered from web scraping and provided textual content.
+        "description": """Synthesize research findings into a comprehensive and detailed final document using all available content sources including web scraping, provided textual content, and file content.
 
         Your mission is to transform all available content into a comprehensive, well-structured research analysis in markdown format.
 
@@ -37,14 +37,19 @@ TASK_CONFIGS = {
         {textual_content}
         ```
 
+        Provided File Content:
+        ```
+        {file_content}
+        ```
+
         Follow these steps meticulously:
 
         1. **Deep Analysis & Synthesis**
-           - Review ALL content thoroughly (both scraped and provided text)
+           - Review ALL content thoroughly (scraped text, provided text, and file content)
            - Identify key themes, patterns, relationships and contrasts across all sources
            - Synthesize information rather than just listing findings
            - Look for supporting evidence and conflicting viewpoints
-           - Cross-reference insights between scraped and provided content
+           - Cross-reference insights between scraped content, provided content, and file content
 
         2. **Research Structure**
            Create a clear markdown structure that includes:
@@ -52,7 +57,7 @@ TASK_CONFIGS = {
            - Introduction providing overview and key findings
            - Main body with sections for each major theme/finding identified
            - Conclusion summarizing key points
-           - References listing all sources used (both scraped and provided)
+           - References listing all sources used (scraped, provided, and file content)
 
         3. **Content Requirements**
            - Write clear, objective analysis supported by all available data
@@ -62,10 +67,11 @@ TASK_CONFIGS = {
            - Focus on factual content, avoid speculation
            - Let the research guide the number and organization of sections
            - Structure sections based on natural groupings of findings
-           - Integrate insights from both scraped and provided content seamlessly
+           - Integrate insights seamlessly from all content sources
+           - Incorporate relevant insights from uploaded file content
 
         Today's date and time is {current_time}""",
-        "expected_output": "A markdown document with comprehensive research analysis, organized into logical sections based on the findings, with proper citations and references for both scraped and provided content"
+        "expected_output": "A markdown document with comprehensive research analysis, organized into logical sections based on the findings, with proper citations and references for all content sources including scraped content, provided content, and file content"
     },
     "content_creation": {
         "description": """Create an engaging and informative blog post based on the research analysis.

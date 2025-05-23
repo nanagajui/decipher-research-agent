@@ -144,6 +144,17 @@ class TaskManager:
                                             notebook_id=notebook_id
                                         )
 
+                                # Save file content in Qdrant
+                                logger.info(f"Embedding file content for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
+                                for file_data in result["file_data"]:
+                                    await qdrant_service.add_source(
+                                        content=file_data["content"],
+                                        notebook_id=notebook_id,
+                                        metadata={
+                                            "url": file_data["file_name"]
+                                        }
+                                    )
+
                                 # Save sources in Qdrant
                                 logger.info(f"Embedding blog post for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
                                 await qdrant_service.add_source(

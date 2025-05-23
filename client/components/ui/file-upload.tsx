@@ -31,13 +31,14 @@ export function FileUpload({
   acceptedTypes = [
     "application/pdf",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/msword",
-    "text/plain",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "application/vnd.ms-powerpoint",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-excel",
-    "text/markdown",
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/bmp",
+    "image/tiff",
   ],
   className,
   multiple = true,
@@ -51,15 +52,16 @@ export function FileUpload({
       "application/pdf": "PDF",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         "DOCX",
-      "application/msword": "DOC",
-      "text/plain": "TXT",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation":
         "PPTX",
-      "application/vnd.ms-powerpoint": "PPT",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
         "XLSX",
-      "application/vnd.ms-excel": "XLS",
-      "text/markdown": "MD",
+      "image/jpeg": "JPEG",
+      "image/png": "PNG",
+      "image/gif": "GIF",
+      "image/webp": "WEBP",
+      "image/bmp": "BMP",
+      "image/tiff": "TIFF",
     };
 
     return types.map((type) => typeMap[type] || type);

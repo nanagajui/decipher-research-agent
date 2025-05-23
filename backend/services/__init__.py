@@ -29,5 +29,5 @@ __all__ = [
     'get_db_session',
     'execute_query',
     # Qdrant service
-    'qdrant_service'
+    'qdrant_service',
 ]

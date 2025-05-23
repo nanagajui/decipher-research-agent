@@ -10,6 +10,8 @@ from models.task_models import ResearchSource
 from typing import List
 from config import llm, SOURCES_RESEARCH_AGENT_CONFIGS, SOURCES_RESEARCH_TASK_CONFIGS
 import asyncio
+from services.markitdown_service import markdown_converter
+
 server_params = StdioServerParameters(
     command="pnpm",
     args=["dlx", "@brightdata/mcp"],
@@ -57,7 +59,6 @@ async def run_sources_research_crew(sources: List[ResearchSource]):
                 max_rpm=20
             )
 
-            # Research and content creation agents
             researcher = Agent(
                 role=SOURCES_RESEARCH_AGENT_CONFIGS["researcher"]["role"],
                 goal=SOURCES_RESEARCH_AGENT_CONFIGS["researcher"]["goal"],
@@ -149,9 +150,28 @@ async def run_sources_research_crew(sources: List[ResearchSource]):
                 if source.source_type == "MANUAL":
                     textual_content += f"\n---\n- {source.source_content}\n---\n"
 
+            logger.info(f"Textual content: {textual_content}")
+
+            file_content = ""
+            file_data = []
+
+            if any(source.source_type == "UPLOAD" for source in sources):
+                markdown_files = await markdown_converter.convert_urls_to_markdown(
+                    [source.source_url for source in sources if source.source_type == "UPLOAD"]
+                )
+                for url, markdown_content in markdown_files.items():
+                    file_content += f"\n---\n- File: {url}\n---\n{markdown_content}\n---\n"
+                    file_data.append({
+                        "file_name": url,
+                        "content": markdown_content
+                    })
+
+            logger.info(f"File content: {file_content}")
+
             research_content_crew_result = await research_content_crew.kickoff_async(inputs={
                 "scraped_data": scraped_data,
                 "textual_content": textual_content,
+                "file_content": file_content,
                 "current_time": current_time,
             })
 
@@ -165,7 +185,8 @@ async def run_sources_research_crew(sources: List[ResearchSource]):
                 "title": research_content_crew_result["title"],
                 "links": [link.model_dump() for link in links],
                 "scraped_data": scraped_data,
-                "faq": [faq.model_dump() for faq in faq_result]
+                "faq": [faq.model_dump() for faq in faq_result],
+                "file_data": file_data
             }
     except Exception as e:
         logger.error(f"Error in topic research agent: {e}")
