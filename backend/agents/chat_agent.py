@@ -14,7 +14,7 @@ async def get_relevant_sources(notebook_id: str, query: str):
 
   output = ""
   for result in results:
-    output += f"{result['content_chunk']}\n---\n"
+    output += f"Content: {result['content_chunk']}\n{"Source: " + result['page_title'] + " (" + result['url'] + ")" if result['url'] else ""}\n---\n"
 
   logger.info(f"Relevant sources from Qdrant for notebook: {notebook_id} with query: {query} are: {output}")
 
@@ -50,7 +50,18 @@ def get_decipher_crew():
     {relevant_sources}
     ```
     """,
-    expected_output="A clear and concise answer to the user's question",
+    expected_output="""A markdown-formatted response with answer. Do not include any other text than the answer to the question. Add a **Sources:** section at the end of the response with the source citations in the following format:
+    **Sources:**
+    - [Source Title 1](url1)
+    - [Source Title 2](url2)
+    - [Source Title 3](url3)
+    ...
+
+    The source citations should be in the following format:
+    - [Source Title 1](url1)
+    - [Source Title 2](url2)
+    - [Source Title 3](url3)
+    ...""",
     agent=decipher_agent,
   )
 

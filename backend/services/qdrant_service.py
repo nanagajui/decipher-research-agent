@@ -259,6 +259,8 @@ class QdrantSourceStore:
                 "content_chunk": scored_point.payload.get("content_chunk"),
                 "notebook_id": scored_point.payload.get("notebook_id"),
                 "metadata": scored_point.payload.get("metadata"),
+                "url": scored_point.payload.get("url"),
+                "page_title": scored_point.payload.get("page_title"),
             })
 
         logger.info(f"Found {len(results)} matching results")

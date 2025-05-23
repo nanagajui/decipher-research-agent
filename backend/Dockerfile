@@ -23,7 +23,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     npm cache clean --force && \
-    pip install --no-cache-dir psycopg2-binary
+    pip install --no-cache-dir psycopg2-binary gunicorn
 
 # Copy Python packages from the builder stage
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
@@ -43,4 +43,5 @@ RUN mkdir -p logs && chmod 777 logs
 
 EXPOSE 8001
 
-CMD ["python", "server.py"]
+# Use gunicorn with uvicorn workers
+CMD ["gunicorn", "server:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8001", "--timeout", "120"]
