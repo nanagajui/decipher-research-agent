@@ -9,6 +9,7 @@ import {
   MessageSquare,
   BookOpen,
   Send,
+  RefreshCw,
 } from "lucide-react";
 import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
 import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
@@ -180,6 +181,7 @@ export function NotebookPolling({
   const [activeTab, setActiveTab] = useState("summary");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const status = notebook?.processingStatus?.status || "IN_QUEUE";
   const statusInfo = statusConfig[status as keyof typeof statusConfig];
@@ -322,6 +324,45 @@ export function NotebookPolling({
     }
   };
 
+  const handleRetry = async () => {
+    if (isRetrying) return;
+
+    setIsRetrying(true);
+    try {
+      const response = await fetch(`/api/notebooks/${notebook.id}/retry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to retry notebook processing");
+      }
+
+      // Update the notebook status to show it's in queue
+      setNotebook((prev) => ({
+        ...prev,
+        processingStatus: {
+          ...prev.processingStatus!,
+          status: "IN_QUEUE",
+          message: "Notebook queued for reprocessing",
+        },
+      }));
+
+      toast.success("Notebook processing restarted", {
+        description: "Your notebook is being processed again.",
+      });
+    } catch (error) {
+      console.error("Error retrying notebook:", error);
+      toast.error("Failed to retry notebook processing", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
   if (!notebook) {
     return <div>Loading...</div>;
   }
@@ -356,13 +397,29 @@ export function NotebookPolling({
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 {notebook.title || "Untitled Notebook"}
               </h1>
-              <Badge
-                variant={statusInfo.variant}
-                className="flex items-center w-fit px-4 py-2 text-base font-semibold text-md"
-              >
-                <StatusIcon className="h-6 w-6 mr-1" />
-                {statusInfo.label}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {status === "ERROR" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRetry}
+                    disabled={isRetrying}
+                    className="flex items-center gap-2"
+                  >
+                    <RefreshCw
+                      className={`h-4 w-4 ${isRetrying ? "animate-spin" : ""}`}
+                    />
+                    {isRetrying ? "Retrying..." : "Try Again"}
+                  </Button>
+                )}
+                <Badge
+                  variant={statusInfo.variant}
+                  className="flex items-center w-fit px-4 py-2 text-base font-semibold text-md"
+                >
+                  <StatusIcon className="h-6 w-6 mr-1" />
+                  {statusInfo.label}
+                </Badge>
+              </div>
             </div>
           </div>
 
