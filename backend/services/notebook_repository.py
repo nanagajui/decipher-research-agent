@@ -196,6 +196,33 @@ class NotebookRepository:
 
             return notebook.to_dict()
 
+    async def delete_notebook_faqs(self, notebook_id: str) -> None:
+        """
+        Delete all FAQs for a specific notebook.
+
+        Args:
+            notebook_id: The notebook ID to delete FAQs for
+        """
+        async with get_db_session() as session:
+            # Get the notebook output ID
+            stmt = select(NotebookOutput).where(NotebookOutput.notebook_id == notebook_id)
+            result = await session.execute(stmt)
+            notebook_output = result.scalar_one_or_none()
+
+            if notebook_output:
+                # Delete all FAQs associated with this notebook output
+                stmt = select(NotebookFAQ).where(NotebookFAQ.notebook_output_id == notebook_output.id)
+                result = await session.execute(stmt)
+                faqs = result.scalars().all()
+
+                for faq in faqs:
+                    await session.delete(faq)
+
+                await session.commit()
+                logger.info(f"Deleted {len(faqs)} FAQs for notebook {notebook_id}")
+            else:
+                logger.info(f"No FAQs found for notebook {notebook_id}")
+
     async def save_notebook_faqs(self, notebook_id: str, faqs: List[Dict[str, str]]) -> None:
         """
         Save or update FAQs for a notebook.

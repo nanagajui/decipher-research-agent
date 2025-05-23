@@ -7,7 +7,26 @@ from models.db import NotebookProcessingStatusValue
 from .task_repository import task_repository
 from .notebook_repository import notebook_repository
 from .qdrant_service import qdrant_service
+
 class TaskManager:
+
+    async def _delete_notebook_data(self, notebook_id: str) -> None:
+        """Delete FAQs and embeddings for a notebook.
+
+        Args:
+            notebook_id: The ID of the notebook to delete data for.
+        """
+        try:
+            # Delete faqs from db
+            logger.info(f"Deleting existing FAQs for notebook: {notebook_id}")
+            await notebook_repository.delete_notebook_faqs(notebook_id)
+
+            # Delete embeddings from qdrant
+            logger.info(f"Deleting existing embeddings for notebook: {notebook_id}")
+            await qdrant_service.delete_by_notebook_id(notebook_id)
+        except Exception as e:
+            logger.error(f"Error deleting existing FAQs and embeddings for notebook: {notebook_id}")
+            logger.error(e)
 
     async def _execute_task(self, task_id: str, topic: Optional[str], notebook_id: str, sources: Optional[List] = None):
         """Internal method to run the research task and update status."""
@@ -47,9 +66,10 @@ class TaskManager:
                             topic=topic
                         )
 
+                        await self._delete_notebook_data(notebook_id)
+
                         # Save faqs in db
                         await notebook_repository.save_notebook_faqs(notebook_id, result["faq"])
-
                         # Save embeddings for blog post
                         max_embedding_retries = 3
                         embedding_retry_count = 0
@@ -103,6 +123,8 @@ class TaskManager:
                             notebook_id,
                             title=title
                         )
+
+                        await self._delete_notebook_data(notebook_id)
 
                         # Save faqs in db
                         await notebook_repository.save_notebook_faqs(notebook_id, result["faq"])

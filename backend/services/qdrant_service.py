@@ -293,8 +293,8 @@ class QdrantSourceStore:
             points_selector=rest.FilterSelector(filter=filter_param),
         )
 
-        logger.info(f"Deleted {result.status.deleted} points for notebook {notebook_id}")
-        return result.status.deleted
+        logger.info(f"Deleted points for notebook {notebook_id}")
+        return result.status
 
 # Create an instance without initialization
 qdrant_service = QdrantSourceStore(
