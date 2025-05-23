@@ -14,7 +14,11 @@ async def get_relevant_sources(notebook_id: str, query: str):
 
   output = ""
   for result in results:
-    output += f"Content: {result['content_chunk']}\n{"Source: " + result['page_title'] + " (" + result['url'] + ")" if result['url'] else ""}\n---\n"
+    source_info = ""
+    if result.get('url'):
+        page_title = result.get('page_title', '')
+        source_info = f"Source: {page_title} ({result['url']})"
+    output += f"Content: {result['content_chunk']}\n{source_info}\n---\n"
 
   logger.info(f"Relevant sources from Qdrant for notebook: {notebook_id} with query: {query} are: {output}")
 

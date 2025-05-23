@@ -4,14 +4,14 @@ from datetime import datetime
 
 class ResearchSource(BaseModel):
     source_type: Literal["URL", "MANUAL", "FILE"]
-    source_url: Optional[str]
-    source_content: Optional[str]
+    source_url: Optional[str] = Field(None, description="The URL of the source.")
+    source_content: Optional[str] = Field(None, description="The content of the source.")
 
 
 class ResearchRequest(BaseModel):
-    notebook_id: str = Field(..., description="The notebook ID to use for the research. If not provided, the agent will create a new notebook.")
+    notebook_id: str = Field(..., description="The notebook ID to use for the research.")
     topic: Optional[str] = Field(None, min_length=3, description="The research topic for the agent.")
-    sources: Optional[List[ResearchSource]] = Field(None, description="The sources to use for the research. If not provided, the agent will use the default sources.")
+    sources: Optional[List[ResearchSource]] = Field(None, description="The sources to use for the research.")
 
 class TaskResponse(BaseModel):
     task_id: str

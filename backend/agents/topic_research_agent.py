@@ -17,6 +17,8 @@ server_params = StdioServerParameters(
 
 # Initialize MCPAdapt with CrewAI adapter
 async def run_research_crew(topic: str):
+    logger.info(f"Running topic research crew for topic: {topic}")
+
     start_time = time.time()
     try:
         with MCPServerAdapter(server_params) as tools:

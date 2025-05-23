@@ -96,16 +96,25 @@ export async function POST(request: Request) {
     });
 
     // Call the research API
-    if (result.notebook && result.notebook.topic) {
+    if (result.notebook && (result.notebook.topic || sources.length > 0)) {
       try {
         const researchApiUrl = process.env.BACKEND_API_URL;
+
+        const sourcesToSend = sources && sources.length > 0 ? sources.map((source: { sourceType: string; sourceUrl: string; content: string }) => ({
+          source_type: source.sourceType,
+          source_url: source.sourceUrl || null,
+          source_content: source.content || null,
+        }))
+          : [];
+
         const researchApiResponse = await fetch(`${researchApiUrl}/api/research`, {
           method: "POST",
           headers: {
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            topic: result.notebook.topic,
+            topic: result.notebook.topic || null,
+            sources: sourcesToSend,
             notebook_id: result.notebook.id,
           }),
         });

@@ -2,7 +2,7 @@ import asyncio
 from typing import Dict, Optional, List, Any
 from loguru import logger
 
-from agents import topic_research_agent
+from agents import topic_research_agent, sources_research_agent
 from models.db import NotebookProcessingStatusValue
 from .task_repository import task_repository
 from .notebook_repository import notebook_repository
@@ -30,10 +30,7 @@ class TaskManager:
                            (f" (retry {retry_count}/{max_retries-1})" if retry_count > 0 else ""))
 
                 with logger.contextualize(task_id=task_id):
-                    if topic and topic != "" and (sources and len(sources) > 0):
-                        logger.warning("Topic and sources research not implemented yet")
-                        return
-                    elif topic and topic != "" and (not sources or len(sources) == 0):
+                    if topic and topic != "" and (not sources or len(sources) == 0):
                         # Run topic research agent
                         logger.info(f"Running topic research agent for topic: {topic}")
                         result = await topic_research_agent.run_research_crew(topic)
@@ -87,10 +84,68 @@ class TaskManager:
                                 logger.error(e)
 
                     elif  sources and len(sources) > 0:
-                        logger.error("Sources research not implemented yet")
-                        return
+                        # Run sources research agent
+                        logger.info(f"Running sources research agent for sources: {sources}")
+                        result = await sources_research_agent.run_sources_research_crew(sources)
+                        # Save notebook output
+                        logger.info(f"Saving notebook output for notebook: {notebook_id}")
+                        await notebook_repository.save_notebook_output(notebook_id, result["blog_post"])
+
+                        # Update notebook title and topic
+                        logger.info(f"Updating notebook title and topic for notebook: {notebook_id}")
+                        title = result["title"]
+                        await notebook_repository.update_notebook(
+                            notebook_id,
+                            title=title
+                        )
+
+                        max_embedding_retries = 3
+                        embedding_retry_count = 0
+
+                        while embedding_retry_count < max_embedding_retries:
+                            try:
+                                # Save textual content in Qdrant
+                                logger.info(f"Embedding textual content for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
+
+                                for source in sources:
+                                    if source.source_type == "MANUAL":
+                                        await qdrant_service.add_source(
+                                            content=source.source_content,
+                                            notebook_id=notebook_id
+                                        )
+
+                                # Save sources in Qdrant
+                                logger.info(f"Embedding blog post for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
+                                await qdrant_service.add_source(
+                                    content=result["blog_post"],
+                                    notebook_id=notebook_id,
+                                    metadata={
+                                        "title": result["title"],
+                                    }
+                                )
+
+                                logger.info(f"Embedding scraped data for notebook: {notebook_id} (attempt {embedding_retry_count + 1}/{max_embedding_retries})")
+                                for source in result["scraped_data"]:
+                                    await qdrant_service.add_source(
+                                        content=source["content"],
+                                        notebook_id=notebook_id,
+                                        metadata={
+                                            "url": source["url"]
+                                        }
+                                    )
+
+                                break
+
+                            except Exception as e:
+                                embedding_retry_count += 1
+                                if embedding_retry_count < max_embedding_retries:
+                                    logger.warning(f"Error embedding sources for notebook: {notebook_id} (attempt {embedding_retry_count}/{max_embedding_retries})")
+                                    logger.warning(e)
+                                    continue
+                                logger.error(f"Error embedding sources for notebook: {notebook_id} after {max_embedding_retries} attempts")
+                                logger.error(e)
                     else:
-                        logger.error("No topic or sources provided")
+                        logger.error("Not supported research type")
                         return
 
 

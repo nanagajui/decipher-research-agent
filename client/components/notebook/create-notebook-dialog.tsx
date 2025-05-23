@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const notebookSchema = z.object({
   topic: z
@@ -53,6 +54,7 @@ export function CreateNotebookDialog() {
   const [sourceValue, setSourceValue] = useState("");
   const [sourceError, setSourceError] = useState("");
   const [formError, setFormError] = useState("");
+  const [activeTab, setActiveTab] = useState<"TOPIC" | "SOURCES">("TOPIC");
 
   const form = useForm<z.infer<typeof notebookSchema>>({
     resolver: zodResolver(notebookSchema),
@@ -95,30 +97,31 @@ export function CreateNotebookDialog() {
 
   async function onSubmit(values: z.infer<typeof notebookSchema>) {
     try {
-      // Validate that at least one of topic or sources is provided
-      if (
-        (!values.topic || values.topic.trim() === "") &&
-        sources.length === 0
-      ) {
-        setFormError("Please provide either a topic or at least one source");
-        return;
-      }
-
-      // Additional validation for topic if it's provided but not empty
-      if (values.topic && values.topic.trim().length < 3) {
-        form.setError("topic", {
-          type: "manual",
-          message: "Topic must be at least 3 characters",
-        });
-        return;
-      }
-
-      if (values.topic && values.topic.trim().length > 200) {
-        form.setError("topic", {
-          type: "manual",
-          message: "Topic must be less than 200 characters",
-        });
-        return;
+      // Validation: only require the active input
+      if (activeTab === "TOPIC") {
+        if (!values.topic || values.topic.trim() === "") {
+          setFormError("Please provide a topic");
+          return;
+        }
+        if (values.topic.trim().length < 3) {
+          form.setError("topic", {
+            type: "manual",
+            message: "Topic must be at least 3 characters",
+          });
+          return;
+        }
+        if (values.topic.trim().length > 200) {
+          form.setError("topic", {
+            type: "manual",
+            message: "Topic must be less than 200 characters",
+          });
+          return;
+        }
+      } else if (activeTab === "SOURCES") {
+        if (sources.length === 0) {
+          setFormError("Please add at least one source");
+          return;
+        }
       }
 
       const sourcesToSave = sources.map((source) => {
@@ -142,8 +145,10 @@ export function CreateNotebookDialog() {
         },
         body: JSON.stringify({
           topic:
-            values.topic && values.topic.trim() ? values.topic.trim() : null,
-          sources: sourcesToSave,
+            activeTab === "TOPIC" && values.topic && values.topic.trim()
+              ? values.topic.trim()
+              : null,
+          sources: activeTab === "SOURCES" ? sourcesToSave : [],
         }),
       });
 
@@ -183,142 +188,156 @@ export function CreateNotebookDialog() {
         <DialogHeader>
           <DialogTitle>Create New Notebook</DialogTitle>
           <DialogDescription>
-            Enter a topic and/or add sources for your new notebook.
+            Enter a topic or add sources for your new notebook.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="topic"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Topic (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter notebook topic"
-                      {...field}
-                      className="w-full"
-                      onChange={(e) => {
-                        field.onChange(e);
-                        setFormError("");
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Provide either a topic or at least one source
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4">
-              <FormLabel>Sources (Optional, Up to 20)</FormLabel>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1">
-                  {currentSource === "URL" ? (
-                    <Input
-                      placeholder="Enter URL"
-                      value={sourceValue}
-                      onChange={(e) => setSourceValue(e.target.value)}
-                      disabled={sources.length >= 20}
-                    />
-                  ) : (
-                    <Textarea
-                      placeholder="Enter text source"
-                      value={sourceValue}
-                      onChange={(e) => setSourceValue(e.target.value)}
-                      disabled={sources.length >= 20}
-                      className="min-h-[120px] resize-y"
-                    />
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as "TOPIC" | "SOURCES")}
+          className="w-full"
+        >
+          <TabsList className="mb-4 w-full">
+            <TabsTrigger value="TOPIC" className="flex-1">
+              Topic
+            </TabsTrigger>
+            <TabsTrigger value="SOURCES" className="flex-1">
+              Sources
+            </TabsTrigger>
+          </TabsList>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <TabsContent value="TOPIC">
+                <FormField
+                  control={form.control}
+                  name="topic"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Topic</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter notebook topic"
+                          {...field}
+                          className="w-full"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setFormError("");
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter a topic for your notebook
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {formError && (
+                  <p className="text-destructive text-sm">{formError}</p>
+                )}
+              </TabsContent>
+              <TabsContent value="SOURCES">
+                <div className="space-y-4">
+                  <FormLabel>Sources (Up to 20)</FormLabel>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                      {currentSource === "URL" ? (
+                        <Input
+                          placeholder="Enter URL"
+                          value={sourceValue}
+                          onChange={(e) => setSourceValue(e.target.value)}
+                          disabled={sources.length >= 20}
+                        />
+                      ) : (
+                        <Textarea
+                          placeholder="Enter text source"
+                          value={sourceValue}
+                          onChange={(e) => setSourceValue(e.target.value)}
+                          disabled={sources.length >= 20}
+                          className="min-h-[120px] resize-y"
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-row sm:flex-col gap-2">
+                      <Select
+                        value={currentSource}
+                        onValueChange={(value: string) =>
+                          setCurrentSource(value as "URL" | "TEXT")
+                        }
+                      >
+                        <SelectTrigger className="w-[100px]">
+                          <SelectValue placeholder="Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="URL">URL</SelectItem>
+                          <SelectItem value="TEXT">Text</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button"
+                        onClick={addSource}
+                        disabled={sources.length >= 20}
+                        className="flex-1"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                  {sourceError && (
+                    <p className="text-destructive text-sm">{sourceError}</p>
+                  )}
+                  {formError && (
+                    <p className="text-destructive text-sm">{formError}</p>
+                  )}
+                  {sources.length > 0 && (
+                    <div className="mt-4 space-y-3">
+                      <h3 className="text-sm font-medium">Added Sources:</h3>
+                      <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                        {sources.map((source, index) => (
+                          <div
+                            key={index}
+                            className="flex justify-between items-center p-3 border rounded-md bg-secondary/10"
+                          >
+                            <div className="flex items-center overflow-hidden">
+                              <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded mr-2 uppercase">
+                                {source.type}
+                              </span>
+                              <span className="text-sm truncate max-w-[350px]">
+                                {source.value}
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeSource(index)}
+                              className="ml-2 flex-shrink-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
-
-                <div className="flex flex-row sm:flex-col gap-2">
-                  <Select
-                    value={currentSource}
-                    onValueChange={(value: string) =>
-                      setCurrentSource(value as "URL" | "TEXT")
-                    }
-                  >
-                    <SelectTrigger className="w-[100px]">
-                      <SelectValue placeholder="Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="URL">URL</SelectItem>
-                      <SelectItem value="TEXT">Text</SelectItem>
-                    </SelectContent>
-                  </Select>
-
+              </TabsContent>
+              <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 pt-2">
+                <DialogClose asChild>
                   <Button
+                    variant="outline"
                     type="button"
-                    onClick={addSource}
-                    disabled={sources.length >= 20}
-                    className="flex-1"
+                    className="w-full sm:w-auto mr-2"
                   >
-                    Add
+                    Cancel
                   </Button>
-                </div>
-              </div>
-
-              {sourceError && (
-                <p className="text-destructive text-sm">{sourceError}</p>
-              )}
-
-              {formError && (
-                <p className="text-destructive text-sm">{formError}</p>
-              )}
-
-              {sources.length > 0 && (
-                <div className="mt-4 space-y-3">
-                  <h3 className="text-sm font-medium">Added Sources:</h3>
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
-                    {sources.map((source, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center p-3 border rounded-md bg-secondary/10"
-                      >
-                        <div className="flex items-center overflow-hidden">
-                          <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded mr-2 uppercase">
-                            {source.type}
-                          </span>
-                          <span className="text-sm truncate max-w-[350px]">
-                            {source.value}
-                          </span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeSource(index)}
-                          className="ml-2 flex-shrink-0"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 pt-2">
-              <DialogClose asChild>
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="w-full sm:w-auto mr-2"
-                >
-                  Cancel
+                </DialogClose>
+                <Button type="submit" className="w-full sm:w-auto">
+                  Decipher It
                 </Button>
-              </DialogClose>
-              <Button type="submit" className="w-full sm:w-auto">
-                Create Notebook
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              </DialogFooter>
+            </form>
+          </Form>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
