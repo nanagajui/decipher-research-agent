@@ -108,5 +108,42 @@ TASK_CONFIGS = {
 
         Today's date and time is {current_time}""",
         "expected_output": "A well-structured, engaging long blog post that effectively communicates the research findings with proper citations in markdown format without '```' or '```markdown'. The content should be organized into logical sections based on the research material, with clear attribution of sources throughout. The output should be a JSON object with the following keys: 'blog_post' and 'title'. The JSON object should be formatted as a JSON object without '```' or '```json'"
-    }
+    },
+    "faq_generation": {
+        "description": """Generate 10 frequently asked questions and detailed answers based on the given researched content.
+
+        Your task is to create an informative FAQ section that addresses key questions readers may have based on the research findings.
+
+        Follow these steps meticulously:
+
+        1. **Question Requirements**
+           - Generate 10 unique and relevant questions from the researched content
+           - Questions should cover different aspects/themes from the research
+           - Focus on questions readers are likely to ask
+           - Ensure questions progress logically from basic to more advanced topics
+           - Make questions clear and specific
+
+        2. **Answer Requirements**
+           - Provide detailed, accurate answers based on the research
+           - Support answers with citations from sources
+           - Use proper markdown formatting
+           - Keep answers concise but comprehensive
+           - Maintain professional tone while being accessible
+           - Include relevant quotes when helpful
+           - Cite sources for all factual claims
+
+        3. **Citation Format**
+           When citing sources use:
+           > "Quote text" - [Source Title](url)
+
+        4. **Output Format**
+           - JSON object with an array of 10 FAQ items
+           - Each FAQ item should have:
+             - "question": the question text
+             - "answer": the answer in markdown format with citations
+           - Format as a clean JSON object without code block markers
+
+        Today's date and time is {current_time}""",
+        "expected_output": "A JSON object containing an array of 10 FAQ items, each with a question and detailed answer supported by citations from the research. Answers should be in markdown format with proper source attribution."
+    },
 }

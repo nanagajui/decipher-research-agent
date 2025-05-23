@@ -16,6 +16,14 @@ class BlogPostTaskResult(BaseModel):
     title: str
 
 
+class FaqItem(BaseModel):
+    question: str = Field(description="The question of the FAQ item.")
+    answer: str = Field(description="The answer of the FAQ item.")
+
+class FaqTaskResult(BaseModel):
+    faq: List[FaqItem] = Field(description="A list of FAQ items.")
+
+
 # class WebScrapingTaskSingleResult(BaseModel):
 #     source: WebSource = Field(description="The source of the web page that was scraped.")
 #     content: str = Field(description="The content of the web page that was scraped.")

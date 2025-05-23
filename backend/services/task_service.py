@@ -47,6 +47,10 @@ class TaskManager:
                             topic=topic
                         )
 
+                        # Save faqs in db
+                        await notebook_repository.save_notebook_faqs(notebook_id, result["faq"])
+
+                        # Save embeddings for blog post
                         max_embedding_retries = 3
                         embedding_retry_count = 0
 
@@ -83,6 +87,7 @@ class TaskManager:
                                 logger.error(f"Error embedding sources for notebook: {notebook_id} after {max_embedding_retries} attempts")
                                 logger.error(e)
 
+
                     elif  sources and len(sources) > 0:
                         # Run sources research agent
                         logger.info(f"Running sources research agent for sources: {sources}")
@@ -98,6 +103,9 @@ class TaskManager:
                             notebook_id,
                             title=title
                         )
+
+                        # Save faqs in db
+                        await notebook_repository.save_notebook_faqs(notebook_id, result["faq"])
 
                         max_embedding_retries = 3
                         embedding_retry_count = 0

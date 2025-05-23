@@ -14,7 +14,11 @@ async function getNotebook(id: string, userId: string) {
     include: {
       processingStatus: true,
       sources: true,
-      output: true,
+      output: {
+        include: {
+          faqs: true,
+        },
+      },
     },
   });
 }

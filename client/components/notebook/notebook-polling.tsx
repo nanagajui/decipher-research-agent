@@ -10,6 +10,7 @@ import {
   BookOpen,
   Send,
   RefreshCw,
+  HelpCircle,
 } from "lucide-react";
 import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
 import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
@@ -165,6 +166,39 @@ const ChatInterface = memo(
 );
 
 ChatInterface.displayName = "ChatInterface";
+
+// FAQ component
+const FaqList = memo(
+  ({ faqs }: { faqs: { question: string; answer: string }[] }) => {
+    if (!faqs || faqs.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+          No FAQs available for this notebook
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {faqs.map((faq, index) => (
+          <div key={index} className="space-y-2">
+            <h3 className="text-lg font-semibold">{faq.question}</h3>
+            <div className="markdown-container prose prose-sm max-w-none dark:prose-invert">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={MarkdownComponents}
+              >
+                {faq.answer}
+              </ReactMarkdown>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+);
+
+FaqList.displayName = "FaqList";
 
 export function NotebookPolling({
   initialNotebook,
@@ -489,7 +523,7 @@ export function NotebookPolling({
                   value={activeTab}
                   onValueChange={setActiveTab}
                 >
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsList className="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="summary" className="flex items-center">
                       <BookOpen className="h-4 w-4 mr-2" />
                       Deciphered Summary
@@ -501,6 +535,14 @@ export function NotebookPolling({
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
                       Decipher with Chat
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="faq"
+                      className="flex items-center"
+                      disabled={status === "ERROR"}
+                    >
+                      <HelpCircle className="h-4 w-4 mr-2" />
+                      FAQs
                     </TabsTrigger>
                   </TabsList>
 
@@ -521,6 +563,10 @@ export function NotebookPolling({
                       isLoading={isLoading}
                       onSendMessage={handleSendMessage}
                     />
+                  </TabsContent>
+
+                  <TabsContent value="faq">
+                    <FaqList faqs={notebook.output?.faqs || []} />
                   </TabsContent>
                 </Tabs>
               </CardContent>

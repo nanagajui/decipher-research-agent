@@ -11,7 +11,7 @@ from loguru import logger
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.db import Notebook, NotebookProcessingStatus, NotebookOutput, NotebookProcessingStatusValue, NotebookSource, NotebookDocumentSourceType
+from models.db import Notebook, NotebookProcessingStatus, NotebookOutput, NotebookProcessingStatusValue, NotebookSource, NotebookDocumentSourceType, NotebookFAQ
 from services.db_service import get_db_session
 
 class NotebookRepository:
@@ -195,6 +195,47 @@ class NotebookRepository:
                 logger.info(f"No fields to update for notebook with ID: {notebook.id}")
 
             return notebook.to_dict()
+
+    async def save_notebook_faqs(self, notebook_id: str, faqs: List[Dict[str, str]]) -> None:
+        """
+        Save or update FAQs for a notebook.
+
+        Args:
+            notebook_id: The notebook ID
+            faqs: List of FAQ dictionaries with 'question' and 'answer' keys
+        """
+        async with get_db_session() as session:
+            # Get the notebook output
+            stmt = select(NotebookOutput).where(
+                NotebookOutput.notebook_id == notebook_id
+            )
+            result = await session.execute(stmt)
+            notebook_output = result.scalar_one_or_none()
+
+            if not notebook_output:
+                logger.warning(f"No notebook output found for notebook {notebook_id}")
+                return
+
+            # Create new FAQ entries
+            new_faqs = [
+                NotebookFAQ(
+                    question=faq["question"],
+                    answer=faq["answer"],
+                    notebook_output_id=notebook_output.id,
+                    created_at=datetime.now()
+                )
+                for faq in faqs
+            ]
+            session.add_all(new_faqs)
+
+            # Update notebook updated_at timestamp
+            notebook_stmt = update(Notebook).where(
+                Notebook.id == notebook_id
+            ).values(updated_at=datetime.now())
+            await session.execute(notebook_stmt)
+
+            await session.commit()
+            logger.info(f"Saved {len(new_faqs)} FAQs for notebook {notebook_id}")
 
 # Singleton instance
 notebook_repository = NotebookRepository()

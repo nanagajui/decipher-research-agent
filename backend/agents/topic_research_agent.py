@@ -5,7 +5,7 @@ import os
 from loguru import logger
 from datetime import datetime
 import time
-from models.topic_research_models import WebScrapingPlannerTaskResult, WebScrapingLinkCollectorTaskResult, WebLink, BlogPostTaskResult
+from models.topic_research_models import WebScrapingPlannerTaskResult, WebScrapingLinkCollectorTaskResult, WebLink, BlogPostTaskResult, FaqTaskResult
 from typing import List
 from config import llm, TOPIC_RESEARCH_AGENT_CONFIGS, TOPIC_RESEARCH_TASK_CONFIGS
 import asyncio
@@ -151,10 +151,19 @@ async def run_research_crew(topic: str):
                 output_pydantic=BlogPostTaskResult
             )
 
+            faq_task = Task(
+                description=TOPIC_RESEARCH_TASK_CONFIGS["faq_generation"]["description"],
+                expected_output=TOPIC_RESEARCH_TASK_CONFIGS["faq_generation"]["expected_output"],
+                agent=researcher,
+                context=[research_task],
+                max_retries=5,
+                output_pydantic=FaqTaskResult
+            )
+
             # Research and content creation crew
             research_content_crew = Crew(
                 agents=[researcher, content_writer],
-                tasks=[research_task, content_task],
+                tasks=[research_task, faq_task, content_task],
                 verbose=True,
                 process=Process.sequential,
                 output_log_file=f"logs/research_content_crew_{current_time}.log",
@@ -236,13 +245,17 @@ async def run_research_crew(topic: str):
                 "current_time": current_time,
             })
 
+            faq_result = faq_task.output.pydantic.faq
+            logger.info(f"FAQ task result: {faq_result}")
+
             logger.info(f"Research and content creation crew result: {research_content_crew_result}")
 
             return {
                 "blog_post": research_content_crew_result["blog_post"],
                 "title": research_content_crew_result["title"],
                 "links": [link.model_dump() for link in links],
-                "scraped_data": scraped_data
+                "scraped_data": scraped_data,
+                "faq": [faq.model_dump() for faq in faq_result]
             }
     except Exception as e:
         logger.error(f"Error in topic research agent: {e}")

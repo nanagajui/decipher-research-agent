@@ -66,5 +66,12 @@ export type NotebookWithDetails = {
     notebookId: string;
     createdAt: Date;
     updatedAt: Date | null;
+    faqs: Array<{
+      id: string;
+      question: string;
+      answer: string;
+      createdAt: Date;
+      updatedAt: Date | null;
+    }>;
   } | null;
 };

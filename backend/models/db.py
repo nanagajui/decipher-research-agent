@@ -125,8 +125,38 @@ class NotebookOutput(Base):
     summary: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, name="createdAt", nullable=False, default=func.now())
 
-    # Relationship
+    # Relationships
     notebook: Mapped["Notebook"] = relationship("Notebook", back_populates="output")
+    faqs: Mapped[List["NotebookFAQ"]] = relationship("NotebookFAQ", back_populates="notebook_output", cascade="all, delete-orphan")
+
+class NotebookFAQ(Base):
+    """NotebookFAQ model for the database."""
+    __tablename__ = "notebook_faqs"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    answer: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, name="createdAt", nullable=False, default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, name="updatedAt", nullable=False, default=func.now(), onupdate=func.now())
+    notebook_output_id: Mapped[str] = mapped_column(String, ForeignKey("notebook_outputs.id", ondelete="CASCADE"), name="notebookOutputId", nullable=False)
+
+    # Relationship
+    notebook_output: Mapped["NotebookOutput"] = relationship("NotebookOutput", back_populates="faqs")
+
+    __table_args__ = (
+        Index('ix_notebook_faqs_notebook_output_id', notebook_output_id),
+    )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the model to a dictionary."""
+        return {
+            "id": self.id,
+            "question": self.question,
+            "answer": self.answer,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "notebook_output_id": self.notebook_output_id
+        }
 
 class NotebookProcessingStatus(Base):
     """NotebookProcessingStatus model for the database."""
