@@ -51,30 +51,30 @@ def configure_logger(
         diagnose=True,
     )
 
-    # Add file handler for all logs
-    logger.add(
-        LOGS_DIR / "app_{time}.log",
-        format=log_format,
-        level=file_level,
-        rotation=rotation,
-        retention=retention,
-        compression="zip",
-        backtrace=True,
-        diagnose=True,
-    )
+    # # Add file handler for all logs
+    # logger.add(
+    #     LOGS_DIR / "app_{time}.log",
+    #     format=log_format,
+    #     level=file_level,
+    #     rotation=rotation,
+    #     retention=retention,
+    #     compression="zip",
+    #     backtrace=True,
+    #     diagnose=True,
+    # )
 
-    # Add file handler for errors only
-    logger.add(
-        LOGS_DIR / "errors_{time}.log",
-        format=log_format,
-        level="ERROR",
-        rotation=rotation,
-        retention=retention,
-        compression="zip",
-        backtrace=True,
-        diagnose=True,
-        filter=lambda record: record["level"].name == "ERROR"
-    )
+    # # Add file handler for errors only
+    # logger.add(
+    #     LOGS_DIR / "errors_{time}.log",
+    #     format=log_format,
+    #     level="ERROR",
+    #     rotation=rotation,
+    #     retention=retention,
+    #     compression="zip",
+    #     backtrace=True,
+    #     diagnose=True,
+    #     filter=lambda record: record["level"].name == "ERROR"
+    # )
 
 
 # Intercept standard library logging to loguru
