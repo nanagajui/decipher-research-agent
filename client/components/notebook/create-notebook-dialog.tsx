@@ -8,6 +8,7 @@ import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { FileUpload } from "@/components/ui/file-upload";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ import {
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 const notebookSchema = z.object({
   topic: z
@@ -48,9 +50,16 @@ const notebookSchema = z.object({
 export function CreateNotebookDialog() {
   const router = useRouter();
   const [sources, setSources] = useState<
-    { type: "URL" | "TEXT"; value: string }[]
+    {
+      type: "URL" | "TEXT" | "FILE";
+      value: string;
+      filename?: string;
+      filePath?: string;
+    }[]
   >([]);
-  const [currentSource, setCurrentSource] = useState<"URL" | "TEXT">("URL");
+  const [currentSource, setCurrentSource] = useState<"URL" | "TEXT" | "FILE">(
+    "URL"
+  );
   const [sourceValue, setSourceValue] = useState("");
   const [sourceError, setSourceError] = useState("");
   const [formError, setFormError] = useState("");
@@ -64,6 +73,11 @@ export function CreateNotebookDialog() {
   });
 
   const addSource = () => {
+    if (currentSource === "FILE") {
+      // File sources are added via the FileUpload component
+      return;
+    }
+
     if (!sourceValue.trim()) {
       setSourceError("Source cannot be empty");
       return;
@@ -93,6 +107,30 @@ export function CreateNotebookDialog() {
     } catch {
       return false;
     }
+  };
+
+  const handleFileUpload = (result: {
+    filePath: string;
+    filename: string;
+    fileSize: number;
+    fileType: string;
+    publicUrl: string;
+  }) => {
+    setSources([
+      ...sources,
+      {
+        type: "FILE",
+        value: result.publicUrl,
+        filename: result.filename,
+        filePath: result.filePath,
+      },
+    ]);
+    setSourceError("");
+    setFormError("");
+  };
+
+  const handleFileUploadError = (error: string) => {
+    setSourceError(error);
   };
 
   async function onSubmit(values: z.infer<typeof notebookSchema>) {
@@ -129,6 +167,13 @@ export function CreateNotebookDialog() {
           return {
             sourceType: "URL",
             sourceUrl: source.value,
+          };
+        } else if (source.type === "FILE") {
+          return {
+            sourceType: "UPLOAD",
+            sourceUrl: source.value,
+            filePath: source.filePath,
+            filename: source.filename,
           };
         } else {
           return {
@@ -184,160 +229,231 @@ export function CreateNotebookDialog() {
           New Notebook
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Create New Notebook</DialogTitle>
-          <DialogDescription>
-            Enter a topic or add sources for your new notebook.
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="space-y-3 pb-4">
+          <DialogTitle className="text-xl font-semibold">Create New Notebook</DialogTitle>
+          <DialogDescription className="text-base text-muted-foreground">
+            Start by choosing a topic or add your own sources to build a comprehensive research notebook.
           </DialogDescription>
         </DialogHeader>
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as "TOPIC" | "SOURCES")}
-          className="w-full"
-        >
-          <TabsList className="mb-4 w-full">
-            <TabsTrigger value="TOPIC" className="flex-1">
-              Topic
-            </TabsTrigger>
-            <TabsTrigger value="SOURCES" className="flex-1">
-              Sources
-            </TabsTrigger>
-          </TabsList>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <TabsContent value="TOPIC">
-                <FormField
-                  control={form.control}
-                  name="topic"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Topic</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter notebook topic"
-                          {...field}
-                          className="w-full"
-                          onChange={(e) => {
-                            field.onChange(e);
-                            setFormError("");
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Enter a topic for your notebook
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {formError && (
-                  <p className="text-destructive text-sm">{formError}</p>
-                )}
-              </TabsContent>
-              <TabsContent value="SOURCES">
-                <div className="space-y-4">
-                  <FormLabel>Sources (Up to 20)</FormLabel>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1">
-                      {currentSource === "URL" ? (
-                        <Input
-                          placeholder="Enter URL"
-                          value={sourceValue}
-                          onChange={(e) => setSourceValue(e.target.value)}
-                          disabled={sources.length >= 20}
-                        />
-                      ) : (
-                        <Textarea
-                          placeholder="Enter text source"
-                          value={sourceValue}
-                          onChange={(e) => setSourceValue(e.target.value)}
-                          disabled={sources.length >= 20}
-                          className="min-h-[120px] resize-y"
-                        />
+
+        <div className="flex-1 overflow-y-auto">
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as "TOPIC" | "SOURCES")}
+            className="w-full h-full"
+          >
+            <TabsList className="mb-6 w-full grid grid-cols-2 bg-muted/50">
+              <TabsTrigger value="TOPIC" className="flex-1 data-[state=active]:bg-background">
+                Topic
+              </TabsTrigger>
+              <TabsTrigger value="SOURCES" className="flex-1 data-[state=active]:bg-background">
+                Sources
+              </TabsTrigger>
+            </TabsList>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <TabsContent value="TOPIC" className="mt-0">
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="topic"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-medium">Research Topic</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Climate change impacts on marine ecosystems"
+                              {...field}
+                              className="h-12 text-base"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                setFormError("");
+                              }}
+                            />
+                          </FormControl>
+                          <FormDescription className="text-sm">
+                            Describe what you want to research and learn about
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
                       )}
+                    />
+                    {formError && (
+                      <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg">
+                        {formError}
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                <TabsContent value="SOURCES">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <FormLabel className="text-base font-medium">Add Sources (Up to 20)</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Choose from URLs, text content, or upload documents to include in your notebook.
+                      </p>
                     </div>
-                    <div className="flex flex-row sm:flex-col gap-2">
+
+                    <div className="space-y-4">
                       <Select
                         value={currentSource}
-                        onValueChange={(value: string) =>
-                          setCurrentSource(value as "URL" | "TEXT")
-                        }
+                        onValueChange={(value: string) => {
+                          setCurrentSource(value as "URL" | "TEXT" | "FILE");
+                          setSourceValue("");
+                          setSourceError("");
+                        }}
                       >
-                        <SelectTrigger className="w-[100px]">
-                          <SelectValue placeholder="Type" />
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue placeholder="Source Type" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="URL">URL</SelectItem>
                           <SelectItem value="TEXT">Text</SelectItem>
+                          <SelectItem value="FILE">File</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button
-                        type="button"
-                        onClick={addSource}
-                        disabled={sources.length >= 20}
-                        className="flex-1"
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                  {sourceError && (
-                    <p className="text-destructive text-sm">{sourceError}</p>
-                  )}
-                  {formError && (
-                    <p className="text-destructive text-sm">{formError}</p>
-                  )}
-                  {sources.length > 0 && (
-                    <div className="mt-4 space-y-3">
-                      <h3 className="text-sm font-medium">Added Sources:</h3>
-                      <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
-                        {sources.map((source, index) => (
-                          <div
-                            key={index}
-                            className="flex justify-between items-center p-3 border rounded-md bg-secondary/10"
-                          >
-                            <div className="flex items-center overflow-hidden">
-                              <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded mr-2 uppercase">
-                                {source.type}
-                              </span>
-                              <span className="text-sm truncate max-w-[350px]">
-                                {source.value}
-                              </span>
+
+                      {currentSource === "FILE" ? (
+                        <FileUpload
+                          onFileUpload={handleFileUpload}
+                          onError={handleFileUploadError}
+                          disabled={sources.length >= 20}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="space-y-3">
+                          {currentSource === "URL" ? (
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="https://example.com/article"
+                                value={sourceValue}
+                                onChange={(e) => setSourceValue(e.target.value)}
+                                disabled={sources.length >= 20}
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                onClick={addSource}
+                                disabled={sources.length >= 20 || !sourceValue.trim()}
+                                size="default"
+                              >
+                                Add
+                              </Button>
                             </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeSource(index)}
-                              className="ml-2 flex-shrink-0"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <Textarea
+                                placeholder="Paste your text content here..."
+                                value={sourceValue}
+                                onChange={(e) => setSourceValue(e.target.value)}
+                                disabled={sources.length >= 20}
+                                className="min-h-[120px] resize-y"
+                              />
+                              <div className="flex justify-end">
+                                <Button
+                                  type="button"
+                                  onClick={addSource}
+                                  disabled={sources.length >= 20 || !sourceValue.trim()}
+                                  size="default"
+                                >
+                                  Add
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </TabsContent>
-              <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 pt-2">
-                <DialogClose asChild>
+
+                    {sourceError && (
+                      <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg">
+                        {sourceError}
+                      </div>
+                    )}
+
+                    {formError && (
+                      <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg">
+                        {formError}
+                      </div>
+                    )}
+
+                    {sources.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-medium">Added Sources ({sources.length}/20)</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {20 - sources.length} remaining
+                          </p>
+                        </div>
+                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 border rounded-lg bg-muted/30 p-3">
+                          {sources.map((source, index) => (
+                            <div
+                              key={index}
+                              className="flex items-start justify-between p-3 border rounded-lg bg-background shadow-sm hover:shadow-md transition-shadow"
+                            >
+                              <div className="flex items-start flex-1 overflow-hidden mr-3">
+                                <span className={cn(
+                                  "text-xs px-2.5 py-1 rounded-full mr-3 flex-shrink-0 font-medium",
+                                  source.type === "URL" && "bg-blue-100 text-blue-700",
+                                  source.type === "TEXT" && "bg-green-100 text-green-700",
+                                  source.type === "FILE" && "bg-purple-100 text-purple-700"
+                                )}>
+                                  {source.type}
+                                </span>
+                                <div className="overflow-hidden flex-1">
+                                  <p className="text-sm font-medium truncate">
+                                    {source.type === "FILE"
+                                      ? source.filename || "Uploaded file"
+                                      : source.value.length > 60
+                                        ? `${source.value.substring(0, 60)}...`
+                                        : source.value
+                                  }
+                                  </p>
+                                  {source.type === "TEXT" && source.value.length > 60 && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {source.value.length} characters
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeSource(index)}
+                                className="flex-shrink-0 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 mt-6 border-t">
+                  <DialogClose asChild>
+                    <Button
+                      variant="outline"
+                      type="button"
+                      className="w-full sm:w-auto order-2 sm:order-1"
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
                   <Button
-                    variant="outline"
-                    type="button"
-                    className="w-full sm:w-auto mr-2"
+                    type="submit"
+                    className="w-full sm:w-auto order-1 sm:order-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80"
                   >
-                    Cancel
+                    Decipher It
                   </Button>
-                </DialogClose>
-                <Button type="submit" className="w-full sm:w-auto">
-                  Decipher It
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </Tabs>
+                </DialogFooter>
+              </form>
+            </Form>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -78,6 +78,8 @@ export async function POST(request: Request) {
                 sourceType: source.sourceType,
                 sourceUrl: source.sourceUrl || null,
                 content: source.content || null,
+                filePath: source.filePath || null,
+                filename: source.filename || null,
               },
             })
           )
@@ -100,23 +102,27 @@ export async function POST(request: Request) {
       try {
         const researchApiUrl = process.env.BACKEND_API_URL;
 
-        const sourcesToSend = sources && sources.length > 0 ? sources.map((source: { sourceType: string; sourceUrl: string; content: string }) => ({
+        const sourcesToSend = sources && sources.length > 0 ? sources.map((source: { sourceType: string; sourceUrl: string; content: string; filePath: string; filename: string }) => ({
           source_type: source.sourceType,
-          source_url: source.sourceUrl || null,
+          source_url: source.sourceUrl || source.filePath || null,
           source_content: source.content || null,
         }))
           : [];
+
+        const researchApiRequestBody = {
+          topic: result.notebook.topic || null,
+          sources: sourcesToSend,
+          notebook_id: result.notebook.id,
+        }
+
+        console.log(researchApiRequestBody);
 
         const researchApiResponse = await fetch(`${researchApiUrl}/api/research`, {
           method: "POST",
           headers: {
             "content-type": "application/json",
           },
-          body: JSON.stringify({
-            topic: result.notebook.topic || null,
-            sources: sourcesToSend,
-            notebook_id: result.notebook.id,
-          }),
+          body: JSON.stringify(researchApiRequestBody),
         });
 
         if (!researchApiResponse.ok) {

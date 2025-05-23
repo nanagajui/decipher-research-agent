@@ -3,7 +3,7 @@ from typing import Optional, List, Any, Literal
 from datetime import datetime
 
 class ResearchSource(BaseModel):
-    source_type: Literal["URL", "MANUAL", "FILE"]
+    source_type: Literal["URL", "MANUAL", "UPLOAD"]
     source_url: Optional[str] = Field(None, description="The URL of the source.")
     source_content: Optional[str] = Field(None, description="The content of the source.")
 
