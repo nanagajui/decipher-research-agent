@@ -33,12 +33,6 @@ export function FileUpload({
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-    "image/bmp",
-    "image/tiff",
   ],
   className,
   multiple = true,
@@ -56,12 +50,6 @@ export function FileUpload({
         "PPTX",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
         "XLSX",
-      "image/jpeg": "JPEG",
-      "image/png": "PNG",
-      "image/gif": "GIF",
-      "image/webp": "WEBP",
-      "image/bmp": "BMP",
-      "image/tiff": "TIFF",
     };
 
     return types.map((type) => typeMap[type] || type);
