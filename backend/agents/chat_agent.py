@@ -14,7 +14,7 @@ async def get_relevant_sources(notebook_id: str, query: str):
 
   output = ""
   for result in results:
-    source_info = ""
+    source_info = "Source: Provided Text"
     if result.get('url'):
         page_title = result.get('page_title', '')
         source_info = f"Source: {page_title} ({result['url']})"
