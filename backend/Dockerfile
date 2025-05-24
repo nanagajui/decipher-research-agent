@@ -44,4 +44,4 @@ RUN mkdir -p logs && chmod 777 logs
 EXPOSE 8001
 
 # Use gunicorn with uvicorn workers
-CMD ["gunicorn", "server:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8001", "--timeout", "120"]
+CMD ["gunicorn", "server:app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8001", "--timeout", "0", "--keep-alive", "5"]
