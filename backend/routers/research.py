@@ -3,11 +3,14 @@ from loguru import logger
 from datetime import datetime
 
 from services import task_manager
+from services.notebook_repository import notebook_repository
+from agents.audio_overview_agent import run_audio_overview_agent
 from models.task_models import (
     ResearchRequest,
     TaskResponse,
     TaskStatusResponse
 )
+from models.audio_overview_models import AudioOverviewTranscript
 
 router = APIRouter(prefix="/research", tags=["research"])
 
@@ -68,3 +71,43 @@ async def get_task_details(task_id: str):
             detail="Task not found."
         )
     return TaskStatusResponse(**task_info, task_id=task_id)
+
+@router.post(
+    "/audio-overview/{notebook_id}",
+    response_model=AudioOverviewTranscript,
+    summary="Generate audio overview from notebook summary",
+    description="Creates an audio overview using the summary from a completed notebook research."
+)
+async def generate_audio_overview(notebook_id: str):
+    """Generate an audio overview from a notebook's research summary."""
+    logger.info(f"Generating audio overview for notebook: {notebook_id}")
+
+    # Validate notebook exists
+    notebook = await notebook_repository.get_notebook(notebook_id)
+    if not notebook:
+        logger.warning(f"Notebook not found: {notebook_id}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Notebook not found."
+        )
+
+    # Get the notebook summary
+    summary = await notebook_repository.get_notebook_output(notebook_id)
+    if not summary:
+        logger.warning(f"No summary found for notebook: {notebook_id}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No research summary found for this notebook. Please complete the research first."
+        )
+
+    try:
+        # Run the audio overview agent
+        result = await run_audio_overview_agent(notebook_id, summary)
+        logger.info(f"Audio overview generated successfully for notebook: {notebook_id}")
+        return result
+    except Exception as e:
+        logger.error(f"Error generating audio overview for notebook {notebook_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate audio overview. Please try again."
+        )

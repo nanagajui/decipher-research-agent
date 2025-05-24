@@ -151,6 +151,26 @@ class NotebookRepository:
 
             return notebook.to_dict()
 
+    async def get_notebook_output(self, notebook_id: str) -> Optional[str]:
+        """
+        Get notebook output summary.
+
+        Args:
+            notebook_id: The notebook ID
+
+        Returns:
+            The summary string or None if not found
+        """
+        async with get_db_session() as session:
+            stmt = select(NotebookOutput).where(NotebookOutput.notebook_id == notebook_id)
+            result = await session.execute(stmt)
+            notebook_output = result.scalar_one_or_none()
+
+            if not notebook_output:
+                return None
+
+            return notebook_output.summary
+
     async def update_notebook(
         self,
         notebook_id: str,
