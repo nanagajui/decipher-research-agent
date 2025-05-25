@@ -224,16 +224,22 @@ export function CreateNotebookDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
+        <Button
+          data-umami-event="frontend_create_notebook_dialog_open"
+          data-umami-event-section="dashboard"
+        >
           <Plus className="h-4 w-4 mr-2" />
           New Notebook
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="space-y-3 pb-4">
-          <DialogTitle className="text-xl font-semibold">Create New Notebook</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            Create New Notebook
+          </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground">
-            Start by choosing a topic or add your own sources to build a comprehensive research notebook.
+            Start by choosing a topic or add your own sources to build a
+            comprehensive research notebook.
           </DialogDescription>
         </DialogHeader>
 
@@ -244,15 +250,24 @@ export function CreateNotebookDialog() {
             className="w-full h-full"
           >
             <TabsList className="mb-6 w-full grid grid-cols-2 bg-muted/50">
-              <TabsTrigger value="TOPIC" className="flex-1 data-[state=active]:bg-background">
+              <TabsTrigger
+                value="TOPIC"
+                className="flex-1 data-[state=active]:bg-background"
+              >
                 Topic
               </TabsTrigger>
-              <TabsTrigger value="SOURCES" className="flex-1 data-[state=active]:bg-background">
+              <TabsTrigger
+                value="SOURCES"
+                className="flex-1 data-[state=active]:bg-background"
+              >
                 Sources
               </TabsTrigger>
             </TabsList>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 <TabsContent value="TOPIC" className="mt-0">
                   <div className="space-y-4">
                     <FormField
@@ -260,7 +275,9 @@ export function CreateNotebookDialog() {
                       name="topic"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-base font-medium">Research Topic</FormLabel>
+                          <FormLabel className="text-base font-medium">
+                            Research Topic
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="e.g., Climate change impacts on marine ecosystems"
@@ -289,9 +306,12 @@ export function CreateNotebookDialog() {
                 <TabsContent value="SOURCES">
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <FormLabel className="text-base font-medium">Add Sources (Up to 20)</FormLabel>
+                      <FormLabel className="text-base font-medium">
+                        Add Sources (Up to 20)
+                      </FormLabel>
                       <p className="text-sm text-muted-foreground">
-                        Choose from URLs, text content, or upload documents to include in your notebook.
+                        Choose from URLs, text content, or upload documents to
+                        include in your notebook.
                       </p>
                     </div>
 
@@ -335,8 +355,12 @@ export function CreateNotebookDialog() {
                               <Button
                                 type="button"
                                 onClick={addSource}
-                                disabled={sources.length >= 20 || !sourceValue.trim()}
+                                disabled={
+                                  sources.length >= 20 || !sourceValue.trim()
+                                }
                                 size="default"
+                                data-umami-event="frontend_source_add_click"
+                                data-umami-event-source-type="URL"
                               >
                                 Add
                               </Button>
@@ -354,8 +378,12 @@ export function CreateNotebookDialog() {
                                 <Button
                                   type="button"
                                   onClick={addSource}
-                                  disabled={sources.length >= 20 || !sourceValue.trim()}
+                                  disabled={
+                                    sources.length >= 20 || !sourceValue.trim()
+                                  }
                                   size="default"
+                                  data-umami-event="frontend_source_add_click"
+                                  data-umami-event-source-type="TEXT"
                                 >
                                   Add
                                 </Button>
@@ -381,7 +409,9 @@ export function CreateNotebookDialog() {
                     {sources.length > 0 && (
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-medium">Added Sources ({sources.length}/20)</h3>
+                          <h3 className="text-sm font-medium">
+                            Added Sources ({sources.length}/20)
+                          </h3>
                           <p className="text-xs text-muted-foreground">
                             {20 - sources.length} remaining
                           </p>
@@ -393,12 +423,17 @@ export function CreateNotebookDialog() {
                               className="flex items-start justify-between p-3 border rounded-lg bg-background shadow-sm hover:shadow-md transition-shadow"
                             >
                               <div className="flex items-start flex-1 overflow-hidden mr-3">
-                                <span className={cn(
-                                  "text-xs px-2.5 py-1 rounded-full mr-3 flex-shrink-0 font-medium",
-                                  source.type === "URL" && "bg-blue-100 text-blue-700",
-                                  source.type === "TEXT" && "bg-green-100 text-green-700",
-                                  source.type === "FILE" && "bg-purple-100 text-purple-700"
-                                )}>
+                                <span
+                                  className={cn(
+                                    "text-xs px-2.5 py-1 rounded-full mr-3 flex-shrink-0 font-medium",
+                                    source.type === "URL" &&
+                                      "bg-blue-100 text-blue-700",
+                                    source.type === "TEXT" &&
+                                      "bg-green-100 text-green-700",
+                                    source.type === "FILE" &&
+                                      "bg-purple-100 text-purple-700"
+                                  )}
+                                >
                                   {source.type}
                                 </span>
                                 <div className="overflow-hidden flex-1">
@@ -406,15 +441,15 @@ export function CreateNotebookDialog() {
                                     {source.type === "FILE"
                                       ? source.filename || "Uploaded file"
                                       : source.value.length > 60
-                                        ? `${source.value.substring(0, 60)}...`
-                                        : source.value
-                                  }
+                                      ? `${source.value.substring(0, 60)}...`
+                                      : source.value}
                                   </p>
-                                  {source.type === "TEXT" && source.value.length > 60 && (
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {source.value.length} characters
-                                    </p>
-                                  )}
+                                  {source.type === "TEXT" &&
+                                    source.value.length > 60 && (
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {source.value.length} characters
+                                      </p>
+                                    )}
                                 </div>
                               </div>
                               <Button
@@ -446,6 +481,9 @@ export function CreateNotebookDialog() {
                   <Button
                     type="submit"
                     className="w-full sm:w-auto order-1 sm:order-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80"
+                    data-umami-event="frontend_notebook_create_submit"
+                    data-umami-event-tab={activeTab}
+                    data-umami-event-sources-count={sources.length}
                   >
                     Decipher It
                   </Button>

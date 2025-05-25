@@ -118,6 +118,8 @@ export default function Home() {
               rel="noopener noreferrer"
               className="hover:underline ml-1"
               aria-label="Brightdata website"
+              data-umami-event="frontend_external_link_click"
+              data-umami-event-link="brightdata"
             >
               Brightdata
             </Link>
@@ -134,7 +136,12 @@ export default function Home() {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <AuthAwareButton />
             <Button variant="link" asChild>
-              <Link href="#features" aria-label="Learn more about DecipherIt">
+              <Link
+                href="#features"
+                aria-label="Learn more about DecipherIt"
+                data-umami-event="frontend_learn_more_click"
+                data-umami-event-section="hero"
+              >
                 Learn more →
               </Link>
             </Button>
@@ -241,6 +248,8 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Star on GitHub"
+                  data-umami-event="frontend_github_star_click"
+                  data-umami-event-section="cta"
                 >
                   Star on GitHub
                 </Link>
@@ -251,6 +260,8 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Report Issues"
+                  data-umami-event="frontend_github_issues_click"
+                  data-umami-event-section="cta"
                 >
                   Report Issues →
                 </Link>

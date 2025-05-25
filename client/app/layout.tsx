@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Oxanium } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/header";
@@ -52,6 +53,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${oxanium.className} antialiased`}>
+        <Script
+          defer
+          src="https://p01--umami--fyers-api-bot--oql9-vlwk.code.run/script.js"
+          data-website-id="d09597b1-692e-4f54-a378-97e224b7630b"
+          strategy="afterInteractive"
+        />
         <Header />
         <main className="min-h-screen pt-4">{children}</main>
         <Footer />

@@ -168,8 +168,20 @@ export default function AuthPage() {
             className="w-full"
           >
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger
+                value="login"
+                data-umami-event="frontend_auth_tab_switch"
+                data-umami-event-tab="login"
+              >
+                Login
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                data-umami-event="frontend_auth_tab_switch"
+                data-umami-event-tab="signup"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="login" key="login-tab">
               <Form {...loginForm}>
@@ -207,7 +219,13 @@ export default function AuthPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
+                    data-umami-event="frontend_sign_in_submit"
+                    data-umami-event-section="auth"
+                  >
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
@@ -279,7 +297,13 @@ export default function AuthPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
+                    data-umami-event="frontend_sign_up_submit"
+                    data-umami-event-section="auth"
+                  >
                     {isLoading ? "Creating account..." : "Create Account"}
                   </Button>
                 </form>

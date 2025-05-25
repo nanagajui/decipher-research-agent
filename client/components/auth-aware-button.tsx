@@ -27,7 +27,12 @@ export function AuthAwareButton() {
   };
 
   return (
-    <Button size="lg" onClick={handleGetStarted}>
+    <Button
+      size="lg"
+      onClick={handleGetStarted}
+      data-umami-event="frontend_get_started_click"
+      data-umami-event-section="hero"
+    >
       Get Started
     </Button>
   );

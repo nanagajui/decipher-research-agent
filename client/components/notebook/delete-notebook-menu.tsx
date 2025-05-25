@@ -82,6 +82,8 @@ export function DeleteNotebookMenu({
             }}
             className="text-destructive"
             disabled={disabled}
+            data-umami-event="frontend_delete_notebook_dialog_open"
+            data-umami-event-notebook-id={notebookId}
           >
             Delete
           </DropdownMenuItem>
@@ -106,6 +108,8 @@ export function DeleteNotebookMenu({
               variant="destructive"
               onClick={handleDelete}
               disabled={deleting}
+              data-umami-event="frontend_notebook_delete_confirm"
+              data-umami-event-notebook-id={notebookId}
             >
               {deleting ? "Deleting..." : "Delete"}
             </Button>

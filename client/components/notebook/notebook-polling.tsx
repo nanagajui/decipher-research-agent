@@ -156,6 +156,10 @@ const ChatInterface = memo(
             onClick={handleSubmit}
             disabled={isLoading || !localInput.trim()}
             className="px-4"
+            data-umami-event="frontend_chat_message_send"
+            data-umami-event-notebook-id={window.location.pathname
+              .split("/")
+              .pop()}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -722,7 +726,13 @@ export function NotebookPolling({
                   onValueChange={setActiveTab}
                 >
                   <TabsList className="grid w-full grid-cols-5 mb-6">
-                    <TabsTrigger value="summary" className="flex items-center">
+                    <TabsTrigger
+                      value="summary"
+                      className="flex items-center"
+                      data-umami-event="frontend_notebook_tab_click"
+                      data-umami-event-tab="summary"
+                      data-umami-event-notebook-id={notebook.id}
+                    >
                       <BookOpen className="h-4 w-4 mr-2" />
                       Deciphered Summary
                     </TabsTrigger>
@@ -730,6 +740,9 @@ export function NotebookPolling({
                       value="mindmap"
                       className="flex items-center"
                       disabled={status === "ERROR"}
+                      data-umami-event="frontend_notebook_tab_click"
+                      data-umami-event-tab="mindmap"
+                      data-umami-event-notebook-id={notebook.id}
                     >
                       <Brain className="h-4 w-4 mr-2" />
                       Mindmap

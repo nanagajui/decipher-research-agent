@@ -36,7 +36,12 @@ export function HeaderClient() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link
+            href="/"
+            className="flex items-center space-x-2"
+            data-umami-event="frontend_logo_click"
+            data-umami-event-section="header"
+          >
             <span className="font-bold text-xl">DecipherIt</span>
           </Link>
 
@@ -46,6 +51,8 @@ export function HeaderClient() {
                 <Link
                   href="/dashboard"
                   className="text-sm font-medium transition-colors hover:text-primary hidden sm:block"
+                  data-umami-event="frontend_dashboard_nav_click"
+                  data-umami-event-section="header"
                 >
                   Dashboard
                 </Link>
@@ -60,6 +67,8 @@ export function HeaderClient() {
                   size="sm"
                   className="text-sm font-medium hidden sm:flex"
                   onClick={handleSignOut}
+                  data-umami-event="frontend_sign_out_click"
+                  data-umami-event-section="header"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign out
@@ -83,6 +92,8 @@ export function HeaderClient() {
                       <Link
                         href="/dashboard"
                         className="flex items-center gap-3 text-base font-medium transition-colors hover:text-primary"
+                        data-umami-event="frontend_dashboard_nav_click"
+                        data-umami-event-section="mobile_menu"
                       >
                         Dashboard
                       </Link>
@@ -96,6 +107,8 @@ export function HeaderClient() {
                         size="lg"
                         className="flex items-center gap-3 text-base font-medium justify-start px-0"
                         onClick={handleSignOut}
+                        data-umami-event="frontend_sign_out_click"
+                        data-umami-event-section="mobile_menu"
                       >
                         <LogOut className="h-5 w-5" />
                         Sign out
@@ -106,7 +119,13 @@ export function HeaderClient() {
               </>
             ) : (
               <Button asChild>
-                <Link href="/auth">Get Started</Link>
+                <Link
+                  href="/auth"
+                  data-umami-event="frontend_get_started_click"
+                  data-umami-event-section="header"
+                >
+                  Get Started
+                </Link>
               </Button>
             )}
           </nav>

@@ -65,7 +65,12 @@ export function NotebookCard({ notebook }: NotebookCardProps) {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <Link href={`/notebook/${notebook.id}`}>
+    <Link
+      href={`/notebook/${notebook.id}`}
+      data-umami-event="frontend_notebook_open_click"
+      data-umami-event-notebook-id={notebook.id}
+      data-umami-event-status={status}
+    >
       <Card className="h-full hover:bg-muted/50 transition-colors p-3 sm:p-4 relative group">
         <CardHeader className="p-0 pb-2">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
