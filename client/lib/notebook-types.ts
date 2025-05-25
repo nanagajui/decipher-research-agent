@@ -63,6 +63,7 @@ export type NotebookWithDetails = {
   output?: {
     id: string;
     summary: string | null;
+    audioOverviewUrl: string | null;
     notebookId: string;
     createdAt: Date;
     updatedAt: Date | null;

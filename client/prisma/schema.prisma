@@ -124,12 +124,13 @@ model NotebookSource {
 }
 
 model NotebookOutput {
-  id         String        @id @default(uuid())
-  notebookId String        @unique
-  summary    String        @db.Text
-  createdAt  DateTime      @default(now())
-  notebook   Notebook      @relation(fields: [notebookId], references: [id], onDelete: Cascade)
-  faqs       NotebookFaq[]
+  id               String        @id @default(uuid())
+  notebookId       String        @unique
+  summary          String        @db.Text
+  audioOverviewUrl String?       @db.Text
+  createdAt        DateTime      @default(now())
+  notebook         Notebook      @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  faqs             NotebookFaq[]
 
   @@map("notebook_outputs")
 }

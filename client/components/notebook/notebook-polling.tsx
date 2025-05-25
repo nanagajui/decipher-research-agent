@@ -11,6 +11,7 @@ import {
   Send,
   RefreshCw,
   HelpCircle,
+  Volume2,
 } from "lucide-react";
 import { NotebookPageDeleteMenu } from "@/components/notebook/notebook-page-delete-menu";
 import { SourcesWrapper } from "@/components/notebook/sources-wrapper";
@@ -24,6 +25,7 @@ import { statusConfig, NotebookWithDetails } from "@/lib/notebook-types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { AudioOverviewSection } from "@/components/notebook/audio-overview-section";
 
 // Chat message type
 type Message = {
@@ -523,10 +525,18 @@ export function NotebookPolling({
                   value={activeTab}
                   onValueChange={setActiveTab}
                 >
-                  <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger value="summary" className="flex items-center">
                       <BookOpen className="h-4 w-4 mr-2" />
                       Deciphered Summary
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="audio"
+                      className="flex items-center"
+                      disabled={status === "ERROR"}
+                    >
+                      <Volume2 className="h-4 w-4 mr-2" />
+                      Audio Overview
                     </TabsTrigger>
                     <TabsTrigger
                       value="chat"
@@ -555,6 +565,15 @@ export function NotebookPolling({
                         {notebook.output.summary}
                       </ReactMarkdown>
                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="audio">
+                    <AudioOverviewSection
+                      notebookId={notebook.id}
+                      initialAudioOverviewUrl={
+                        notebook.output?.audioOverviewUrl
+                      }
+                    />
                   </TabsContent>
 
                   <TabsContent value="chat">
