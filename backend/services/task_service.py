@@ -327,6 +327,10 @@ class TaskManager:
 
                 await task_repository.update_task_error(task_id, str(e))
 
+                # Save mindmap to notebook output
+                logger.info(f"Saving mindmap to database for notebook: {notebook_id}")
+                await notebook_repository.update_notebook_mindmap(notebook_id, "ERROR")
+
                 return
 
     async def submit_mindmap_task_async(self, notebook_id: str) -> str:
