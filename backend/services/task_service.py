@@ -1,13 +1,15 @@
 import asyncio
 from typing import Dict, Optional, List, Any
 from loguru import logger
+from sqlalchemy import select
 
 from agents import topic_research_agent, sources_research_agent
-from models.db import NotebookProcessingStatusValue
+from models.db import NotebookProcessingStatusValue, Task
 from .task_repository import task_repository
 from .notebook_repository import notebook_repository
 from .qdrant_service import qdrant_service
 from .audio_overview_service import audio_overview_service
+from .db_service import get_db_session
 
 class TaskManager:
 
@@ -284,6 +286,75 @@ class TaskManager:
 
         logger.info(f"Audio overview task {task_id} submitted for notebook: {notebook_id}")
         return task_id
+
+    async def _execute_mindmap_task(self, task_id: str, notebook_id: str):
+        """Internal method to run the mindmap task and update status."""
+
+        max_retries = 1
+        retry_count = 0
+
+        while retry_count < max_retries:
+            try:
+                await task_repository.update_task_status(task_id, "running")
+
+                logger.info(f"Mindmap task {task_id} started for notebook: {notebook_id}" +
+                           (f" (retry {retry_count}/{max_retries-1})" if retry_count > 0 else ""))
+
+                with logger.contextualize(task_id=task_id):
+                    # Import here to avoid circular imports
+                    from agents.mindmap_agent import run_mindmap_agent
+
+                    # Generate mindmap structure
+                    result = await run_mindmap_agent(notebook_id)
+
+                await task_repository.update_task_result(task_id, result, "completed")
+
+                logger.success(f"Mindmap task {task_id} completed successfully")
+                return
+
+            except Exception as e:
+                retry_count += 1
+                # Log the error but keep retrying if we haven't hit the limit
+                if retry_count < max_retries:
+                    logger.warning(f"Mindmap task {task_id} failed (attempt {retry_count}/{max_retries-1}): {e}")
+                    continue
+
+                logger.opt(exception=True).error(f"Mindmap task {task_id} failed after {retry_count} attempts: {e}")
+
+                await task_repository.update_task_error(task_id, str(e))
+
+                return
+
+    async def submit_mindmap_task_async(self, notebook_id: str) -> str:
+        """Async implementation for submitting a new mindmap task."""
+
+        task_id = await task_repository.create_task(notebook_id, topic="mindmap")
+
+        asyncio.create_task(self._execute_mindmap_task(task_id, notebook_id))
+
+        logger.info(f"Mindmap task {task_id} submitted for notebook: {notebook_id}")
+        return task_id
+
+    async def get_task_status_async(self, task_id: str) -> Optional[Dict[str, Any]]:
+        """Get task status and details by task ID."""
+        async with get_db_session() as session:
+            stmt = select(Task).where(Task.id == task_id)
+            result = await session.execute(stmt)
+            task = result.scalar_one_or_none()
+
+            if not task:
+                return None
+
+            return {
+                "notebook_id": task.notebook_id,
+                "topic": task.topic,
+                "status": task.status,
+                "result": task.result,
+                "error": task.error,
+                "created_at": task.created_at,
+                "completed_at": task.completed_at,
+                "failed_at": task.failed_at
+            }
 
 # Singleton instance
 task_manager = TaskManager()
