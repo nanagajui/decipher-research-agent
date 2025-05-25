@@ -284,5 +284,37 @@ class NotebookRepository:
             await session.commit()
             logger.info(f"Saved {len(new_faqs)} FAQs for notebook {notebook_id}")
 
+    async def update_audio_overview_url(self, notebook_id: str, audio_url: str) -> None:
+        """
+        Update the audio overview URL for a notebook output.
+
+        Args:
+            notebook_id: The notebook ID
+            audio_url: The URL of the uploaded audio file
+        """
+        async with get_db_session() as session:
+            # Get the notebook output
+            stmt = select(NotebookOutput).where(
+                NotebookOutput.notebook_id == notebook_id
+            )
+            result = await session.execute(stmt)
+            notebook_output = result.scalar_one_or_none()
+
+            if not notebook_output:
+                logger.warning(f"No notebook output found for notebook {notebook_id}")
+                return
+
+            # Update the audio overview URL
+            notebook_output.audio_overview_url = audio_url
+
+            # Update notebook updated_at timestamp
+            notebook_stmt = update(Notebook).where(
+                Notebook.id == notebook_id
+            ).values(updated_at=datetime.now())
+            await session.execute(notebook_stmt)
+
+            await session.commit()
+            logger.info(f"Updated audio overview URL for notebook {notebook_id}")
+
 # Singleton instance
 notebook_repository = NotebookRepository()

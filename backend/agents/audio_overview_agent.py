@@ -9,26 +9,26 @@ def get_audio_overview_crew():
   research_analyst = Agent(
     name="Research Analyst",
     role="Content Analyst",
-    goal="Analyze and extract key insights, themes, and important points from research content while maintaining factual accuracy and context.",
-    backstory="You are an expert research analyst with years of experience distilling complex information into clear, actionable insights.",
+    goal="Extract and organize key insights from research content into a clear, structured summary",
+    backstory="You are an expert research analyst who excels at distilling complex information into clear, actionable summaries while maintaining accuracy.",
     llm=llm,
     verbose=True
   )
 
   conversation_planner = Agent(
     name="Conversation Planner",
-    role="Dialogue Architect",
-    goal="Create engaging, natural-flowing podcast conversation outlines that effectively communicate key research findings.",
-    backstory="You are a seasoned podcast producer who excels at structuring compelling conversations that educate and engage listeners.",
+    role="Podcast Producer",
+    goal="Structure research insights into an engaging podcast conversation outline",
+    backstory="You are a podcast producer who specializes in transforming complex topics into natural, flowing conversations that educate and engage.",
     llm=llm,
     verbose=True
   )
 
   script_writer = Agent(
     name="Script Writer",
-    role="Dialogue Creator",
-    goal="Transform outlines into natural, engaging podcast conversations that effectively communicate complex topics.",
-    backstory="You are an accomplished scriptwriter specializing in educational content and engaging dialogue.",
+    role="Podcast Scriptwriter",
+    goal="Write natural podcast dialogue that effectively communicates research insights",
+    backstory="You are a scriptwriter who excels at crafting authentic podcast conversations that balance education with entertainment.",
     llm=llm,
     verbose=True
   )
@@ -36,50 +36,61 @@ def get_audio_overview_crew():
   # Tasks
   analyze_research_task = Task(
     description="""
-    Analyze the provided research content and create a comprehensive bullet-point summary that:
-    - Identifies the main themes and key insights
-    - Highlights important supporting details and examples
-    - Maintains factual accuracy and proper context
-    - Organizes points in a logical flow
+    Create a structured bullet-point summary of the research content that:
+    - Identifies main themes and key insights
+    - Highlights important supporting details
+    - Maintains factual accuracy
+    - Organizes points logically
 
     Research Content:
     ```
     {research}
     ```
     """,
-    expected_output="A structured bullet-point summary capturing key insights and themes from the research.",
+    expected_output="A structured bullet-point summary of key research insights.",
     agent=research_analyst
   )
 
   create_conversation_outline_task = Task(
-    description="""
-    Create an engaging podcast conversation outline based on the research summary that:
-    - Structures topics in a natural, flowing conversation between Alex (host) and Jamie
-    - Includes specific talking points and transitions for both speakers
-    - Balances educational content with engaging dialogue
-    - Ensures key research points are effectively communicated
-    - Plans for Alex to guide the conversation as the host while Jamie provides expert insights
+    description=f"""
+    Create a comprehensive but concise podcast conversation outline between Michael (host) and Sarah (expert) that:
+    - Starts with a brief welcome to "The DecipherIt Podcast" (1-2 sentences)
+    - Covers all major insights and key findings from the research analysis above
+    - Organizes points in a logical flow with clear transitions
+    - Balances thoroughness with brevity (aim for 4-5 minutes total)
+    - Focuses on substance over style - prioritize important content
+    - Indicates where to include examples or elaboration without writing full dialogue
 
-    Use the summary from the previous task to guide the conversation structure.
+    Use the bullet-point summary from the research analysis task above.
+    Create an outline/structure only, not a complete transcript.
+    The goal is to capture all important points while keeping the format high-level.
     """,
-    expected_output="A detailed conversation outline with clear topics, questions, and talking points for Alex (host) and Jamie.",
+    expected_output="A thorough conversation outline covering all key research points.",
     agent=conversation_planner,
     context=[analyze_research_task]
   )
 
   write_podcast_script_task = Task(
-    description="""
-    Write a natural, engaging podcast conversation between Alex and Jamie that:
-    - Follows the provided outline while maintaining natural dialogue
-    - Effectively communicates key research points
-    - Keeps the conversation flowing and engaging
-    - Stays within 3 minutes (~500 words)
-    - Uses appropriate tone and language for the topic
+    description=f"""
+    Write a 4-5 minute podcast conversation between Michael and Sarah that follows the outline from the previous task.
+    The conversation should:
+    - Opens with Michael's welcome to "The DecipherIt Podcast"
+    - Uses casual, natural dialogue
+    - Incorporates research points conversationally
+    - Includes authentic reactions and interjections
+    - Maintains engaging but focused discussion
+    - Stays between 800-1000 words
+    - Ensures comprehensive coverage of key insights
+    - Allows time for proper explanation of complex topics
+    - Includes meaningful back-and-forth discussion
 
-    Format each dialogue segment as an object with 'name' and 'transcript' fields.
-    The name field must be either 'Alex' or 'Jamie'.
+    Use the outline from the previous task as the structure and flow for the conversation.
+    Follow the outline's sequence of topics and key points while making the dialogue natural.
+
+    Format each segment as:
+    {{'name': 'Michael' or 'Sarah', 'transcript': 'dialogue'}}
     """,
-    expected_output="A structured podcast transcript with alternating speakers, natural dialogue, and clear communication of key points.",
+    expected_output="A natural podcast transcript in the required format.",
     output_pydantic=AudioOverviewTranscript,
     agent=script_writer,
     context=[create_conversation_outline_task]

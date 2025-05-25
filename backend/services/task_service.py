@@ -7,6 +7,7 @@ from models.db import NotebookProcessingStatusValue
 from .task_repository import task_repository
 from .notebook_repository import notebook_repository
 from .qdrant_service import qdrant_service
+from .audio_overview_service import audio_overview_service
 
 class TaskManager:
 
@@ -228,6 +229,50 @@ class TaskManager:
         asyncio.create_task(self._execute_task(task_id, topic, notebook_id, sources))
 
         logger.info(f"Task {task_id} submitted for notebook: {notebook_id}" + (f" on topic: {topic}" if topic else ""))
+        return task_id
+
+    async def _execute_audio_overview_task(self, task_id: str, notebook_id: str):
+        """Internal method to run the audio overview task and update status."""
+
+        max_retries = 1
+        retry_count = 0
+
+        while retry_count < max_retries:
+            try:
+                await task_repository.update_task_status(task_id, "running")
+
+                logger.info(f"Audio overview task {task_id} started for notebook: {notebook_id}" +
+                           (f" (retry {retry_count}/{max_retries-1})" if retry_count > 0 else ""))
+
+                with logger.contextualize(task_id=task_id):
+                    # Generate complete audio overview
+                    result = await audio_overview_service.generate_complete_audio_overview(notebook_id)
+
+                await task_repository.update_task_result(task_id, result, "completed")
+
+                logger.success(f"Audio overview task {task_id} completed successfully")
+                return
+
+            except Exception as e:
+                retry_count += 1
+                # Log the error but keep retrying if we haven't hit the limit
+                if retry_count < max_retries:
+                    logger.warning(f"Audio overview task {task_id} failed (attempt {retry_count}/{max_retries-1}): {e}")
+                    continue
+
+                logger.opt(exception=True).error(f"Audio overview task {task_id} failed after {retry_count} attempts: {e}")
+
+                await task_repository.update_task_error(task_id, str(e))
+                return
+
+    async def submit_audio_overview_task_async(self, notebook_id: str) -> str:
+        """Async implementation for submitting a new audio overview task."""
+
+        task_id = await task_repository.create_task(notebook_id, topic="audio_overview")
+
+        asyncio.create_task(self._execute_audio_overview_task(task_id, notebook_id))
+
+        logger.info(f"Audio overview task {task_id} submitted for notebook: {notebook_id}")
         return task_id
 
 # Singleton instance

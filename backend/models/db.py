@@ -123,6 +123,7 @@ class NotebookOutput(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     notebook_id: Mapped[str] = mapped_column(String, ForeignKey("notebooks.id", ondelete="CASCADE"), name="notebookId", nullable=False, unique=True)
     summary: Mapped[str] = mapped_column(Text, nullable=False)
+    audio_overview_url: Mapped[Optional[str]] = mapped_column(String, name="audioOverviewUrl", nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, name="createdAt", nullable=False, default=func.now())
 
     # Relationships

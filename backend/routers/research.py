@@ -4,13 +4,11 @@ from datetime import datetime
 
 from services import task_manager
 from services.notebook_repository import notebook_repository
-from agents.audio_overview_agent import run_audio_overview_agent
 from models.task_models import (
     ResearchRequest,
     TaskResponse,
     TaskStatusResponse
 )
-from models.audio_overview_models import AudioOverviewTranscript
 
 router = APIRouter(prefix="/research", tags=["research"])
 
@@ -74,8 +72,10 @@ async def get_task_details(task_id: str):
 
 @router.post(
     "/audio-overview/{notebook_id}",
+    response_model=TaskResponse,
+    status_code=status.HTTP_202_ACCEPTED,
     summary="Generate audio overview from notebook summary",
-    description="Creates an audio overview using the summary from a completed notebook research."
+    description="Creates an audio overview using the summary from a completed notebook research. The task runs in the background."
 )
 async def generate_audio_overview(notebook_id: str):
     """Generate an audio overview from a notebook's research summary."""
@@ -91,13 +91,19 @@ async def generate_audio_overview(notebook_id: str):
         )
 
     try:
-        # Run the audio overview agent
-        result = await run_audio_overview_agent(notebook_id)
-        logger.info(f"Audio overview generated successfully for notebook: {notebook_id}")
-        return result
+        # Submit audio overview task
+        task_id = await task_manager.submit_audio_overview_task_async(notebook_id)
+        logger.info(f"Audio overview task submitted for notebook: {notebook_id}")
+
+        return TaskResponse(
+            task_id=task_id,
+            notebook_id=notebook_id,
+            status="IN_QUEUE",
+            message="Audio overview task submitted and will be processed."
+        )
     except Exception as e:
-        logger.error(f"Error generating audio overview for notebook {notebook_id}: {e}")
+        logger.error(f"Error submitting audio overview task for notebook {notebook_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate audio overview. Please try again."
+            detail="Failed to submit audio overview task. Please try again."
         )

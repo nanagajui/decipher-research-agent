@@ -289,13 +289,16 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "asyncpg" },
+    { name = "boto3" },
     { name = "crewai" },
     { name = "crewai-tools", extra = ["mcp"] },
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "langtrace-python-sdk" },
     { name = "loguru" },
     { name = "markitdown", extra = ["all"] },
     { name = "pydantic" },
+    { name = "pydub" },
     { name = "python-dotenv" },
     { name = "qdrant-client" },
     { name = "sqlalchemy" },
@@ -305,13 +308,16 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "asyncpg", specifier = ">=0.30.0" },
+    { name = "boto3", specifier = ">=1.38.0" },
     { name = "crewai", specifier = ">=0.120.1" },
     { name = "crewai-tools", extras = ["mcp"], specifier = ">=0.45.0" },
     { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "langtrace-python-sdk", specifier = ">=3.8.18" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "markitdown", extras = ["all"], specifier = ">=0.1.1" },
     { name = "pydantic", specifier = ">=2.11.4" },
+    { name = "pydub", specifier = ">=0.25.1" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "qdrant-client", specifier = ">=1.14.2" },
     { name = "sqlalchemy", specifier = ">=2.0.41" },
