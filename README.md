@@ -20,7 +20,19 @@
 
 ## ✨ Overview
 
-DecipherIt is a cutting-edge AI-powered research assistant that revolutionizes how you explore, analyze, and synthesize information. Input any combination of documents, links, or topics, and watch as our intelligent agents transform your sources into comprehensive research notebooks with summaries, interactive Q&A, audio overviews, and automatically generated FAQs.
+DecipherIt is a cutting-edge AI-powered research assistant inspired by **Google NotebookLM** that revolutionizes how researchers, students, and professionals explore, analyze, and synthesize information from the web. The platform transforms any combination of documents, URLs, or topics into comprehensive research notebooks complete with AI-generated summaries, interactive Q&A capabilities, audio overviews, visual mindmaps, and automatically generated FAQs.
+
+### The Problem DecipherIt Solves
+
+Traditional research is time-consuming and fragmented. Researchers often struggle with:
+
+- **Information Overload**: Sifting through countless sources manually
+- **Geo-restrictions**: Unable to access content from different regions
+- **Bot Detection**: Getting blocked when trying to scrape valuable data
+- **Synthesis Challenges**: Difficulty connecting insights across multiple sources
+- **Accessibility**: Converting research into different formats for various audiences
+
+DecipherIt addresses these challenges by leveraging **Bright Data's MCP Server** to provide unrestricted, intelligent web access combined with advanced AI agents that can understand, synthesize, and present information in multiple formats.
 
 ### 🎯 Key Features
 
@@ -30,6 +42,34 @@ DecipherIt is a cutting-edge AI-powered research assistant that revolutionizes h
 - **💬 Interactive Q&A** - Chat with your research materials using natural language queries
 - **🎧 Audio Overviews** - AI-generated podcast-style audio summaries with multiple voices
 - **❓ Smart FAQ Generation** - Automatically create relevant FAQs from your research content
+- **🧠 Visual Mindmaps** - Generate interactive, hierarchical mindmaps to visualize research structure and connections
+- **🌐 Global Web Access** - Bypass geo-restrictions and bot detection using Bright Data's infrastructure
+
+### 🔍 Detailed Feature Overview
+
+**🔬 Deep Research**
+DecipherIt's AI agents conduct comprehensive research by strategically planning data collection, discovering diverse sources through Bright Data's global search capabilities, and synthesizing information from multiple perspectives. The system can research any topic from current events to academic subjects, providing thorough analysis that rivals human researchers.
+
+**🔍 Multi-Source Research**
+Users can combine various input types in a single research project: upload documents (PDF, DOCX, PPTX, XLSX), add custom URLs for specific web content, input manual text for direct analysis, or simply enter topics for AI-driven discovery. All sources are processed and integrated into a unified research space.
+
+**🤖 AI-Powered Summaries**
+Specialized CrewAI agents work together to create comprehensive research summaries. The Research Analyst synthesizes information from all sources, while the Content Writer crafts engaging, well-structured analyses that highlight key insights, trends, and connections across the research material.
+
+**💬 Interactive Q&A**
+Using vector embeddings and semantic search through Qdrant database, users can ask natural language questions about their research content. The system provides contextual answers by retrieving relevant information from all processed sources, enabling deep exploration of the research material.
+
+**🎧 Audio Overviews**
+On-demand feature that transforms research into engaging podcast-style audio content. The Podcast Script Generator agent creates conversational scripts, which are then converted to high-quality audio using LemonFox TTS with multiple AI voices, making research accessible in audio format.
+
+**❓ Smart FAQ Generation**
+AI agents automatically analyze research content to generate relevant, insightful questions and comprehensive answers. This feature helps users understand key aspects of their research topic and provides quick access to important information.
+
+**🧠 Visual Mindmaps**
+The Mindmap Creator agent analyzes research structure to generate interactive, hierarchical visualizations with up to 5 levels of depth. Built with react-mindmap-visualiser, these mindmaps help users understand complex topics at a glance and navigate research relationships visually.
+
+**🌐 Global Web Access**
+Powered by Bright Data's MCP Server, DecipherIt bypasses geo-restrictions and bot detection to access content from anywhere in the world. This ensures comprehensive research coverage and access to diverse, authoritative sources that traditional scraping methods cannot reach.
 
 ---
 
@@ -46,12 +86,14 @@ graph TB
         C2[Topic Research Agent]
         C3[Sources Research Agent]
         C4[Podcast Script Generator]
+        C5[Mindmap Agent]
     end
 
     B --> C1
     B --> C2
     B --> C3
     B --> C4
+    B --> C5
     B --> D[Qdrant Vector DB]
     B --> E[PostgreSQL]
     B --> F[Cloudflare R2]
@@ -64,6 +106,8 @@ graph TB
     C3 --> G2[Bright Data MCP Server]
     C3 --> I3[LLM]
     C4 --> I4[LLM]
+    C5 --> D
+    C5 --> I5[LLM]
 
     subgraph Bright Data MCP
         G1 --> K1[search_engine]
@@ -89,6 +133,7 @@ graph TB
 - **[Radix UI](https://radix-ui.com/)** - Unstyled, accessible UI primitives
 - **[Better Auth](https://better-auth.com/)** - Modern authentication solution
 - **[Prisma](https://prisma.io/)** - Type-safe database ORM
+- **[react-mindmap-visualiser](https://www.npmjs.com/package/react-mindmap-visualiser)** - Interactive mindmap visualization component
 - **[pnpm](https://pnpm.io/)** - Fast, disk space efficient package manager
 
 ### Backend
@@ -187,7 +232,41 @@ DecipherIt uses the official **[Bright Data MCP Server](https://github.com/brigh
 - For advanced use cases, you can create a custom Web Unlocker zone in your Bright Data control panel
 - This provides more control over proxy settings and usage limits
 
-#### 4. Security Best Practices
+#### 4. Integration Implementation
+
+**Official MCP Server Integration**:
+
+```python
+from mcp import StdioServerParameters
+from crewai_tools import MCPServerAdapter
+
+server_params = StdioServerParameters(
+    command="pnpm",
+    args=["dlx", "@brightdata/mcp"],
+    env={
+        "API_TOKEN": os.environ["BRIGHT_DATA_API_TOKEN"],
+        "BROWSER_AUTH": os.environ["BRIGHT_DATA_BROWSER_AUTH"]
+    },
+)
+```
+
+**Multi-Agent Workflow**:
+
+```python
+# Execute multiple scraping tasks in parallel
+web_scraping_tasks = []
+for link in links:
+    web_scraping_tasks.append(
+        web_scraping_crew.kickoff_async(inputs={
+            "url": link.url,
+            "current_time": current_time,
+        })
+    )
+
+web_scraping_results = await asyncio.gather(*web_scraping_tasks)
+```
+
+#### 5. Security Best Practices
 
 ⚠️ **Important**: Always treat scraped web content as untrusted data. DecipherIt automatically:
 
@@ -244,12 +323,27 @@ CLOUDFLARE_R2_SECRET_ACCESS_KEY="your-r2-secret-key"
 
 DecipherIt employs specialized AI agents powered by **CrewAI** to handle different aspects of research:
 
+#### CrewAI Crews Overview
+
+DecipherIt employs a sophisticated multi-crew architecture powered by **CrewAI**:
+
+- **Web Scraping Crew** - A crew of agents focused on data collection strategy and execution
+- **Research Crew** - A crew dedicated to discovering and analyzing relevant sources using Bright Data
+- **Content Processing Crew** - A crew that extracts and structures web content data
+- **Analysis Crew** - A crew that synthesizes information from multiple research sources
+- **Content Creation Crew** - A crew producing engaging, well-structured research summaries
+- **FAQ Generation Crew** - A specialized crew generating relevant questions and answers
+- **Visualization Crew** - A crew analyzing research to create hierarchical visual mindmaps
+
+#### Individual Agent Roles
+
 - **Web Scraping Planner** - Strategizes optimal data collection approaches
-- **Link Collector** - Discovers relevant sources using Bright Data's search capabilities
-- **Content Scraper** - Extracts and processes web content into structured data
+- **Link Collector Agent** - Uses `search_engine` to find relevant sources based on research topics
+- **Web Scraper Agent** - Uses `scrape_as_markdown` to extract clean, structured content from discovered URLs
 - **Research Analyst** - Synthesizes information from multiple sources
 - **Content Writer** - Creates engaging, well-structured research summaries
 - **FAQ Generator** - Automatically generates relevant questions and answers
+- **Mindmap Creator** - Analyzes research content to create hierarchical visual mindmaps with up to 5 levels of depth
 
 ### 🌐 Advanced Web Scraping with Bright Data MCP
 
@@ -294,8 +388,41 @@ Transform your research into engaging audio content:
 
 - **LemonFox TTS** for high-quality voice synthesis
 - Multiple AI voices for podcast-style conversations
-- Automatic script generation from research content using **Podcast Script Generator** crewai agent
+- Automatic script generation from research content using **Podcast Script Generator** CrewAI agent
 - Seamless audio file management with Cloudflare R2
+
+#### How It Works
+
+1. **Input Your Research Sources**: Enter any topic, upload documents, add custom URLs, or input manual text
+2. **AI Planning**: The system creates a strategic research plan using specialized AI agents
+3. **Web Discovery**: Bright Data's search engine finds relevant sources globally
+4. **Intelligent Scraping**: Bright Data extracts content and converts it to clean markdown format
+5. **AI Analysis**: Multiple AI agents analyze, synthesize, and create comprehensive summaries
+6. **Multi-Format Output**: Get research summaries, FAQs, visual mindmaps, and podcast-style audio overviews
+
+### 🧠 Interactive Visual Mindmaps
+
+Transform complex research into visual hierarchical structures:
+
+- **Intelligent Content Analysis** - AI agents analyze research to identify main themes and relationships
+- **Hierarchical Structure Generation** - Creates up to 5 levels of depth based on content complexity
+- **Interactive Visualization** - Built with react-mindmap-visualiser for smooth user experience
+- **Adaptive Depth** - Automatically adjusts mindmap complexity based on research content richness
+- **Real-time Generation** - Background processing with live status updates
+
+#### AI Processing Pipeline
+
+**Immediate Processing:**
+
+- **Vector embeddings** created using OpenAI embeddings and stored in Qdrant for semantic search capabilities
+- **Contextual analysis** by Research Analyst agents to synthesize information from multiple sources
+- **Automatic FAQ generation** by analyzing content patterns and extracting key insights
+
+**On-Demand Generation:**
+
+- **Audio script creation** when users request podcast-style overviews, processed by specialized TTS agents
+- **Mindmap structure analysis** for hierarchical visualization when users want visual representations
+- **Interactive Q&A responses** powered by vector similarity search through processed content
 
 ### 📄 Document Processing
 
