@@ -74,7 +74,6 @@ async def get_task_details(task_id: str):
 
 @router.post(
     "/audio-overview/{notebook_id}",
-    response_model=AudioOverviewTranscript,
     summary="Generate audio overview from notebook summary",
     description="Creates an audio overview using the summary from a completed notebook research."
 )
@@ -91,18 +90,9 @@ async def generate_audio_overview(notebook_id: str):
             detail="Notebook not found."
         )
 
-    # Get the notebook summary
-    summary = await notebook_repository.get_notebook_output(notebook_id)
-    if not summary:
-        logger.warning(f"No summary found for notebook: {notebook_id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No research summary found for this notebook. Please complete the research first."
-        )
-
     try:
         # Run the audio overview agent
-        result = await run_audio_overview_agent(notebook_id, summary)
+        result = await run_audio_overview_agent(notebook_id)
         logger.info(f"Audio overview generated successfully for notebook: {notebook_id}")
         return result
     except Exception as e:

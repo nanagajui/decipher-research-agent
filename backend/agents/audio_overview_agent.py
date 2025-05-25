@@ -2,6 +2,7 @@ from crewai import Agent, Crew, Task, Process
 from loguru import logger
 from config import llm
 from models.audio_overview_models import AudioOverviewTranscript
+from services.qdrant_service import qdrant_service
 
 def get_audio_overview_crew():
   # Define Agents
@@ -42,7 +43,9 @@ def get_audio_overview_crew():
     - Organizes points in a logical flow
 
     Research Content:
+    ```
     {research}
+    ```
     """,
     expected_output="A structured bullet-point summary capturing key insights and themes from the research.",
     agent=research_analyst
@@ -90,8 +93,17 @@ def get_audio_overview_crew():
   )
 
 
-async def run_audio_overview_agent(notebook_id: str, research: str):
-    logger.info(f"Running audio overview agent for research: {research}")
+async def run_audio_overview_agent(notebook_id: str):
+    logger.info(f"Running audio overview agent for notebook: {notebook_id}")
+
+    chunks = await qdrant_service.get_all_chunks_by_notebook_id(notebook_id)
+
+    research = "\n\n".join(
+        chunk["content_chunk"]
+        for chunk in chunks
+    )
+
+    logger.debug(f"Research content length: {len(research)} characters")
 
     crew = get_audio_overview_crew()
 
@@ -99,8 +111,8 @@ async def run_audio_overview_agent(notebook_id: str, research: str):
       "research": research,
     })
 
-    logger.info(f"Audio overview result for notebook: {notebook_id} with research: {research} is: {crew_result}")
+    logger.info(f"Audio overview result for notebook: {notebook_id} completed successfully")
 
-    return crew_result.raw
+    return [transcript.model_dump() for transcript in crew_result["transcript"]]
 
 
