@@ -64,6 +64,7 @@ export type NotebookWithDetails = {
     id: string;
     summary: string | null;
     audioOverviewUrl: string | null;
+    mindmap: string | null;
     notebookId: string;
     createdAt: Date;
     updatedAt: Date | null;

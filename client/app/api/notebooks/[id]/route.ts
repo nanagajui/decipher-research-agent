@@ -48,7 +48,11 @@ export async function GET(
       include: {
         processingStatus: true,
         sources: true,
-        output: true,
+        output: {
+          include: {
+            faqs: true,
+          },
+        },
       },
     });
 

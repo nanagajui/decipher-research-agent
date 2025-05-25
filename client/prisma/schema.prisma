@@ -128,6 +128,7 @@ model NotebookOutput {
   notebookId       String        @unique
   summary          String        @db.Text
   audioOverviewUrl String?       @db.Text
+  mindmap          String?       @db.Text
   createdAt        DateTime      @default(now())
   notebook         Notebook      @relation(fields: [notebookId], references: [id], onDelete: Cascade)
   faqs             NotebookFaq[]
