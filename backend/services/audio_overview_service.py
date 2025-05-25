@@ -45,8 +45,8 @@ class AudioOverviewService:
             )
 
             # Step 4: Update database with audio URL
-            # logger.info(f"Updating database with audio URL {audio_url} for notebook: {notebook_id}")
-            # await notebook_repository.update_audio_overview_url(notebook_id, audio_url)
+            logger.info(f"Updating database with audio URL {audio_url} for notebook: {notebook_id}")
+            await notebook_repository.update_audio_overview_url(notebook_id, audio_url)
 
             logger.success(f"Complete audio overview generation completed for notebook: {notebook_id} URL: {audio_url}")
 

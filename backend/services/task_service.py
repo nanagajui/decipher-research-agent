@@ -245,6 +245,11 @@ class TaskManager:
                            (f" (retry {retry_count}/{max_retries-1})" if retry_count > 0 else ""))
 
                 with logger.contextualize(task_id=task_id):
+
+                    # Update database with audio URL - IN_PROGRESS
+                    logger.info(f"Updating database with audio URL - IN_PROGRESS for notebook: {notebook_id}")
+                    await notebook_repository.update_audio_overview_url(notebook_id, "IN_PROGRESS")
+
                     # Generate complete audio overview
                     result = await audio_overview_service.generate_complete_audio_overview(notebook_id)
 
@@ -263,6 +268,11 @@ class TaskManager:
                 logger.opt(exception=True).error(f"Audio overview task {task_id} failed after {retry_count} attempts: {e}")
 
                 await task_repository.update_task_error(task_id, str(e))
+
+                # Update database with audio URL - ERROR
+                logger.info(f"Updating database with audio URL - ERROR for notebook: {notebook_id}")
+                await notebook_repository.update_audio_overview_url(notebook_id, "ERROR")
+
                 return
 
     async def submit_audio_overview_task_async(self, notebook_id: str) -> str:
