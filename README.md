@@ -45,11 +45,13 @@ graph TB
         C1[Chat Agent]
         C2[Topic Research Agent]
         C3[Sources Research Agent]
+        C4[Podcast Script Generator]
     end
 
     B --> C1
     B --> C2
     B --> C3
+    B --> C4
     B --> D[Qdrant Vector DB]
     B --> E[PostgreSQL]
     B --> F[Cloudflare R2]
@@ -57,10 +59,18 @@ graph TB
 
     C1 --> D
     C1 --> I1[LLM]
-    C2 --> G1[Bright Data MCP]
+    C2 --> G1[Bright Data MCP Server]
     C2 --> I2[LLM]
-    C3 --> G2[Bright Data MCP]
+    C3 --> G2[Bright Data MCP Server]
     C3 --> I3[LLM]
+    C4 --> I4[LLM]
+
+    subgraph Bright Data MCP
+        G1 --> K1[search_engine]
+        G1 --> K2[scrape_as_markdown]
+        G2 --> K1
+        G2 --> K2
+    end
 
     D --> J[OpenAI Embeddings]
 ```
@@ -94,7 +104,7 @@ graph TB
 
 ### AI & ML Services
 
-- **[Bright Data MCP Server](https://brightdata.com/)** - Web scraping and data collection
+- **[Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** - Official Model Context Protocol server for real-time web access, bypassing geo-restrictions and bot detection
 - **[Google Gemini using OpenRouter](https://openrouter.ai/models/google/gemini-1.5-flash)** - Large language models for content generation
 - **[OpenAI Embeddings](https://openai.com/)** - Text embeddings for semantic search
 - **[LemonFox TTS](https://lemonfox.ai/)** - High-quality text-to-speech synthesis
@@ -158,6 +168,33 @@ graph TB
    cd backend && python server.py
    ```
 
+### 🌐 Bright Data MCP Server Setup
+
+DecipherIt uses the official **[Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** for advanced web scraping capabilities. Follow these steps to set it up:
+
+#### 1. Get Your Bright Data Account
+
+- Sign up at [brightdata.com](https://brightdata.com) (new users get free credits)
+- Navigate to your user settings page to get your API token
+
+#### 2. Configure Web Unlocker (Automatic)
+
+- By default, DecipherIt creates a Web Unlocker zone automatically using your API token
+- For custom control, create your own Web Unlocker zone in the Bright Data control panel
+
+#### 3. Web Unlocker Zone (Optional)
+
+- For advanced use cases, you can create a custom Web Unlocker zone in your Bright Data control panel
+- This provides more control over proxy settings and usage limits
+
+#### 4. Security Best Practices
+
+⚠️ **Important**: Always treat scraped web content as untrusted data. DecipherIt automatically:
+
+- Filters and validates all web data before processing
+- Uses structured data extraction rather than raw text
+- Implements rate limiting and error handling
+
 ### Environment Variables
 
 #### Frontend (.env.local)
@@ -185,9 +222,9 @@ OPENAI_API_KEY="your-openai-api-key"
 OPENROUTER_API_KEY="your-openrouter-api-key"
 LEMONFOX_API_KEY="your-lemonfox-api-key"
 
-# Web Scraping
+# Bright Data MCP Server
 BRIGHT_DATA_API_TOKEN="your-bright-data-token"
-BRIGHT_DATA_BROWSER_AUTH="your-browser-auth"
+BRIGHT_DATA_WEB_UNLOCKER_ZONE="your-web-unlocker-zone"  # Optional: custom zone name
 
 # Vector Database
 QDRANT_API_URL="http://localhost:6333"
@@ -214,13 +251,33 @@ DecipherIt employs specialized AI agents powered by **CrewAI** to handle differe
 - **Content Writer** - Creates engaging, well-structured research summaries
 - **FAQ Generator** - Automatically generates relevant questions and answers
 
-### 🌐 Advanced Web Scraping
+### 🌐 Advanced Web Scraping with Bright Data MCP
 
-Powered by **Bright Data's MCP Server**, DecipherIt can:
+DecipherIt leverages the **[official Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** - a powerful Model Context Protocol server that provides an all-in-one solution for public web access. This integration enables:
 
-- Search the web for relevant information
-- Extract content from any website
-- Handle dynamic content and JavaScript-heavy sites
+#### 🚀 Core Capabilities
+
+- **Real-time Web Access** - Access up-to-date information directly from the web
+- **Bypass Geo-restrictions** - Access content regardless of location constraints
+- **Web Unlocker Technology** - Navigate websites with advanced bot detection protection
+- **Browser Control** - Optional remote browser automation capabilities
+- **Seamless Integration** - Works with all MCP-compatible AI assistants
+
+#### 🛠️ Tools Used by DecipherIt
+
+DecipherIt leverages two key tools from the Bright Data MCP server:
+
+- `search_engine` - Search the web for relevant information and discover sources
+- `scrape_as_markdown` - Extract and convert web content to clean, structured Markdown format
+
+#### 🔒 Security & Reliability
+
+- **Anti-Bot Detection** - Advanced techniques to avoid getting blocked
+- **Residential Proxies** - Access content through real residential IP addresses
+- **Rate Limiting** - Built-in protection against overuse
+- **Data Validation** - Automatic filtering and validation of scraped content
+
+This powerful integration allows DecipherIt's AI agents to conduct comprehensive research across the entire web without the typical limitations of traditional scraping methods.
 
 ### 🧠 Vector-Powered Search
 
@@ -248,90 +305,6 @@ Comprehensive document support using **MarkItDown**:
 - Automatic text extraction and formatting
 - Secure file storage with Cloudflare R2
 - Metadata preservation and indexing
-
----
-
-## 🔧 API Documentation
-
-### Research Endpoints
-
-#### Start Research Task
-
-```http
-POST /research
-Content-Type: application/json
-
-{
-  "topic": "Artificial Intelligence in Healthcare",
-  "notebook_id": "uuid-string"
-}
-```
-
-#### Chat with Research
-
-```http
-POST /chat/message
-Content-Type: application/json
-
-{
-  "notebook_id": "uuid-string",
-  "messages": [
-    {
-      "role": "user",
-      "content": "What are the main benefits of AI in healthcare?"
-    }
-  ]
-}
-```
-
-#### Generate Audio Overview
-
-```http
-POST /audio-overview/{notebook_id}
-```
-
----
-
-## 🏃‍♂️ Usage Examples
-
-### 1. Topic-Based Research
-
-```typescript
-// Start research on a specific topic
-const response = await fetch("/api/research", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    topic: "Quantum Computing Applications",
-    notebook_id: "new-notebook-id",
-  }),
-});
-```
-
-### 2. Multi-Source Research
-
-```typescript
-// Upload documents and add URLs
-const sources = [
-  { type: "UPLOAD", file: pdfFile },
-  { type: "URL", url: "https://example.com/article" },
-  { type: "MANUAL", content: "Custom research notes..." },
-];
-```
-
-### 3. Interactive Q&A
-
-```typescript
-// Chat with your research
-const chatResponse = await fetch("/api/chat/message", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    notebook_id: "your-notebook-id",
-    messages: [{ role: "user", content: "Summarize the key findings" }],
-  }),
-});
-```
 
 ---
 
@@ -403,38 +376,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Code Standards
-
-- **Frontend**: ESLint + Prettier with TypeScript strict mode
-- **Backend**: Black + isort + mypy for Python code quality
-- **Commits**: Conventional Commits specification
-- **Testing**: Minimum 80% code coverage
-
----
-
-## 📈 Roadmap
-
-### Q1 2025
-
-- [ ] Real-time collaborative research
-- [ ] Advanced visualization tools
-- [ ] Mobile app development
-- [ ] API rate limiting improvements
-
-### Q2 2025
-
-- [ ] Multi-language support
-- [ ] Advanced analytics dashboard
-- [ ] Integration with academic databases
-- [ ] Custom AI model fine-tuning
-
-### Q3 2025
-
-- [ ] Enterprise features
-- [ ] Advanced export options
-- [ ] Workflow automation
-- [ ] Third-party integrations
-
 ---
 
 ## 📄 License
@@ -455,7 +396,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **[Bright Data](https://brightdata.com/)** for powerful web scraping capabilities
+- **[Bright Data](https://brightdata.com/)** for their powerful [MCP Server](https://github.com/brightdata-com/brightdata-mcp) enabling real-time web access and advanced scraping capabilities
 - **[CrewAI](https://crewai.com/)** for the multi-agent AI framework
 - **[Qdrant](https://qdrant.tech/)** for vector database technology
 - **[LemonFox](https://lemonfox.ai/)** for high-quality TTS services
