@@ -1,7 +1,7 @@
 from crewai import Agent, Crew, Task, Process
 from loguru import logger
 from config import llm
-from models.mindmap_models import MindmapStructure
+from models.mindmap_models import MindmapStructure, SimpleMindmapStructure
 from services.qdrant_service import qdrant_service
 import uuid
 
@@ -59,48 +59,75 @@ def get_mindmap_crew():
 
     create_mindmap_task = Task(
         description="""
-        Create the final mindmap structure as a nested dictionary using the hierarchical breakdown from the content analysis.
+        Create the final mindmap structure using the hierarchical breakdown from the content analysis.
 
-        Generate a clean nested dictionary structure where:
-        - Each key is a topic/subtopic name (concise, 1-4 words)
-        - Each value is a dictionary containing its children
-        - Empty dictionaries {} represent leaf nodes (no children)
+        Generate a hierarchical node structure where:
+        - Root node has id="root", text content, display={"block": true}, and nodes array
+        - Each child node has a unique id (like "1", "2", "3", etc.), text content, and nodes array
+        - Empty nodes arrays [] represent leaf nodes (no children)
         - Structure depth adapts to content complexity (2-5 levels)
         - Start with ONE main topic that encompasses all the research content
 
-        Example format:
+        You must create the structure in the "mindmap" field with this exact format:
         {
-            "Main Research Topic": {
-                "Category A": {
-                    "Subtopic 1": {
-                        "Detail 1": {},
-                        "Detail 2": {}
+            "mindmap": {
+                "id": "root",
+                "text": "Main Research Topic",
+                "display": {"block": true},
+                "nodes": [
+                    {
+                        "id": "1",
+                        "text": "Category A",
+                        "nodes": [
+                            {
+                                "id": "2",
+                                "text": "Subtopic 1",
+                                "nodes": []
+                            },
+                            {
+                                "id": "3",
+                                "text": "Subtopic 2",
+                                "nodes": []
+                            }
+                        ]
                     },
-                    "Subtopic 2": {}
-                },
-                "Category B": {
-                    "Subtopic 3": {}
-                }
-            }
+                    {
+                        "id": "4",
+                        "text": "Category B",
+                        "nodes": [
+                            {
+                                "id": "5",
+                                "text": "Subtopic 3",
+                                "nodes": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            "title": "Research Topic Title",
+            "description": "Brief description"
         }
 
         Structure guidelines:
-        - Level 1: ONE main topic (the central theme of all research)
-        - Level 2: Primary categories under the main topic (3-6 categories)
-        - Level 3: Secondary subtopics under each category (2-5 per category)
-        - Level 4: Detailed aspects (if needed, 2-4 per subtopic)
-        - Level 5: Specific details (if highly detailed, 1-3 per aspect)
+        - Root level: ONE main topic (the central theme of all research)
+        - Level 1: Primary categories under the main topic (3-6 categories)
+        - Level 2: Secondary subtopics under each category (2-5 per category)
+        - Level 3: Detailed aspects (if needed, 2-4 per subtopic)
+        - Level 4: Specific details (if highly detailed, 1-3 per aspect)
 
         Rules:
-        - Use the exact nested dictionary format shown above
+        - Use the exact hierarchical node structure shown above
+        - Root node must have id="root" and display={"block": true}
+        - All other nodes have simple numeric IDs ("1", "2", "3", etc.)
         - Start with ONE main topic that encompasses all the research content
-        - Keep topic names concise but descriptive
+        - Keep text content concise but descriptive (1-4 words per node)
         - Only create levels that add meaningful organization
         - Ensure logical parent-child relationships
         - Adapt depth to content complexity (don't force 5 levels if content is simple)
+        - Empty nodes arrays [] for leaf nodes
         """,
-        expected_output="A nested dictionary structure representing the mindmap hierarchy with appropriate depth based on content complexity.",
-        output_pydantic=MindmapStructure,
+        expected_output="A hierarchical node structure with id, text, display, and nodes array representing the mindmap hierarchy with appropriate depth based on content complexity.",
+        output_pydantic=SimpleMindmapStructure,
         agent=mindmap_creator,
         context=[analyze_content_task]
     )
