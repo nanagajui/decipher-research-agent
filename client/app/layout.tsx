@@ -11,6 +11,9 @@ const oxanium = Oxanium({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "https://decipherit.xyz"
+  ),
   title: {
     default:
       "DecipherIt - AI-Powered Research Assistant | Transform Your Research Process",
