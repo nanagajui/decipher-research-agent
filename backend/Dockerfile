@@ -13,10 +13,10 @@ RUN uv pip install --system -e .
 # Final image - ultra slim
 FROM python:3.12-slim-bookworm
 
-# Install runtime dependencies, Node.js, PNPM and PostgreSQL client libraries
+# Install runtime dependencies, Node.js, PNPM, PostgreSQL client libraries, and FFmpeg
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl \
-    libpq-dev postgresql-client && \
+    libpq-dev postgresql-client ffmpeg && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     npm install -g pnpm && \
