@@ -74,50 +74,7 @@ Powered by Bright Data's MCP Server, DecipherIt bypasses geo-restrictions and bo
 ---
 
 ## 🏗️ Architecture
-
-DecipherIt follows a modern microservices architecture with a React frontend and Python backend, leveraging cutting-edge AI technologies:
-
-```mermaid
-graph TB
-    A[Next.js Frontend] --> B[FastAPI Backend]
-
-    subgraph CrewAI Agents
-        C1[Chat Agent]
-        C2[Topic Research Agent]
-        C3[Sources Research Agent]
-        C4[Podcast Script Generator]
-        C5[Mindmap Agent]
-    end
-
-    B --> C1
-    B --> C2
-    B --> C3
-    B --> C4
-    B --> C5
-    B --> D[Qdrant Vector DB]
-    B --> E[PostgreSQL]
-    B --> F[Cloudflare R2]
-    B --> H[LemonFox TTS]
-
-    C1 --> D
-    C1 --> I1[LLM]
-    C2 --> G1[Bright Data MCP Server]
-    C2 --> I2[LLM]
-    C3 --> G2[Bright Data MCP Server]
-    C3 --> I3[LLM]
-    C4 --> I4[LLM]
-    C5 --> D
-    C5 --> I5[LLM]
-
-    subgraph Bright Data MCP
-        G1 --> K1[search_engine]
-        G1 --> K2[scrape_as_markdown]
-        G2 --> K1
-        G2 --> K2
-    end
-
-    D --> J[OpenAI Embeddings]
-```
+![DecipherIt drawio](https://github.com/user-attachments/assets/085c41aa-4cdc-400f-b6e0-af8cbce4c5a3)
 
 ---
 
