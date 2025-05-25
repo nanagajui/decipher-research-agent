@@ -10,6 +10,9 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} DecipherIt. All rights reserved.
             </p>
+            <p className="text-xs text-muted-foreground/80 max-w-md text-center md:text-left">
+              DecipherIt can be inaccurate; please double check its responses.
+            </p>
           </div>
           <div className="flex flex-col items-center md:items-end gap-2">
             <Link
