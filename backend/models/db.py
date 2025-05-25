@@ -124,6 +124,7 @@ class NotebookOutput(Base):
     notebook_id: Mapped[str] = mapped_column(String, ForeignKey("notebooks.id", ondelete="CASCADE"), name="notebookId", nullable=False, unique=True)
     summary: Mapped[str] = mapped_column(Text, nullable=False)
     audio_overview_url: Mapped[Optional[str]] = mapped_column(String, name="audioOverviewUrl", nullable=True)
+    mindmap: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, name="createdAt", nullable=False, default=func.now())
 
     # Relationships

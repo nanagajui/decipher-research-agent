@@ -307,6 +307,10 @@ class TaskManager:
                     # Generate mindmap structure
                     result = await run_mindmap_agent(notebook_id)
 
+                    # Save mindmap to notebook output
+                    logger.info(f"Saving mindmap to database for notebook: {notebook_id}")
+                    await notebook_repository.update_notebook_mindmap(notebook_id, result)
+
                 await task_repository.update_task_result(task_id, result, "completed")
 
                 logger.success(f"Mindmap task {task_id} completed successfully")

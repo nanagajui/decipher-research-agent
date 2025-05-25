@@ -316,5 +316,37 @@ class NotebookRepository:
             await session.commit()
             logger.info(f"Updated audio overview URL for notebook {notebook_id}")
 
+    async def update_notebook_mindmap(self, notebook_id: str, mindmap: Dict[str, Any]) -> None:
+        """
+        Update the mindmap for a notebook output.
+
+        Args:
+            notebook_id: The notebook ID
+            mindmap: The mindmap structure as a nested dictionary
+        """
+        async with get_db_session() as session:
+            # Get the notebook output
+            stmt = select(NotebookOutput).where(
+                NotebookOutput.notebook_id == notebook_id
+            )
+            result = await session.execute(stmt)
+            notebook_output = result.scalar_one_or_none()
+
+            if not notebook_output:
+                logger.warning(f"No notebook output found for notebook {notebook_id}")
+                return
+
+            # Update the mindmap
+            notebook_output.mindmap = mindmap
+
+            # Update notebook updated_at timestamp
+            notebook_stmt = update(Notebook).where(
+                Notebook.id == notebook_id
+            ).values(updated_at=datetime.now())
+            await session.execute(notebook_stmt)
+
+            await session.commit()
+            logger.info(f"Updated mindmap for notebook {notebook_id}")
+
 # Singleton instance
 notebook_repository = NotebookRepository()

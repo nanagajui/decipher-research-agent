@@ -10,26 +10,17 @@ def get_mindmap_crew():
     content_analyzer = Agent(
         name="Content Analyzer",
         role="Research Content Analyst",
-        goal="Analyze research content to identify main themes, subtopics, and hierarchical relationships",
-        backstory="You are an expert content analyst who excels at breaking down complex research into logical hierarchical structures and identifying key relationships between concepts.",
+        goal="Analyze research content to identify main themes, subtopics, and hierarchical relationships up to 5 levels deep",
+        backstory="You are an expert content analyst who excels at breaking down complex research into logical hierarchical structures and identifying key relationships between concepts at multiple levels of detail.",
         llm=llm,
         verbose=True
     )
 
-    structure_designer = Agent(
-        name="Structure Designer",
-        role="Information Architect",
-        goal="Design the hierarchical structure and organization of the mindmap",
-        backstory="You are an information architect who specializes in creating clear, logical hierarchical structures that effectively organize complex information into digestible visual formats.",
-        llm=llm,
-        verbose=True
-    )
-
-    mindmap_builder = Agent(
-        name="Mindmap Builder",
-        role="Mindmap Creator",
-        goal="Create the final mindmap structure with proper node relationships and hierarchy",
-        backstory="You are a mindmap specialist who transforms structured information into well-organized mindmap formats with clear parent-child relationships and logical flow.",
+    mindmap_creator = Agent(
+        name="Mindmap Creator",
+        role="Mindmap Specialist",
+        goal="Create the final mindmap structure as a nested dictionary with proper hierarchical relationships based on content analysis",
+        backstory="You are a mindmap specialist who transforms analyzed content into well-organized nested dictionary formats with clear hierarchical relationships and logical flow.",
         llm=llm,
         verbose=True
     )
@@ -37,83 +28,87 @@ def get_mindmap_crew():
     # Tasks
     analyze_content_task = Task(
         description="""
-        Analyze the research content and identify:
-        - The main central theme/topic (1 clear topic)
-        - Primary categories or main branches (4-6 major themes maximum)
-        - Secondary subtopics under each main branch (2-4 per branch maximum)
-        - Keep it simple with only 3 levels maximum
+        Analyze the research content and identify hierarchical themes with appropriate depth (up to 5 levels):
+
+        - Level 1: ONE main central topic/theme (the overarching subject)
+        - Level 2: Primary categories under the main topic (3-6 major categories)
+        - Level 3: Secondary subtopics under each category (2-5 per category)
+        - Level 4: Detailed aspects (if content warrants it, 2-4 per subtopic)
+        - Level 5: Specific details (only if highly detailed content, 1-3 per aspect)
 
         Research Content:
         ```
         {research}
         ```
 
-        Create a simple hierarchical breakdown that shows:
-        1. Central topic (Level 0)
-        2. Main categories/branches (Level 1) - 4-6 items
-        3. Key subtopics (Level 2) - 2-4 per branch
+        Determine the appropriate depth based on content complexity:
+        - Simple content: 2-3 levels
+        - Moderate content: 3-4 levels
+        - Complex content: 4-5 levels
 
-        Keep labels concise (1-3 words each). Focus on the most important themes only.
+        Create a hierarchical breakdown with:
+        - ONE main topic at the root level that encompasses the entire research
+        - Concise labels (1-4 words each)
+        - Logical grouping of related concepts under the main topic
+        - Appropriate depth based on content richness
+        - Clear parent-child relationships
         """,
-        expected_output="A simple 3-level hierarchical breakdown with concise labels and clear relationships.",
+        expected_output="A hierarchical breakdown with appropriate depth (2-5 levels) based on content complexity, with concise labels and clear relationships.",
         agent=content_analyzer
     )
 
-    design_structure_task = Task(
+    create_mindmap_task = Task(
         description="""
-        Using the hierarchical breakdown from the content analysis, design a simple mindmap structure that:
-        - Has ONE clear central node representing the main topic
-        - Organizes 4-6 main branches around the center
-        - Each branch has 2-4 subtopics maximum
-        - Uses ONLY 3 levels total (0, 1, 2)
-        - Keeps node labels very concise (1-3 words per node)
-        - Groups related concepts together logically
+        Create the final mindmap structure as a nested dictionary using the hierarchical breakdown from the content analysis.
 
-        Simple structure rules:
-        - Level 0: Central topic (1 node)
-        - Level 1: Main categories (4-6 nodes)
-        - Level 2: Key subtopics (2-4 per category)
+        Generate a clean nested dictionary structure where:
+        - Each key is a topic/subtopic name (concise, 1-4 words)
+        - Each value is a dictionary containing its children
+        - Empty dictionaries {} represent leaf nodes (no children)
+        - Structure depth adapts to content complexity (2-5 levels)
+        - Start with ONE main topic that encompasses all the research content
 
-        Keep it clean and simple. Avoid overcomplicated structures.
-        Create a clear outline showing the 3-level hierarchy.
+        Example format:
+        {
+            "Main Research Topic": {
+                "Category A": {
+                    "Subtopic 1": {
+                        "Detail 1": {},
+                        "Detail 2": {}
+                    },
+                    "Subtopic 2": {}
+                },
+                "Category B": {
+                    "Subtopic 3": {}
+                }
+            }
+        }
+
+        Structure guidelines:
+        - Level 1: ONE main topic (the central theme of all research)
+        - Level 2: Primary categories under the main topic (3-6 categories)
+        - Level 3: Secondary subtopics under each category (2-5 per category)
+        - Level 4: Detailed aspects (if needed, 2-4 per subtopic)
+        - Level 5: Specific details (if highly detailed, 1-3 per aspect)
+
+        Rules:
+        - Use the exact nested dictionary format shown above
+        - Start with ONE main topic that encompasses all the research content
+        - Keep topic names concise but descriptive
+        - Only create levels that add meaningful organization
+        - Ensure logical parent-child relationships
+        - Adapt depth to content complexity (don't force 5 levels if content is simple)
         """,
-        expected_output="A simple 3-level mindmap structure outline with concise labels and clear relationships.",
-        agent=structure_designer,
-        context=[analyze_content_task]
-    )
-
-    build_mindmap_task = Task(
-        description="""
-        Create the final simple mindmap structure using the design from the previous task.
-
-        Generate a clean mindmap with:
-        - Unique IDs for each node (use simple names like "root", "topic1", "subtopic1a")
-        - Clear parent-child relationships
-        - EXACTLY 3 levels only (0, 1, 2)
-        - Very concise labels (1-3 words maximum)
-        - Proper connections between nodes
-
-        Strict rules for node creation:
-        - Level 0: ONE root node (central topic)
-        - Level 1: 4-6 main category nodes
-        - Level 2: 2-4 subtopic nodes per category
-        - Each node must have a unique, simple ID
-        - Parent-child relationships must be correctly established
-        - Node labels must be 1-3 words only
-        - No more than 3 levels total
-
-        Keep the structure simple and clean. Use the outline from the previous task.
-        """,
-        expected_output="A simple 3-level mindmap structure with concise labels and proper relationships.",
+        expected_output="A nested dictionary structure representing the mindmap hierarchy with appropriate depth based on content complexity.",
         output_pydantic=MindmapStructure,
-        agent=mindmap_builder,
-        context=[design_structure_task]
+        agent=mindmap_creator,
+        context=[analyze_content_task]
     )
 
     # Crew
     return Crew(
-        agents=[content_analyzer, structure_designer, mindmap_builder],
-        tasks=[analyze_content_task, design_structure_task, build_mindmap_task],
+        agents=[content_analyzer, mindmap_creator],
+        tasks=[analyze_content_task, create_mindmap_task],
         process=Process.sequential,
         verbose=True,
     )
