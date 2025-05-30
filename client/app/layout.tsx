@@ -110,7 +110,7 @@ export default function RootLayout({
       <body className={`${oxanium.className} antialiased`}>
         <Script
           defer
-          src="https://p01--umami--fyers-api-bot--oql9-vlwk.code.run/script.js"
+          src="https://analytics.amitwani.dev/script.js"
           data-website-id="d09597b1-692e-4f54-a378-97e224b7630b"
           strategy="afterInteractive"
         />
