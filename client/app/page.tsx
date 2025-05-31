@@ -21,6 +21,7 @@ import {
 import Script from "next/script";
 import Link from "next/link";
 import { AuthAwareButton } from "@/components/auth-aware-button";
+import { DonationButton } from "@/components/ui/donation-button";
 
 interface Feature {
   name: string;
@@ -420,6 +421,51 @@ export default function Home() {
                   </CardDescription>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Support Section */}
+      <section className="py-24 sm:py-32 bg-muted/50 border-y">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Support DecipherIt&apos;s Development
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+              Help us continue building and improving this open-source AI
+              research platform. Your support enables us to maintain servers,
+              add new features, and keep DecipherIt free for everyone.
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <DonationButton size="lg" className="text-lg px-8 py-4">
+                Support Our Mission
+              </DonationButton>
+              <p className="text-sm text-muted-foreground max-w-md">
+                Every contribution helps us maintain and improve DecipherIt for
+                researchers worldwide
+              </p>
+            </div>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">🚀</div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Server Costs
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">⚡</div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  New Features
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">🌍</div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Free Access
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { DonationButton } from "@/components/ui/donation-button";
 
 export function HeaderClient() {
   const router = useRouter();
@@ -56,6 +57,11 @@ export function HeaderClient() {
                 >
                   Dashboard
                 </Link>
+                <DonationButton
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:flex"
+                />
                 <div className="hidden sm:flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">
@@ -97,6 +103,11 @@ export function HeaderClient() {
                       >
                         Dashboard
                       </Link>
+                      <DonationButton
+                        variant="outline"
+                        size="lg"
+                        className="justify-start"
+                      />
                       <div className="flex items-center gap-3 text-base text-muted-foreground">
                         <User className="h-5 w-5" />
                         <span>{session.user.name || session.user.email}</span>
@@ -118,15 +129,22 @@ export function HeaderClient() {
                 </Sheet>
               </>
             ) : (
-              <Button asChild>
-                <Link
-                  href="/auth"
-                  data-umami-event="frontend_get_started_click"
-                  data-umami-event-section="header"
-                >
-                  Get Started
-                </Link>
-              </Button>
+              <>
+                <DonationButton
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:flex"
+                />
+                <Button asChild>
+                  <Link
+                    href="/auth"
+                    data-umami-event="frontend_get_started_click"
+                    data-umami-event-section="header"
+                  >
+                    Get Started
+                  </Link>
+                </Button>
+              </>
             )}
           </nav>
         </div>
