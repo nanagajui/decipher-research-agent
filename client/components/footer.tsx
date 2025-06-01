@@ -59,7 +59,7 @@ export function Footer() {
             <p className="text-xs text-muted-foreground text-center md:text-left">
               &copy; {currentYear} ResearchForge. All rights reserved.
               <span className="block md:inline md:ml-2 mt-1 md:mt-0">
-                Based on the open-source DecipherIt project.
+                Built upon the open-source DecipherIt project.
               </span>
             </p>
             <div className="flex items-center space-x-6">

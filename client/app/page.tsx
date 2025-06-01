@@ -172,7 +172,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
-              The Problem DecipherIt Solves
+              The Problem ResearchForge Solves
             </h2>
             <p className="text-lg text-muted-foreground mb-12 max-w-3xl mx-auto">
               Traditional research is time-consuming, fragmented, and often
@@ -266,7 +266,7 @@ export default function Home() {
             </div>
             <div className="mt-12 p-6 bg-primary/5 rounded-lg border border-primary/20">
               <p className="text-lg font-medium text-foreground mb-2">
-                DecipherIt&apos;s Solution
+                ResearchForge&apos;s Solution
               </p>
               <p className="text-muted-foreground">
                 Our AI-powered platform addresses these challenges by leveraging
@@ -336,7 +336,7 @@ export default function Home() {
               id="how-it-works-heading"
               className="text-3xl font-bold tracking-tight sm:text-4xl"
             >
-              How DecipherIt Works
+              How ResearchForge Works
             </h2>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
               Advanced AI agents work together to transform your research
@@ -422,16 +422,16 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Support DecipherIt&apos;s Development
+              Support ResearchForge&apos;s Development
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
               Help us continue building and improving this open-source AI
               research platform. Your support enables us to maintain servers,
-              add new features, and keep DecipherIt free for everyone.
+              add new features, and keep ResearchForge free for everyone.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <p className="text-sm text-muted-foreground max-w-md">
-                Every contribution helps us maintain and improve DecipherIt for
+                Every contribution helps us maintain and improve ResearchForge for
                 researchers worldwide
               </p>
             </div>

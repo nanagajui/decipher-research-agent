@@ -87,14 +87,14 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://decipherit.xyz",
+    canonical: "https://researchforge.ai",
   },
   other: {
-    "application-name": "DecipherIt",
+    "application-name": "ResearchForge",
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "DecipherIt",
+    "apple-mobile-web-app-title": "ResearchForge",
     "format-detection": "telephone=no",
   },
 };
