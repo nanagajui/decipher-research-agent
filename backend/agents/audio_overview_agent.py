@@ -53,8 +53,8 @@ def get_audio_overview_crew():
 
   create_conversation_outline_task = Task(
     description=f"""
-    Create a comprehensive but concise podcast conversation outline between Michael (host) and Sarah (expert) that:
-    - Starts with a brief welcome to "The DecipherIt Podcast" (1-2 sentences)
+    Create a comprehensive but concise podcast conversation outline between Michael (Australian host) and Sarah (Australian expert) that:
+    - Starts with a brief welcome to the ResearchForge Audio Overview (1-2 sentences)
     - Covers all major insights and key findings from the research analysis above
     - Organizes points in a logical flow with clear transitions
     - Balances thoroughness with brevity (aim for 4-5 minutes total)
@@ -74,7 +74,7 @@ def get_audio_overview_crew():
     description=f"""
     Write a 4-5 minute podcast conversation between Michael and Sarah that follows the outline from the previous task.
     The conversation should:
-    - Opens with Michael's welcome to "The DecipherIt Podcast"
+    - Opens with a warm welcome to the ResearchForge Audio Overview
     - Uses casual, natural dialogue
     - Incorporates research points conversationally
     - Includes authentic reactions and interjections

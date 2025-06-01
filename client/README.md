@@ -1,6 +1,6 @@
-# DecipherIt - AI-Powered Research Assistant
+# ResearchForge - AI-Powered Research Platform
 
-DecipherIt is an AI-powered research assistant that transforms how you explore information. Input any source, get instant summaries, chat with your research, and generate FAQs - all in one powerful platform.
+ResearchForge is an advanced AI-powered research platform that transforms how you explore and analyze information. Built on top of the open-source DecipherIt project, ResearchForge enhances the experience with additional features and improvements while maintaining the core functionality that makes it a powerful research assistant.
 
 ## Features
 
@@ -22,8 +22,8 @@ DecipherIt is an AI-powered research assistant that transforms how you explore i
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/mtwn105/decipher-research-agent.git
-cd decipher-research-agent/client
+git clone https://github.com/yourusername/researchforge.git
+cd researchforge/client
 ```
 
 2. Install dependencies:
@@ -38,7 +38,7 @@ pnpm install
    Create a `.env` file with the following variables:
 
 ```
-DATABASE_URL="postgresql://username:password@localhost:5432/decipher"
+DATABASE_URL="postgresql://username:password@localhost:5432/researchforge"
 ```
 
 4. Set up the database:

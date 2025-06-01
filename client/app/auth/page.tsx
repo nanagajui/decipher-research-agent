@@ -155,7 +155,7 @@ export default function AuthPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            Welcome to DecipherIt
+            Welcome to ResearchForge
           </CardTitle>
           <CardDescription className="text-center">
             Sign in to your account or create a new one

@@ -1,8 +1,8 @@
-# Getting Started with Decipher Research Agent (Fork)
+# Getting Started with ResearchForge
 
-> **Note**: This is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project, enhanced with additional features like Firecrawl AI integration and advanced PDF reporting.
+> **Note**: ResearchForge is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project, enhanced with additional features like Firecrawl AI integration, advanced PDF reporting, and improved research capabilities.
 
-This guide will walk you through setting up the Decipher Research Agent with a hybrid approach: running Qdrant in Docker and all other services locally for a flexible development experience.
+This guide will walk you through setting up ResearchForge with a hybrid approach: running Qdrant in Docker and all other services locally for a flexible development experience.
 
 ## 🏗 Project Structure
 
@@ -75,8 +75,8 @@ You'll need to sign up for the following services and obtain API keys:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/decipher-research-agent.git
-   cd decipher-research-agent
+   git clone https://github.com/yourusername/researchforge.git
+   cd researchforge
    ```
 
 2. **Configure environment variables**
@@ -199,8 +199,8 @@ sudo -u postgres psql
 
 In the PostgreSQL prompt:
 ```sql
-CREATE USER decipher WITH PASSWORD 'yoursecurepassword';
-CREATE DATABASE decipher_db OWNER decipher;
+CREATE USER researchforge WITH PASSWORD 'yoursecurepassword';
+CREATE DATABASE researchforge_db OWNER researchforge;
 \q
 ```
 
@@ -293,7 +293,7 @@ pnpm run dev
 
 ## 📚 Additional Resources
 
-- [Project Documentation](https://github.com/yourusername/decipher-research-agent)
+- [Project Documentation](https://github.com/yourusername/researchforge)
 - [CrewAI Documentation](https://docs.crewai.com/)
 - [Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)
 - [Qdrant Documentation](https://qdrant.tech/documentation/)

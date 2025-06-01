@@ -70,7 +70,7 @@ class R2Service:
             )
 
             # Generate public URL
-            public_url = f"https://files.decipherit.xyz/{file_key}"
+            public_url = f"https://files.researchforge.app/{file_key}"
 
             logger.info(f"Successfully uploaded audio file for notebook: {notebook_id}")
             logger.debug(f"Audio file URL: {public_url}")
@@ -96,7 +96,7 @@ class R2Service:
         Returns:
             Public URL of the file
         """
-        return f"https://files.decipherit.xyz/{file_key}"
+        return f"https://files.researchforge.app/{file_key}"
 
 
 # Singleton instance

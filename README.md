@@ -1,6 +1,6 @@
 # 🚀 ResearchForge - Advanced AI Research Assistant
 
-> **Note**: This is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project by Amit Wani, enhanced with additional features and modifications.
+> **Note**: ResearchForge is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project by Amit Wani, enhanced with additional features and modifications to create a more powerful research platform.
 
 ## 🚀 Enhanced Features in This Fork
 
@@ -199,7 +199,7 @@ ResearchForge leverages multiple AI models and techniques to enhance your resear
 
 ## 🏗️ Architecture
 
-This fork maintains the core architecture of DecipherIt while adding new components for enhanced functionality. The system now includes additional modules for advanced web crawling, PDF generation, and AI-powered analysis.
+ResearchForge maintains the core architecture of DecipherIt while adding new components for enhanced functionality. The system includes additional modules for advanced web crawling, PDF generation, and AI-powered analysis, making it a comprehensive research platform.
 
 ---
 ---
@@ -298,7 +298,7 @@ This fork maintains the core architecture of DecipherIt while adding new compone
 
 ### 🌐 Bright Data MCP Server Setup
 
-DecipherIt uses the official **[Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** for advanced web scraping capabilities. Follow these steps to set it up:
+ResearchForge uses the official **[Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** for advanced web scraping capabilities. Follow these steps to set it up:
 
 #### 1. Get Your Bright Data Account
 
@@ -307,7 +307,7 @@ DecipherIt uses the official **[Bright Data MCP Server](https://github.com/brigh
 
 #### 2. Configure Web Unlocker (Automatic)
 
-- By default, DecipherIt creates a Web Unlocker zone automatically using your API token
+- By default, ResearchForge creates a Web Unlocker zone automatically using your API token
 - For custom control, create your own Web Unlocker zone in the Bright Data control panel
 
 #### 3. Web Unlocker Zone (Optional)
@@ -351,7 +351,7 @@ web_scraping_results = await asyncio.gather(*web_scraping_tasks)
 
 #### 5. Security Best Practices
 
-⚠️ **Important**: Always treat scraped web content as untrusted data. DecipherIt automatically:
+⚠️ **Important**: Always treat scraped web content as untrusted data. ResearchForge automatically:
 
 - Filters and validates all web data before processing
 - Uses structured data extraction rather than raw text
@@ -369,7 +369,7 @@ R2_ENDPOINT="https://your-account-id.r2.cloudflarestorage.com"
 R2_ACCESS_KEY_ID="your-r2-access-key"
 R2_SECRET_ACCESS_KEY="your-r2-secret-key"
 R2_BUCKET_NAME="decipher-files"
-R2_PUBLIC_URL="https://files.decipherit.xyz"
+R2_PUBLIC_URL="https://files.researchforge.app"
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 ```
 
@@ -404,11 +404,11 @@ CLOUDFLARE_R2_SECRET_ACCESS_KEY="your-r2-secret-key"
 
 ### 🔍 Intelligent Research Agents
 
-DecipherIt employs specialized AI agents powered by **CrewAI** to handle different aspects of research:
+ResearchForge employs specialized AI agents powered by **CrewAI** to handle different aspects of research:
 
 #### CrewAI Crews Overview
 
-DecipherIt employs a sophisticated multi-crew architecture powered by **CrewAI**:
+ResearchForge employs a sophisticated multi-crew architecture powered by **CrewAI**:
 
 - **Web Scraping Crew** - A crew of agents focused on data collection strategy and execution
 - **Research Crew** - A crew dedicated to discovering and analyzing relevant sources using Bright Data
@@ -430,7 +430,7 @@ DecipherIt employs a sophisticated multi-crew architecture powered by **CrewAI**
 
 ### 🌐 Advanced Web Scraping with Bright Data MCP
 
-DecipherIt leverages the **[official Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** - a powerful Model Context Protocol server that provides an all-in-one solution for public web access. This integration enables:
+ResearchForge leverages the **[official Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)** - a powerful Model Context Protocol server that provides an all-in-one solution for public web access. This integration enables:
 
 #### 🚀 Core Capabilities
 
@@ -440,9 +440,9 @@ DecipherIt leverages the **[official Bright Data MCP Server](https://github.com/
 - **Browser Control** - Optional remote browser automation capabilities
 - **Seamless Integration** - Works with all MCP-compatible AI assistants
 
-#### 🛠️ Tools Used by DecipherIt
+#### 🛠️ Tools Used by ResearchForge
 
-DecipherIt leverages two key tools from the Bright Data MCP server:
+ResearchForge leverages two key tools from the Bright Data MCP server:
 
 - `search_engine` - Search the web for relevant information and discover sources
 - `scrape_as_markdown` - Extract and convert web content to clean, structured Markdown format
@@ -454,7 +454,7 @@ DecipherIt leverages two key tools from the Bright Data MCP server:
 - **Rate Limiting** - Built-in protection against overuse
 - **Data Validation** - Automatic filtering and validation of scraped content
 
-This powerful integration allows DecipherIt's AI agents to conduct comprehensive research across the entire web without the typical limitations of traditional scraping methods.
+This powerful integration allows ResearchForge's AI agents to conduct comprehensive research across the entire web without the typical limitations of traditional scraping methods.
 
 ### 🧠 Vector-Powered Search
 
@@ -642,7 +642,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ResearchForge builds upon the work of many amazing open-source projects and communities:
 
-- [DecipherIt](https://github.com/mtwn105/decipher-research-agent) - The original project by Amit Wani
+- [DecipherIt](https://github.com/mtwn105/decipher-research-agent) - The original project by Amit Wani that inspired ResearchForge
 - [CrewAI](https://www.crewai.com/) - Framework for orchestrating AI agents
 - [OpenAI](https://openai.com/) - Advanced language models
 - [Qdrant](https://qdrant.tech/) - Vector search engine
@@ -657,6 +657,6 @@ ResearchForge builds upon the work of many amazing open-source projects and comm
   <p>⭐ Star this repository if you find it helpful!</p>
   <p>👉 Follow us on Twitter: <a href="https://twitter.com/researchforge">@researchforge</a></p>
 
-Made with ❤️ by [Amit Wani](https://github.com/mtwn105)
+Originated from the original project by Amit Wani forked by Nangajui
 
 </div>
