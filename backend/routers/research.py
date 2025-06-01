@@ -10,7 +10,7 @@ from models.task_models import (
     TaskStatusResponse
 )
 
-router = APIRouter(tags=["research"])
+router = APIRouter(prefix="/research", tags=["research"])
 
 @router.post(
     "/",
@@ -20,35 +20,53 @@ router = APIRouter(tags=["research"])
     description="Submits a topic for research. The task runs in the background."
 )
 async def submit_research_task(request: ResearchRequest):
-    logger.info(f"Submitting research task for notebook: {request.notebook_id}" +
-              (f" on topic: {request.topic}" if request.topic else ""))
+    try:
+        logger.info(f"Received research request: {request.dict()}")
+        logger.info(f"Submitting research task for notebook: {request.notebook_id}" +
+                  (f" on topic: {request.topic}" if request.topic else ""))
 
-    if not request.notebook_id or request.notebook_id == "":
+        if not request.notebook_id or request.notebook_id == "":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Notebook ID is required."
+            )
+
+        if (not request.topic or request.topic == "") and (not request.sources or len(request.sources) == 0):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Either topic or sources must be provided."
+            )
+
+        try:
+            task_id = await task_manager.submit_task_async(
+                notebook_id=request.notebook_id,
+                topic=request.topic,
+                sources=request.sources
+            )
+            logger.debug(f"Research task submitted with ID: {task_id}")
+
+            return TaskResponse(
+                task_id=task_id,
+                notebook_id=request.notebook_id,
+                status="IN_QUEUE",
+                message="Research task submitted and will be processed."
+            )
+        except Exception as e:
+            logger.error(f"Error in task_manager.submit_task_async: {str(e)}")
+            logger.exception(e)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to submit research task: {str(e)}"
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in submit_research_task: {str(e)}")
+        logger.exception(e)
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Notebook ID is required."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error processing research request: {str(e)}"
         )
-
-    if (not request.topic or request.topic == "") and (not request.sources or len(request.sources) == 0):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Either topic or sources must be provided."
-        )
-
-    task_id = await task_manager.submit_task_async(
-        notebook_id=request.notebook_id,
-        topic=request.topic,
-        sources=request.sources
-    )
-
-    logger.debug(f"Research task submitted with ID: {task_id}")
-
-    return TaskResponse(
-        task_id=task_id,
-        notebook_id=request.notebook_id,
-        status="IN_QUEUE",
-        message="Research task submitted and will be processed."
-    )
 
 @router.get(
     "/{task_id}",

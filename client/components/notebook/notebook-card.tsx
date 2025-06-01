@@ -12,6 +12,13 @@ import {
 } from "lucide-react";
 import { DeleteNotebookMenu } from "@/components/notebook/delete-notebook-menu";
 
+// Format date consistently for both server and client
+function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  // Use fixed format: DD/MM/YYYY
+  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+}
+
 type NotebookSource = {
   id: string;
   sourceType: string;
@@ -103,7 +110,7 @@ export function NotebookCard({ notebook }: NotebookCardProps) {
           )}
           <div className="flex items-center justify-between mt-2">
             <p className="text-xs text-muted-foreground">
-              Created on {new Date(notebook.createdAt).toLocaleDateString()}
+              Created on {formatDate(notebook.createdAt)}
             </p>
             {notebook.sources && notebook.sources.length > 0 && (
               <div className="flex items-center text-xs text-muted-foreground gap-1">

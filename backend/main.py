@@ -47,8 +47,7 @@ def create_app() -> FastAPI:
     )
 
     # Include API routes
-    # The api_router already has a prefix of "/api"
-    app.include_router(api_router)
+    app.include_router(api_router, prefix="/api")
     
     # Mount static files for uploads
     app.mount(

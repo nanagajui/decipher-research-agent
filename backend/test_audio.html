@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-case { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        h2 { margin-top: 0; }
+        button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Audio Playback Test</h1>
+    
+    <div class="test-case">
+        <h2>Test 1: Direct Audio Element</h2>
+        <audio controls src="http://localhost:8001/api/audio/notebook_68642df8-8e3a-4a2b-ad3a-8f9ab909c7df_audio_9fc363fa.mp3"></audio>
+        <p>Status: <span id="test1-status">Not started</span></p>
+    </div>
+    
+    <div class="test-case">
+        <h2>Test 2: Fetch API then Play</h2>
+        <button id="test2-button">Start Test</button>
+        <div id="test2-audio-container"></div>
+        <p>Status: <span id="test2-status">Not started</span></p>
+    </div>
+    
+    <div class="test-case">
+        <h2>Test 3: XMLHttpRequest</h2>
+        <button id="test3-button">Start Test</button>
+        <div id="test3-audio-container"></div>
+        <p>Status: <span id="test3-status">Not started</span></p>
+    </div>
+
+    <script>
+        // Test 1: Direct Audio Element
+        const audio1 = document.querySelector('audio');
+        audio1.onloadeddata = () => {
+            document.getElementById('test1-status').textContent = 'Audio loaded successfully';
+            document.getElementById('test1-status').style.color = 'green';
+        };
+        audio1.onerror = (e) => {
+            document.getElementById('test1-status').textContent = `Error: ${audio1.error ? audio1.error.code : 'unknown'}`;
+            document.getElementById('test1-status').style.color = 'red';
+            console.error('Test 1 error:', e, audio1.error);
+        };
+
+        // Test 2: Fetch API
+        document.getElementById('test2-button').addEventListener('click', () => {
+            document.getElementById('test2-status').textContent = 'Loading...';
+            
+            fetch('http://localhost:8001/api/audio/notebook_68642df8-8e3a-4a2b-ad3a-8f9ab909c7df_audio_9fc363fa.mp3')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const audioUrl = URL.createObjectURL(blob);
+                    const audioElement = document.createElement('audio');
+                    audioElement.controls = true;
+                    audioElement.src = audioUrl;
+                    
+                    document.getElementById('test2-audio-container').innerHTML = '';
+                    document.getElementById('test2-audio-container').appendChild(audioElement);
+                    document.getElementById('test2-status').textContent = 'Audio loaded successfully';
+                    document.getElementById('test2-status').style.color = 'green';
+                })
+                .catch(error => {
+                    document.getElementById('test2-status').textContent = `Error: ${error.message}`;
+                    document.getElementById('test2-status').style.color = 'red';
+                    console.error('Test 2 error:', error);
+                });
+        });
+
+        // Test 3: XMLHttpRequest
+        document.getElementById('test3-button').addEventListener('click', () => {
+            document.getElementById('test3-status').textContent = 'Loading...';
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'http://localhost:8001/api/audio/notebook_68642df8-8e3a-4a2b-ad3a-8f9ab909c7df_audio_9fc363fa.mp3', true);
+            xhr.responseType = 'blob';
+            
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    const audioUrl = URL.createObjectURL(this.response);
+                    const audioElement = document.createElement('audio');
+                    audioElement.controls = true;
+                    audioElement.src = audioUrl;
+                    
+                    document.getElementById('test3-audio-container').innerHTML = '';
+                    document.getElementById('test3-audio-container').appendChild(audioElement);
+                    document.getElementById('test3-status').textContent = 'Audio loaded successfully';
+                    document.getElementById('test3-status').style.color = 'green';
+                } else {
+                    document.getElementById('test3-status').textContent = `Error: HTTP ${this.status}`;
+                    document.getElementById('test3-status').style.color = 'red';
+                }
+            };
+            
+            xhr.onerror = function() {
+                document.getElementById('test3-status').textContent = 'Network error';
+                document.getElementById('test3-status').style.color = 'red';
+                console.error('Test 3 error:', this);
+            };
+            
+            xhr.send();
+        });
+    </script>
+</body>
+</html>

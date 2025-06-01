@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from services import initialize_db_pool, close_db_pool
 from routers.research import router as research_router
 from routers.chat import router as chat_router
+from routers.audio import router as audio_router
 
 # Create router for API endpoints
 router = APIRouter()
@@ -38,9 +39,10 @@ async def lifespan(app):
     
     logger.info("Application shutdown complete")
 
-# Include the routers with their own prefixes
-router.include_router(research_router, prefix="/research")
-router.include_router(chat_router, prefix="/chat")
+# Include the routers
+router.include_router(research_router, prefix="")
+router.include_router(chat_router, prefix="")
+router.include_router(audio_router, prefix="")
 
 # Export the router and lifespan for use in main.py
 __all__ = ["router", "lifespan"]

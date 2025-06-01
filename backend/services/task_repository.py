@@ -31,7 +31,10 @@ class TaskRepository:
             task = Task(
                 notebook_id=notebook_id,
                 topic=topic,
-                sources=[source.model_dump() for source in sources] if sources else None,
+                sources=sources if sources is None else [
+                    source.model_dump() if hasattr(source, 'model_dump') else source 
+                    for source in sources
+                ],
                 status="queued",
                 created_at=datetime.now()
             )

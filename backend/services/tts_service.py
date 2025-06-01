@@ -12,6 +12,11 @@ import httpx
 from loguru import logger
 from pydub import AudioSegment
 
+# Explicitly set paths to FFmpeg binaries
+import pydub.utils
+pydub.utils.FFMPEG_PATH = "/usr/bin/ffmpeg"
+pydub.utils.FFPROBE_PATH = "/usr/bin/ffprobe"
+
 
 class TTSService:
     """Service for converting text to speech using LemonFox AI API."""

@@ -18,6 +18,17 @@ This guide will walk you through setting up the Decipher Research Agent with a h
    sudo apt install -y git
    ```
 
+3. **FFmpeg** (required for audio processing)
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install -y ffmpeg
+   
+   # Verify installation
+   ffmpeg -version
+   ffprobe -version
+   ```
+
 ## 🔑 Required Accounts and API Keys
 
 You'll need to sign up for the following services and obtain API keys:
@@ -67,8 +78,13 @@ You'll need to sign up for the following services and obtain API keys:
    DATABASE_URL=postgresql://decipher:yoursecurepassword@localhost:5432/decipher_db
    
    # AI Services
-   OPENROUTER_API_KEY=your_openrouter_api_key
+   # Note: We've switched to OpenAI as the primary LLM provider
    OPENAI_API_KEY=your_openai_api_key
+   
+   # Optional: Keep OpenRouter as fallback if needed
+   # OPENROUTER_API_KEY=your_openrouter_api_key
+   
+   # Audio Generation
    LEMONFOX_API_KEY=your_lemonfox_api_key
    
    # Qdrant - use localhost since Qdrant runs in Docker but backend runs locally
@@ -78,9 +94,51 @@ You'll need to sign up for the following services and obtain API keys:
    # Storage - use a local path for uploads
    STORAGE_TYPE=local
    STORAGE_BASE_PATH=./uploads
+   
+   # Audio Processing
+   # Make sure FFmpeg is installed and in your system PATH
+   # FFMPEG_PATH=/usr/bin/ffmpeg
+   # FFPROBE_PATH=/usr/bin/ffprobe
    ```
 
-3. **Configure the frontend**
+## 🗄️ Database Setup
+
+### 1. Initialize the Database
+
+Before starting the application, you need to create the database tables. Run the following command:
+
+```bash
+# From the project root directory
+cd backend
+python init_db.py
+```
+
+This will create all the necessary tables in your PostgreSQL database.
+
+### 2. Run Database Migrations
+
+After initializing the database, apply any pending migrations:
+
+```bash
+alembic upgrade head
+```
+
+### 3. Create Required Directories
+
+Create the necessary directories for logs and uploads:
+
+```bash
+# Create logs directory
+mkdir -p backend/logs
+
+# Create uploads directory
+mkdir -p backend/uploads
+
+# Set appropriate permissions
+chmod -R 777 backend/logs backend/uploads
+```
+
+4. **Configure the frontend**
    ```bash
    cd ../client
    cp .env.example .env.local
