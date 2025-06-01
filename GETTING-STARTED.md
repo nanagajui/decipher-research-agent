@@ -1,6 +1,23 @@
-# Getting Started with Decipher Research Agent
+# Getting Started with Decipher Research Agent (Fork)
+
+> **Note**: This is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project, enhanced with additional features like Firecrawl AI integration and advanced PDF reporting.
 
 This guide will walk you through setting up the Decipher Research Agent with a hybrid approach: running Qdrant in Docker and all other services locally for a flexible development experience.
+
+## 🏗 Project Structure
+
+```
+decipher-research-agent/
+├── backend/             # FastAPI backend
+│   └── services/        # AI and processing services
+│       └── firecrawl/   # Firecrawl AI integration
+├── client/              # Next.js frontend
+│   └── app/             # App router pages
+│       └── reports/     # PDF report generation
+├── docker/              # Docker configuration
+├── .env.example         # Example environment variables
+└── docker-compose.yml   # Docker Compose configuration
+```
 
 ## 🛠 Prerequisites
 
@@ -281,12 +298,8 @@ pnpm run dev
 - [Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)
 - [Qdrant Documentation](https://qdrant.tech/documentation/)
 
-## 🤝 Getting Help
+## ❓ Need Help?
 
-If you encounter any issues, please check the following:
-1. All services are running
-2. All API keys are correctly set
-3. Database is accessible
-4. Ports 3000 and 8000 are available
+If you encounter any issues or have questions:
 
 For further assistance, please open an issue on the GitHub repository.

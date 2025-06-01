@@ -12,69 +12,68 @@ const oxanium = Oxanium({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "https://decipherit.xyz"
+    process.env.NEXT_PUBLIC_BASE_URL || "https://yourdomain.com"
   ),
   title: {
     default:
-      "DecipherIt - AI-Powered Research Assistant | Transform Your Research Process",
-    template: "%s | DecipherIt",
+      "ResearchForge - Advanced AI Research Assistant | Smarter Research, Faster Insights",
+    template: "%s | ResearchForge",
   },
   description:
-    "Transform your research with DecipherIt's AI-powered platform. Upload documents, analyze URLs, generate summaries, create interactive Q&A, audio overviews, visual mindmaps, and FAQs. Bypass geo-restrictions with Bright Data integration.",
+    "ResearchForge supercharges your research with AI-powered analysis, multi-source integration, and automated reporting. Generate comprehensive reports, extract insights from documents, and access web content without restrictions.",
   keywords: [
-    "AI research assistant",
+    "AI research",
     "research automation",
     "document analysis",
-    "web scraping",
-    "AI summaries",
-    "interactive Q&A",
-    "audio overviews",
-    "visual mindmaps",
-    "FAQ generation",
-    "Bright Data",
-    "CrewAI",
-    "vector search",
+    "web data extraction",
+    "AI-powered summaries",
+    "interactive research",
+    "automated reporting",
     "knowledge management",
-    "research tools",
-    "academic research",
-    "content synthesis",
+    "data visualization",
+    "Firecrawl AI",
     "multi-source research",
-    "geo-unrestricted access",
-    "NotebookLM alternative",
+    "academic research",
+    "business intelligence",
+    "market research",
+    "competitive analysis",
+    "data-driven insights",
+    "automated documentation",
+    "research collaboration"
   ],
-  authors: [{ name: "Amit Wani", url: "https://github.com/mtwn105" }],
-  creator: "Amit Wani",
-  publisher: "DecipherIt",
-  category: "Research Tools",
+  authors: [
+    { name: "Your Name", url: "" },
+    { name: "Amit Wani (Original Creator)", url: "" }
+  ],
+  creator: "Your Name",
+  publisher: "ResearchForge",
+  category: "AI Research Tools",
   classification: "AI Research Assistant",
   openGraph: {
     title:
-      "DecipherIt - AI-Powered Research Assistant | Transform Your Research Process",
+      "ResearchForge - Advanced AI Research Assistant | Smarter Research, Faster Insights",
     description:
-      "Revolutionary AI research platform inspired by Google NotebookLM. Upload documents, analyze web content, generate summaries, create interactive Q&A, audio overviews, and visual mindmaps. Powered by Bright Data for global web access.",
-    type: "website",
-    url: "https://decipherit.xyz",
-    siteName: "DecipherIt",
+      "Supercharge your research with AI-powered analysis, multi-source integration, and automated reporting. Generate comprehensive reports and extract insights effortlessly.",
+    url: "https://yourdomain.com",
+    siteName: "ResearchForge",
     locale: "en_US",
+    type: "website",
     images: [
       {
-        url: "/og.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "DecipherIt - AI-Powered Research Assistant with multi-source analysis, summaries, Q&A, audio overviews, and mindmaps",
-        type: "image/png",
+        alt: "ResearchForge - Advanced AI Research Assistant",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@decipherit",
-    creator: "@mtwn105",
-    title:
-      "DecipherIt - AI-Powered Research Assistant | Transform Your Research Process",
+    title: "ResearchForge - AI-Powered Research Assistant",
     description:
-      "Revolutionary AI research platform. Upload documents, analyze URLs, generate summaries, interactive Q&A, audio overviews & visual mindmaps. Powered by Bright Data & CrewAI.",
-    images: ["/og.png"],
+      "Transform your research with advanced AI analysis, automated reporting, and multi-source integration.",
+    creator: "@yourtwitter",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,

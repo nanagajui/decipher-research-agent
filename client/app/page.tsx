@@ -21,7 +21,6 @@ import {
 import Script from "next/script";
 import Link from "next/link";
 import { AuthAwareButton } from "@/components/auth-aware-button";
-import { DonationButton } from "@/components/ui/donation-button";
 
 interface Feature {
   name: string;
@@ -38,15 +37,15 @@ interface Step {
 
 const features: Feature[] = [
   {
-    name: "Deep Research",
+    name: "AI-Powered Research",
     description:
-      "Conduct thorough research on any topic with AI-assisted analysis and synthesis. Our specialized CrewAI agents strategically plan data collection and discover diverse sources through Bright Data's global search capabilities.",
+      "Leverage advanced AI to conduct comprehensive research with automated analysis and synthesis. Our intelligent systems plan and execute research strategies across diverse data sources.",
     icon: Search,
   },
   {
-    name: "Multi-Source Research",
+    name: "Unified Research Platform",
     description:
-      "Seamlessly integrate documents (PDF, DOCX, PPTX, XLSX), URLs, manual text, and topics into unified research spaces. All sources are processed and integrated using advanced AI agents.",
+      "Integrate multiple document formats, web content, and custom inputs into a single research workspace. Our platform processes and connects information from all your sources.",
     icon: FileText,
   },
 
@@ -88,7 +87,7 @@ const steps: Step[] = [
     step: "02",
     title: "AI Planning & Web Discovery",
     description:
-      "The system creates a strategic research plan using specialized AI agents. Bright Data's search engine finds relevant sources globally, bypassing geo-restrictions.",
+      "The system creates a strategic research plan using AI agents. Bright Data's search engine finds relevant sources globally, bypassing geo-restrictions.",
     icon: Zap,
   },
   {
@@ -109,18 +108,23 @@ const steps: Step[] = [
 
 const structuredData = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "DecipherIt Research Assistant",
-  applicationCategory: "Research Tool",
-  operatingSystem: "Web",
+  "@type": "WebApplication",
+  name: "ResearchForge - Advanced AI Research Assistant",
+  description:
+    "The most advanced AI research assistant that helps you discover, analyze, and present information with Firecrawl AI and advanced analytics. Generate comprehensive reports, interactive visualizations, and intelligent summaries.",
+  applicationCategory: "Research Application",
+  operatingSystem: "Web, Windows, macOS, Linux",
   offers: {
     "@type": "Offer",
     price: "0",
     priceCurrency: "USD",
   },
-  description:
-    "AI-powered research assistant inspired by Google NotebookLM that transforms how researchers explore information. Input any source, get instant summaries, chat with your research, generate FAQs, create visual mindmaps, and produce podcast-style audio overviews - all in one powerful platform.",
   featureList: features.map((f) => f.name).join(", "),
+  creator: {
+    "@type": "Organization",
+    name: "ResearchForge",
+    url: "https://yourdomain.com",
+  },
 };
 
 export default function Home() {
@@ -136,40 +140,27 @@ export default function Home() {
       <section className="relative px-4 pt-24 pb-20 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center">
           <div className="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium bg-primary/10 text-primary mb-8">
-            Powered by{" "}
-            <Link
-              href="https://brightdata.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline ml-1"
-              aria-label="Brightdata website"
-              data-umami-event="frontend_external_link_click"
-              data-umami-event-link="brightdata"
-            >
-              Bright Data MCP Server
-            </Link>
+            Next-Generation Research Platform
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-            Research Smarter with{" "}
-            <span className="text-primary">DecipherIt</span>
+            Transform Your Research with{" "}
+            <span className="text-primary">ResearchForge</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-3xl mx-auto">
-            Your AI-powered research assistant inspired by Google NotebookLM
-            that transforms how you explore information. Input any source, get
-            instant summaries, chat with your research, generate FAQs, create
-            visual mindmaps, and produce podcast-style audio overviews - all in
-            one powerful platform.
+            The most advanced AI research assistant that helps you discover, analyze, and present
+            information like never before. Powered by Firecrawl AI and advanced analytics,
+            ResearchForge turns complex data into actionable insights with beautiful reports,
+            interactive visualizations, and intelligent summaries.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <AuthAwareButton />
-            <Button variant="link" asChild>
+            <Button variant="outline" asChild>
               <Link
                 href="#features"
-                aria-label="Learn more about DecipherIt"
-                data-umami-event="frontend_learn_more_click"
-                data-umami-event-section="hero"
+                aria-label="Explore features"
+                className="border-primary/20 hover:bg-primary/5"
               >
-                Learn more →
+                Explore Features
               </Link>
             </Button>
           </div>
@@ -403,7 +394,7 @@ export default function Home() {
                 <CardContent>
                   <CardDescription>
                     Multi-agent AI framework with specialized crews for
-                    research, analysis, content creation, and visualization
+                    research, analysis, content creation, and visualistion
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -439,9 +430,6 @@ export default function Home() {
               add new features, and keep DecipherIt free for everyone.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <DonationButton size="lg" className="text-lg px-8 py-4">
-                Support Our Mission
-              </DonationButton>
               <p className="text-sm text-muted-foreground max-w-md">
                 Every contribution helps us maintain and improve DecipherIt for
                 researchers worldwide
@@ -485,33 +473,13 @@ export default function Home() {
               Ready to start researching smarter?
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-              Join our open-source community and help shape the future of
-              AI-powered research. Star the project, contribute, or use it for
-              your research needs.
+              Start your AI-powered research journey today. Explore new insights
+              and enhance your research with our powerful tools.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
+            <div className="mt-10">
               <Button size="lg" asChild>
-                <Link
-                  href="https://github.com/mtwn105/decipher-research-agent"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Star on GitHub"
-                  data-umami-event="frontend_github_star_click"
-                  data-umami-event-section="cta"
-                >
-                  Star on GitHub
-                </Link>
-              </Button>
-              <Button variant="link" asChild>
-                <Link
-                  href="https://github.com/mtwn105/decipher-research-agent/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Report Issues"
-                  data-umami-event="frontend_github_issues_click"
-                  data-umami-event-section="cta"
-                >
-                  Report Issues →
+                <Link href="/login">
+                  Get Started
                 </Link>
               </Button>
             </div>

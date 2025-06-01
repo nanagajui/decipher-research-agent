@@ -13,7 +13,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { DonationButton } from "@/components/ui/donation-button";
 
 export function HeaderClient() {
   const router = useRouter();
@@ -37,14 +36,32 @@ export function HeaderClient() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center space-x-2"
-            data-umami-event="frontend_logo_click"
-            data-umami-event-section="header"
-          >
-            <span className="font-bold text-xl">DecipherIt</span>
-          </Link>
+          <div className="flex items-center space-x-8">
+            <Link
+              href="/"
+              className="flex items-center space-x-2"
+              data-umami-event="frontend_logo_click"
+              data-umami-event-section="header"
+            >
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                ResearchForge
+              </span>
+            </Link>
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link href="/features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Features
+              </Link>
+              <Link href="/solutions" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Solutions
+              </Link>
+              <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Pricing
+              </Link>
+              <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Docs
+              </Link>
+            </nav>
+          </div>
 
           <nav className="flex items-center gap-4">
             {session?.user ? (
@@ -57,11 +74,6 @@ export function HeaderClient() {
                 >
                   Dashboard
                 </Link>
-                <DonationButton
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:flex"
-                />
                 <div className="hidden sm:flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">
@@ -103,11 +115,6 @@ export function HeaderClient() {
                       >
                         Dashboard
                       </Link>
-                      <DonationButton
-                        variant="outline"
-                        size="lg"
-                        className="justify-start"
-                      />
                       <div className="flex items-center gap-3 text-base text-muted-foreground">
                         <User className="h-5 w-5" />
                         <span>{session.user.name || session.user.email}</span>
@@ -130,11 +137,6 @@ export function HeaderClient() {
               </>
             ) : (
               <>
-                <DonationButton
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:flex"
-                />
                 <Button asChild>
                   <Link
                     href="/auth"

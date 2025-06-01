@@ -314,7 +314,6 @@ export function AudioPlayer({
             <audio
               ref={audioRef}
               key={audioUrl}
-              controls
               onEnded={() => setIsPlaying(false)}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
@@ -370,7 +369,7 @@ export function AudioPlayer({
                 }
               }}
               preload="auto"
-              style={{ width: '100%' }}
+              style={{ width: '100%', display: 'none' }}
             >
               <source src={audioUrl} type="audio/mpeg" />
               Your browser does not support the audio element.

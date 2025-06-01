@@ -1,10 +1,21 @@
-# 🔍 DecipherIt - AI-Powered Research Assistant
+# 🚀 ResearchForge - Advanced AI Research Assistant
+
+> **Note**: This is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project by Amit Wani, enhanced with additional features and modifications.
+
+## 🚀 Enhanced Features in This Fork
+
+- **Firecrawl AI Integration**: Advanced web crawling and data extraction capabilities
+- **Enhanced PDF Reporting**: Generate comprehensive reports with images, graphics, and visualizations
+- **Improved Research Capabilities**: Expanded AI analysis and synthesis features
+- **Custom UI/UX Enhancements**: Streamlined user experience with additional tools
+
+---
 
 <div align="center">
 
-![DecipherIt Logo](https://img.shields.io/badge/DecipherIt-AI%20Research%20Assistant-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4KPC9zdmc+)
+![ResearchForge Logo](https://img.shields.io/badge/ResearchForge-AI%20Research%20Platform-blue?style=for-the-badge&logo=lightbulb)
 
-**Transform your research process with AI-powered intelligence**
+**Transform your research with AI-powered intelligence**
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.3.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.0.0-blue?style=flat-square&logo=react)](https://reactjs.org/)
@@ -12,7 +23,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://typescriptlang.org/)
 
-[🚀 Live Demo](https://decipherit.xyz) • [🛠️ Installation](#installation) • [🤝 Contributing](#contributing)
+[🚀 Get Started](#installation) • [📚 Documentation](#documentation) • [🤖 Features](#-key-features)
 
 </div>
 
@@ -20,62 +31,177 @@
 
 ## ✨ Overview
 
-DecipherIt is a cutting-edge AI-powered research assistant inspired by **Google NotebookLM** that revolutionizes how researchers, students, and professionals explore, analyze, and synthesize information from the web. The platform transforms any combination of documents, URLs, or topics into comprehensive research notebooks complete with AI-generated summaries, interactive Q&A capabilities, audio overviews, visual mindmaps, and automatically generated FAQs.
+ResearchForge is a next-generation AI-powered research platform that transforms how professionals, academics, and students discover, analyze, and present information. Built on advanced AI and machine learning technologies, ResearchForge helps you turn complex data into actionable insights with beautiful reports, interactive visualizations, and intelligent summaries.
 
-### The Problem DecipherIt Solves
+### The Problem ResearchForge Solves
 
-Traditional research is time-consuming and fragmented. Researchers often struggle with:
+Modern research faces significant challenges:
 
-- **Information Overload**: Sifting through countless sources manually
-- **Geo-restrictions**: Unable to access content from different regions
-- **Bot Detection**: Getting blocked when trying to scrape valuable data
-- **Synthesis Challenges**: Difficulty connecting insights across multiple sources
-- **Accessibility**: Converting research into different formats for various audiences
+- **Information Overload**: Managing and making sense of vast amounts of data
+- **Time-Consuming Analysis**: Spending hours on manual data processing and synthesis
+- **Formatting Hassles**: Converting research into presentation-ready formats
+- **Collaboration Barriers**: Sharing and working together on research projects
+- **Knowledge Silos**: Disconnected tools and platforms for different research needs
 
-DecipherIt addresses these challenges by leveraging **Bright Data's MCP Server** to provide unrestricted, intelligent web access combined with advanced AI agents that can understand, synthesize, and present information in multiple formats.
+ResearchForge addresses these challenges by providing an integrated platform that combines powerful AI analysis with intuitive tools for knowledge management and presentation.
 
 ### 🎯 Key Features
 
-- **🔬 Deep Research** - Conduct thorough research on any topic with AI-assisted analysis and synthesis
-- **🔍 Multi-Source Research** - Seamlessly integrate documents, URLs, and manual text into unified research spaces
-- **🤖 AI-Powered Summaries** - Generate comprehensive, well-structured research analyses using advanced AI agents
-- **💬 Interactive Q&A** - Chat with your research materials using natural language queries
-- **🎧 Audio Overviews** - AI-generated podcast-style audio summaries with multiple voices
-- **❓ Smart FAQ Generation** - Automatically create relevant FAQs from your research content
-- **🧠 Visual Mindmaps** - Generate interactive, hierarchical mindmaps to visualize research structure and connections
-- **🌐 Global Web Access** - Bypass geo-restrictions and bot detection using Bright Data's infrastructure
+#### 🔍 Research & Analysis
+- **AI-Powered Research** - Leverage advanced AI to conduct comprehensive research with automated analysis and synthesis
+- **Multi-Source Integration** - Seamlessly work with documents (PDF, DOCX, PPTX), web content, and custom text inputs
+- **Advanced Analytics** - Gain deeper insights with intelligent data processing and visualization
+- **Semantic Search** - Find exactly what you need with AI-powered semantic search across all your research
+
+#### 🛠️ Intelligent Tools
+- **Smart Summarization** - Generate concise, well-structured research analyses using advanced AI agents
+- **Interactive Q&A** - Chat with your research materials using natural language queries
+- **Audio Overviews** - Listen to AI-generated podcast-style summaries with natural-sounding voices
+- **Automated FAQ Generation** - Automatically create relevant FAQs from your research content
+- **Visual Mindmaps** - Generate interactive, hierarchical mindmaps to visualize research structure
+
+#### 📊 Presentation & Collaboration
+- **Professional Reporting** - Generate beautiful, formatted reports with automated layouts
+- **Team Workspaces** - Collaborate in real-time with team members on research projects
+- **Presentation Mode** - Turn research into beautiful presentations with one click
+- **Export Options** - Export your work in multiple formats (PDF, DOCX, Markdown)
+
+#### 🌐 Global Web Access** - Bypass geo-restrictions and bot detection using Bright Data's infrastructure
 
 ### 🔍 Detailed Feature Overview
 
-**🔬 Deep Research**
-DecipherIt's AI agents conduct comprehensive research by strategically planning data collection, discovering diverse sources through Bright Data's global search capabilities, and synthesizing information from multiple perspectives. The system can research any topic from current events to academic subjects, providing thorough analysis that rivals human researchers.
+#### 🔍 How ResearchForge Works
 
-**🔍 Multi-Source Research**
-Users can combine various input types in a single research project: upload documents (PDF, DOCX, PPTX, XLSX), add custom URLs for specific web content, input manual text for direct analysis, or simply enter topics for AI-driven discovery. All sources are processed and integrated into a unified research space.
+#### 🤖 AI-Powered Research Analysis
+ResearchForge employs advanced AI agents to transform how you conduct research. Our system intelligently processes and synthesizes information from multiple sources, identifying key insights, trends, and connections that might otherwise be missed. The platform's AI understands context, extracts meaningful patterns, and presents information in a clear, actionable format.
 
-**🤖 AI-Powered Summaries**
-Specialized CrewAI agents work together to create comprehensive research summaries. The Research Analyst synthesizes information from all sources, while the Content Writer crafts engaging, well-structured analyses that highlight key insights, trends, and connections across the research material.
+**🔍 Intelligent Content Processing**
+- Automatically extracts key information from various document formats
+- Identifies and connects related concepts across different sources
+- Generates structured data from unstructured text
+- Supports multiple languages and technical domains
 
-**💬 Interactive Q&A**
-Using vector embeddings and semantic search through Qdrant database, users can ask natural language questions about their research content. The system provides contextual answers by retrieving relevant information from all processed sources, enabling deep exploration of the research material.
+**💬 Smart Q&A System**
+Ask questions in natural language and get precise answers drawn from your research materials. Our system understands context and can provide detailed explanations, making it easy to explore complex topics without manual searching.
+
+- **Context-Aware Responses** - Answers are grounded in your specific research context
+- **Citation Tracking** - See exactly which sources support each answer
+- **Follow-up Questions** - Ask follow-up questions to explore topics in depth
+- **Technical Understanding** - Comprehends specialized terminology and concepts
+
+**📊 Data Visualization & Reporting**
+Transform your research into beautiful, insightful visualizations and reports with just a few clicks. Choose from multiple templates and customize the output to match your needs.
 
 **🎧 Audio Overviews**
-On-demand feature that transforms research into engaging podcast-style audio content. The Podcast Script Generator agent creates conversational scripts, which are then converted to high-quality audio using LemonFox TTS with multiple AI voices, making research accessible in audio format.
+Transform your research into engaging, digestible audio content. Our advanced text-to-speech system creates natural-sounding audio summaries that you can listen to on the go, making it easy to absorb information during your commute or workout.
 
 **❓ Smart FAQ Generation**
-AI agents automatically analyze research content to generate relevant, insightful questions and comprehensive answers. This feature helps users understand key aspects of their research topic and provides quick access to important information.
+Automatically generates relevant questions and answers from your research content. The system identifies key concepts and formulates insightful questions with accurate, well-cited answers, helping you quickly grasp the main points of complex topics.
 
 **🧠 Visual Mindmaps**
-The Mindmap Creator agent analyzes research structure to generate interactive, hierarchical visualizations with up to 5 levels of depth. Built with react-mindmap-visualiser, these mindmaps help users understand complex topics at a glance and navigate research relationships visually.
+Turn complex research into clear, interactive mindmaps that reveal connections between ideas. Our AI analyzes your content to identify main topics and their relationships, creating a visual representation that enhances understanding and recall.
 
 **🌐 Global Web Access**
-Powered by Bright Data's MCP Server, DecipherIt bypasses geo-restrictions and bot detection to access content from anywhere in the world. This ensures comprehensive research coverage and access to diverse, authoritative sources that traditional scraping methods cannot reach.
+Powered by advanced web crawling technology, ResearchForge can access and process content from around the world, ensuring comprehensive research coverage without geographical limitations.
+
+## 🏗️ Technical Architecture
+
+ResearchForge is built on a modern, scalable architecture that leverages cutting-edge technologies:
+
+### Frontend
+- **Next.js 15** - High-performance React framework with server components
+- **TypeScript** - Type-safe JavaScript for better developer experience
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **shadcn/ui** - Beautiful, accessible, and customizable components
+- **React Query** - Powerful data synchronization and state management
+- **Zod** - TypeScript-first schema validation with static type inference
+
+### Backend
+- **FastAPI** - High-performance Python framework for building APIs
+- **Python 3.12** - Latest Python version with improved performance
+- **SQLModel** - SQL databases in Python with Pydantic and SQLAlchemy
+- **PostgreSQL** - Robust, open-source relational database
+- **Qdrant** - High-performance vector search engine for AI applications
+- **Firecrawl** - Advanced web crawling and data extraction
+
+### AI & ML
+- **OpenAI API** - State-of-the-art language models
+- **LemonFox TTS** - Natural-sounding text-to-speech
+- **Hugging Face** - Open-source models and datasets
+- **LangChain** - Framework for building LLM applications
+
+### Infrastructure
+- **Docker** - Containerization for consistent environments
+- **Docker Compose** - Multi-container application management
+- **Nginx** - High-performance web server and reverse proxy
+- **GitHub Actions** - Automated CI/CD pipelines
+- **Vercel** - Cloud platform for frontend deployment
+- **Railway** - Modern application hosting platform
+- **Qdrant Cloud** - Managed vector database service
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js 18+ and pnpm
+- Python 3.12
+- OpenAI API key
+- Qdrant Cloud API key (or local Qdrant instance)
+- LemonFox API key (for text-to-speech)
+- Web crawling service credentials
+- OAuth credentials for authentication
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/yourusername/researchforge.git
+   cd researchforge
+   ```
+
+2. **Set up environment variables**
+
+   Copy and configure the environment files:
+
+   ```bash
+   cp .env.example .env
+   cp client/.env.example client/.env.local
+   ```
+   Update the files with your API keys and configuration.
+
+3. **Start the application**
+
+   ```bash
+   # Start all services
+   docker-compose up -d
+   ```
+
+4. **Access the application**
+
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
+
+## 🤖 AI-Powered Features
+
+ResearchForge leverages multiple AI models and techniques to enhance your research:
+
+- **Content Analysis** - Extract key information and identify patterns
+- **Semantic Search** - Find relevant content using natural language
+- **Automated Summarization** - Generate concise overviews of complex topics
+- **Question Answering** - Get precise answers from your research materials
+- **Data Visualization** - Transform data into insightful charts and graphs
+- **Document Processing** - Extract text and data from various file formats
 
 ---
 
 ## 🏗️ Architecture
-![DecipherIt drawio](https://github.com/user-attachments/assets/085c41aa-4cdc-400f-b6e0-af8cbce4c5a3)
 
+This fork maintains the core architecture of DecipherIt while adding new components for enhanced functionality. The system now includes additional modules for advanced web crawling, PDF generation, and AI-powered analysis.
+
+---
 ---
 
 ## 🛠️ Tech Stack
@@ -387,11 +513,6 @@ Comprehensive document support using **MarkItDown**:
 
 - PDF, DOCX, PPTX, XLSX file processing
 - Automatic text extraction and formatting
-- Secure file storage with Cloudflare R2
-- Metadata preservation and indexing
-
----
-
 ## 🐳 Docker Deployment
 
 ### Using Docker Compose
@@ -404,7 +525,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/decipher
+      - DATABASE_URL=postgresql://postgres:password@db:5432/researchforge
     depends_on:
       - db
       - backend
@@ -414,7 +535,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/decipher
+      - DATABASE_URL=postgresql://postgres:password@db:5432/researchforge
     depends_on:
       - db
       - qdrant
@@ -422,7 +543,7 @@ services:
   db:
     image: postgres:15
     environment:
-      - POSTGRES_DB=decipher
+      - POSTGRES_DB=researchforge
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     volumes:
@@ -448,52 +569,93 @@ docker-compose up -d
 
 ---
 
+## 🏗️ Project Structure
+
+```
+researchforge/
+├── client/                  # Next.js frontend application
+│   ├── app/                # App router pages and layouts
+│   ├── components/         # Reusable React components
+│   ├── lib/                # Utility functions and hooks
+│   └── public/             # Static assets and media files
+├── server/                 # FastAPI backend services
+│   ├── app/
+│   │   ├── api/           # API endpoints and routes
+│   │   ├── core/           # Core application logic
+│   │   ├── models/         # Database and data models
+│   │   └── services/       # Business logic and external services
+│   └── tests/              # Backend test suite
+├── docker/                 # Docker configuration files
+├── docs/                   # Project documentation
+└── scripts/                # Development and deployment scripts
+```
+
+## 🚀 Deployment
+
+### Frontend Deployment (Vercel)
+
+1. Push your code to a GitHub/GitLab repository
+2. Import the repository to Vercel
+3. Configure environment variables:
+   ```
+   NEXT_PUBLIC_API_URL=https://your-api-url.com
+   NEXT_PUBLIC_APP_ENV=production
+   # Add other required environment variables
+   ```
+
+### Backend Deployment (Railway/Heroku)
+1. Connect your repository to your preferred platform
+2. Set up required services:
+   - PostgreSQL database
+   - Qdrant vector database
+   - Redis (for caching and job queues)
+3. Configure environment variables
+4. Set up SSL/TLS certificates
+
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions from the community! Here's how you can help improve ResearchForge:
 
-### Development Workflow
+1. **Report Issues**
+   - Check existing issues to avoid duplicates
+   - Provide detailed reproduction steps
+   - Include environment details and error logs
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. **Feature Requests**
+   - Open an issue with the "enhancement" label
+   - Explain the use case and benefits
+   - Include any relevant examples or mockups
 
----
+3. **Code Contributions**
+   - Fork the repository
+   - Create a feature branch: `git checkout -b feature/your-feature`
+   - Follow our code style and commit guidelines
+   - Write tests for new functionality
+   - Update documentation as needed
+   - Submit a pull request with a clear description
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
-
-## 👨‍💻 Created By
-
-**Amit Wani**
-
-- GitHub: [@mtwn105](https://github.com/mtwn105)
-- LinkedIn: [Amit Wani](https://linkedin.com/in/mtwn105)
-- Website: [linktr.ee/mtwn105](https://linktr.ee/mtwn105)
-
----
-
 ## 🙏 Acknowledgments
 
-- **[Bright Data](https://brightdata.com/)** for their powerful [MCP Server](https://github.com/brightdata-com/brightdata-mcp) enabling real-time web access and advanced scraping capabilities
-- **[CrewAI](https://crewai.com/)** for the multi-agent AI framework
-- **[Qdrant](https://qdrant.tech/)** for vector database technology
-- **[LemonFox](https://lemonfox.ai/)** for high-quality TTS services
-- **[Cloudflare](https://cloudflare.com/)** for R2 storage and CDN
-- **[Vercel](https://vercel.com/)** for seamless deployment
-- **[OpenAI](https://openai.com/)** for GPT and embedding models
-- **[OpenRouter](https://openrouter.ai/)** for OpenRouter API for Gemini
+ResearchForge builds upon the work of many amazing open-source projects and communities:
+
+- [DecipherIt](https://github.com/mtwn105/decipher-research-agent) - The original project by Amit Wani
+- [CrewAI](https://www.crewai.com/) - Framework for orchestrating AI agents
+- [OpenAI](https://openai.com/) - Advanced language models
+- [Qdrant](https://qdrant.tech/) - Vector search engine
+- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
+- [Next.js](https://nextjs.org/) - React framework for the web
+- And all the other open-source projects that made this possible
 
 ---
 
 <div align="center">
-
-**⭐ Star this repository if you find it helpful!**
+  <p>Made with ❤️ by the ResearchForge Team</p>
+  <p>⭐ Star this repository if you find it helpful!</p>
+  <p>👉 Follow us on Twitter: <a href="https://twitter.com/researchforge">@researchforge</a></p>
 
 Made with ❤️ by [Amit Wani](https://github.com/mtwn105)
 
