@@ -1,0 +1,234 @@
+# Getting Started with Decipher Research Agent
+
+This guide will walk you through setting up the Decipher Research Agent with a hybrid approach: running Qdrant in Docker and all other services locally for a flexible development experience.
+
+## 🛠 Prerequisites
+
+1. **Docker and Docker Compose**
+   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine
+   - Verify installation:
+     ```bash
+     docker --version
+     docker-compose --version
+     ```
+
+2. **Git** (if not already installed)
+   ```bash
+   sudo apt update
+   sudo apt install -y git
+   ```
+
+## 🔑 Required Accounts and API Keys
+
+You'll need to sign up for the following services and obtain API keys:
+
+1. **Bright Data** - For web scraping
+   - Sign up at [Bright Data](https://brightdata.com/)
+   - Get your API token from the dashboard
+   - (Optional) Set up a Web Unlocker zone
+
+2. **OpenRouter** - For AI model access
+   - Sign up at [OpenRouter](https://openrouter.ai/)
+   - Get your API key from the dashboard
+
+3. **OpenAI** - For embeddings
+   - Sign up at [OpenAI](https://platform.openai.com/)
+   - Create an API key
+
+4. **LemonFox** - For text-to-speech
+   - Sign up at [LemonFox](https://lemonfox.ai/)
+   - Get your API key
+
+5. **Qdrant** - Vector database
+   - Local setup is included in the Docker configuration
+   - For production, consider [Qdrant Cloud](https://cloud.qdrant.io/)
+
+## 🚀 Project Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/decipher-research-agent.git
+   cd decipher-research-agent
+   ```
+
+2. **Configure environment variables**
+   ```bash
+   cd backend
+   cp .env.example .env
+   nano .env  # Use your preferred text editor
+   ```
+
+   Update the `.env` file with your API keys and settings:
+   ```env
+   # Application
+   DEBUG=true
+   
+   # Database - point to local PostgreSQL
+   DATABASE_URL=postgresql://decipher:yoursecurepassword@localhost:5432/decipher_db
+   
+   # AI Services
+   OPENROUTER_API_KEY=your_openrouter_api_key
+   OPENAI_API_KEY=your_openai_api_key
+   LEMONFOX_API_KEY=your_lemonfox_api_key
+   
+   # Qdrant - use localhost since Qdrant runs in Docker but backend runs locally
+   QDRANT_API_URL=http://localhost:6333
+   QDRANT_API_KEY=  # Optional for local development
+   
+   # Storage - use a local path for uploads
+   STORAGE_TYPE=local
+   STORAGE_BASE_PATH=./uploads
+   ```
+
+3. **Configure the frontend**
+   ```bash
+   cd ../client
+   cp .env.example .env.local
+   nano .env.local  # Use your preferred text editor
+   ```
+
+   Update the `.env.local` file:
+   ```env
+   # Database URL for Prisma - point to local PostgreSQL
+   DATABASE_URL=postgresql://decipher:yoursecurepassword@localhost:5432/decipher_db
+   
+   # Authentication settings
+   BETTER_AUTH_SECRET=your_secure_auth_secret_key
+   BETTER_AUTH_URL=http://localhost:3000
+   
+   # API settings - point to locally running backend
+   BACKEND_API_URL=http://localhost:8001
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000
+   ```
+
+## 🛠️ Local Development Setup
+
+### 1. Install Local Dependencies
+
+**PostgreSQL Database**
+Install and configure PostgreSQL locally:
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+
+# macOS with Homebrew
+brew install postgresql
+brew services start postgresql
+```
+
+Create a database user and database:
+```bash
+sudo -u postgres psql
+```
+
+In the PostgreSQL prompt:
+```sql
+CREATE USER decipher WITH PASSWORD 'yoursecurepassword';
+CREATE DATABASE decipher_db OWNER decipher;
+\q
+```
+
+**Python Dependencies**
+Install backend dependencies:
+```bash
+cd backend
+pip install -e .
+```
+
+**Node.js Dependencies**
+Install frontend dependencies:
+```bash
+cd ../client
+npm install
+# or
+pnpm install
+```
+
+### 2. 🐳 Start Qdrant in Docker
+
+```bash
+# From the project root directory
+docker-compose up -d
+```
+
+This will start only:
+- Qdrant vector database (ports 6333, 6334)
+
+Monitor Qdrant logs:
+```bash
+docker-compose logs -f qdrant
+```
+
+Access the Qdrant dashboard at http://localhost:6333/dashboard
+
+### 3. Run Database Migrations
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+### 4. Start Backend API
+
+```bash
+cd backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
+```
+
+### 5. Start Frontend
+
+```bash
+cd client
+npm run dev
+# or
+pnpm run dev
+```
+
+### 6. Access the Services
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8001
+- API Documentation: http://localhost:8001/docs
+- Qdrant Dashboard: http://localhost:6333/dashboard
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **Port conflicts**
+   - Ensure ports 3000, 5432, 6333, 6334, and 8001 are available
+   - Check running containers: `docker ps`
+
+2. **Database connection issues**
+   - Verify PostgreSQL is running: `docker-compose ps db`
+   - Check logs: `docker-compose logs db`
+
+3. **File permissions**
+   - If you see permission errors with the uploads directory:
+     ```bash
+     mkdir -p backend/uploads
+     chmod -R 777 backend/uploads
+     ```
+   - Double-check all API keys in your `.env` files
+   - Ensure services are properly activated in your accounts
+
+4. **Permission issues**
+   - Make sure your database user has correct permissions
+   - Check file permissions for uploads directory
+
+## 📚 Additional Resources
+
+- [Project Documentation](https://github.com/yourusername/decipher-research-agent)
+- [CrewAI Documentation](https://docs.crewai.com/)
+- [Bright Data MCP Server](https://github.com/brightdata-com/brightdata-mcp)
+- [Qdrant Documentation](https://qdrant.tech/documentation/)
+
+## 🤝 Getting Help
+
+If you encounter any issues, please check the following:
+1. All services are running
+2. All API keys are correctly set
+3. Database is accessible
+4. Ports 3000 and 8000 are available
+
+For further assistance, please open an issue on the GitHub repository.

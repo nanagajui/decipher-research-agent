@@ -62,7 +62,7 @@ export async function POST(
       source_content: source.content || null,
     }));
 
-    const researchApiResponse = await fetch(`${researchApiUrl}/api/research`, {
+    const researchApiResponse = await fetch(`${researchApiUrl}/api/research/`, {
       method: "POST",
       headers: {
         "content-type": "application/json",

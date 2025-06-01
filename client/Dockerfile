@@ -23,7 +23,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
-ENV NEXT_PUBLIC_BASE_URL=https://decipherit.xyz
+# Allow build-time arguments for environment variables
+ARG NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
 
 # Generate Prisma Client
 RUN corepack enable pnpm && pnpm prisma generate

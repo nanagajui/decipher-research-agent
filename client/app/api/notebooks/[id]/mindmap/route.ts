@@ -63,7 +63,7 @@ export async function POST(
       throw new Error("BACKEND_API_URL not configured");
     }
 
-    const mindmapApiResponse = await fetch(`${backendApiUrl}/api/research/mindmap/${id}`, {
+    const mindmapApiResponse = await fetch(`${backendApiUrl}/api/research/mindmap/${id}/`, {
       method: "POST",
       headers: {
         "content-type": "application/json",

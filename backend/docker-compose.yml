@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: decipher
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d decipher"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Qdrant vector database
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:6333/readyz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/decipher
+      - QDRANT_API_URL=http://qdrant:6333
+      - STORAGE_TYPE=local
+      - STORAGE_BASE_PATH=/app/uploads
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    ports:
+      - "8001:8001"  # Match the port in your Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  qdrant_data:

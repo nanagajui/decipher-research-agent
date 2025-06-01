@@ -10,10 +10,10 @@ from models.task_models import (
     TaskStatusResponse
 )
 
-router = APIRouter(prefix="/research", tags=["research"])
+router = APIRouter(tags=["research"])
 
 @router.post(
-    "",
+    "/",
     response_model=TaskResponse,
     status_code=status.HTTP_202_ACCEPTED,
     summary="Submit a new research task",

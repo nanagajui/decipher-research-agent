@@ -1,3 +1,4 @@
+# backend/services/audio_overview_service.py
 """
 Audio overview service that orchestrates TTS generation, file upload, and database updates.
 """
@@ -8,9 +9,8 @@ from loguru import logger
 
 from agents.audio_overview_agent import run_audio_overview_agent
 from .tts_service import tts_service
-from .r2_service import r2_service
+from .storage_factory import storage
 from .notebook_repository import notebook_repository
-
 
 class AudioOverviewService:
     """Service for generating complete audio overviews from notebook content."""
@@ -38,9 +38,9 @@ class AudioOverviewService:
                 transcript, notebook_id
             )
 
-            # Step 3: Upload audio file to R2
-            logger.info(f"Uploading audio file to R2 for notebook: {notebook_id}")
-            audio_url = await r2_service.upload_audio_file(
+            # Step 3: Upload audio file to storage
+            logger.info(f"Uploading audio file for notebook: {notebook_id}")
+            audio_url = await storage.upload_audio_file(
                 audio_content, notebook_id
             )
 
@@ -60,7 +60,6 @@ class AudioOverviewService:
             error_msg = f"Failed to generate complete audio overview for notebook {notebook_id}: {str(e)}"
             logger.error(error_msg)
             raise Exception(error_msg)
-
 
 # Singleton instance
 audio_overview_service = AudioOverviewService()

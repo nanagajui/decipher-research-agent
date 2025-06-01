@@ -21,7 +21,7 @@ from config.logging import setup_logging
 # Configure logging with loguru
 setup_logging(console_level="INFO", file_level="DEBUG")
 
-from api import app
+from main import app
 
 if __name__ == "__main__":
     logger.info("Starting Decipher Research Agent API server")
