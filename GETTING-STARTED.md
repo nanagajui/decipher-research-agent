@@ -1,23 +1,28 @@
-# Getting Started with ResearchForge
+# 🚀 Getting Started with ResearchForge
 
-> **Note**: ResearchForge is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project, enhanced with additional features like Firecrawl AI integration, advanced PDF reporting, and improved research capabilities.
+> **Note**: This guide provides detailed setup instructions for ResearchForge. For a quick overview, see the main [README.md](./README.md).
 
-This guide will walk you through setting up ResearchForge with a hybrid approach: running Qdrant in Docker and all other services locally for a flexible development experience.
+ResearchForge is an AI-powered research platform that helps you discover, analyze, and present information efficiently. This guide will walk you through the complete setup process, including environment configuration and database setup.
 
 ## 🏗 Project Structure
 
 ```
-decipher-research-agent/
-├── backend/             # FastAPI backend
-│   └── services/        # AI and processing services
-│       └── firecrawl/   # Firecrawl AI integration
+researchforge/
+├── backend/             # FastAPI backend (Python)
+│   ├── app/            # Application code
+│   │   ├── api/        # API endpoints
+│   │   ├── core/       # Core configurations
+│   │   └── services/   # Business logic
 ├── client/              # Next.js frontend
-│   └── app/             # App router pages
-│       └── reports/     # PDF report generation
-├── docker/              # Docker configuration
-├── .env.example         # Example environment variables
-└── docker-compose.yml   # Docker Compose configuration
+│   ├── app/            # App router pages
+│   ├── components/     # React components
+│   └── lib/            # Utility functions
+├── docker/             # Docker configuration
+├── .env.example        # Example environment variables
+└── docker-compose.yml  # Docker Compose configuration
 ```
+
+For a quick start with basic setup, refer to the main [README.md](./README.md).
 
 ## 🛠 Prerequisites
 

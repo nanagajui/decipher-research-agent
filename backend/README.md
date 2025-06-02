@@ -1,142 +1,155 @@
-# Decipher Research Agent
+# ResearchForge Backend
 
-A FastAPI application that runs intelligent research agents asynchronously in the background.
+> The backend service for ResearchForge, built with FastAPI and Python 3.12+.
 
-## Features
+## 🚀 Getting Started
 
-- Asynchronous background task processing using `ThreadPoolExecutor`.
-- Thread-safe in-memory task storage.
-- Simple task status tracking (queued, running, completed, failed, cancelled).
-- API for submitting, checking status, listing, and attempting to cancel tasks.
-- CORS middleware enabled (configurable for production).
-- Basic health check endpoint.
-- OpenAPI documentation (/docs, /redoc).
+### Prerequisites
 
-## Setup
+- Python 3.12+
+- PostgreSQL 14+
+- [Poetry](https://python-poetry.org/) (recommended)
 
-1.  **Clone Repository**
-2.  **Create & Activate Virtual Environment**
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-    ```
-3.  **Install Dependencies**
-    ```bash
-    pip install -e .
-    ```
-4.  **Environment Variables**
-    Create a `.env` file in the project root with your `BRIGHT_DATA_API_TOKEN`:
-    ```
-    BRIGHT_DATA_API_TOKEN=your_api_token_here
-    ```
+### Installation
 
-## Running the API
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/researchforge.git
+   cd researchforge/backend
+   ```
 
-```bash
-python server.py
+2. **Set up a virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   # Install Poetry if you haven't already
+   curl -sSL https://install.python-poetry.org | python3 -
+   
+   # Install dependencies
+   poetry install
+   ```
+
+4. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+5. **Run database migrations**
+   ```bash
+   poetry run alembic upgrade head
+   ```
+
+6. **Start the development server**
+   ```bash
+   poetry run uvicorn main:app --reload
+   ```
+
+7. Access the API at http://localhost:8000
+
+## 📚 API Documentation
+
+Once the server is running, you can access the interactive API documentation:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+## 🏗 Project Structure
+
+```
+backend/
+├── alembic/           # Database migrations
+├── app/
+│   ├── api/          # API routes and endpoints
+│   ├── core/          # Core configurations and utilities
+│   │   ├── config.py  # Application configuration
+│   │   └── security.py # Authentication and security
+│   ├── db/            # Database session and connection
+│   ├── models/        # SQLAlchemy models
+│   ├── schemas/       # Pydantic models
+│   └── services/      # Business logic and services
+│       ├── ai/        # AI and ML services
+│       └── storage/   # File storage services
+├── tests/             # Test files
+├── alembic.ini        # Alembic configuration
+├── main.py            # Application entry point
+├── poetry.lock        # Dependency lock file
+└── pyproject.toml     # Project metadata and dependencies
 ```
 
-The API will be available at `http://localhost:8000`.
+## ⚙️ Configuration
 
-## API Endpoints
+Create a `.env` file with the following variables:
 
-### 1. Submit Research Task
+```env
+# Application
+DEBUG=True
+ENVIRONMENT=development
 
--   **POST** `/research`
--   **Description**: Submits a new topic for research. The task is added to a queue and processed in the background.
--   **Request Body**:
-    ```json
-    {
-      "topic": "Your research topic (min 3 chars)"
-    }
-    ```
--   **Response (202 Accepted)**:
-    ```json
-    {
-      "task_id": "uuid-string-for-the-task",
-      "status": "queued",
-      "message": "Research task submitted and will be processed."
-    }
-    ```
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/researchforge
 
-### 2. Get Task Status
+# JWT Authentication
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440  # 24 hours
 
--   **GET** `/research/{task_id}`
--   **Description**: Retrieves the current status and details of a specific research task.
--   **Response (200 OK)**:
-    ```json
-    {
-      "task_id": "uuid-string-for-the-task",
-      "topic": "Your research topic",
-      "status": "queued|running|completed|failed|cancelled|cancellation_requested",
-      "created_at": "2023-10-27T10:00:00.000000",
-      "result": "Research results if task is completed...",
-      "error": "Error message if task failed...",
-      "completed_at": "2023-10-27T10:05:00.000000", // If completed
-      "failed_at": "2023-10-27T10:03:00.000000"    // If failed
-    }
-    ```
--   **Response (404 Not Found)**: If `task_id` does not exist.
+# CORS
+FRONTEND_URL=http://localhost:3000
 
-### 3. List All Tasks
+# AI Services (optional)
+OPENAI_API_KEY=your-openai-api-key
+LEMONFOX_API_KEY=your-lemonfox-api-key
 
--   **GET** `/tasks`
--   **Description**: Retrieves a list of all submitted tasks. Can be filtered by status.
--   **Query Parameters**:
-    -   `status` (optional): Filter by task status (e.g., `queued`, `running`, `completed`).
--   **Response (200 OK)**:
-    ```json
-    {
-      "tasks": [
-        {
-          "task_id": "uuid-string-1",
-          "topic": "Topic 1",
-          "status": "completed",
-          "created_at": "2023-10-27T09:00:00.000000",
-          "completed_at": "2023-10-27T09:05:00.000000"
-        },
-        {
-          "task_id": "uuid-string-2",
-          "topic": "Topic 2",
-          "status": "running",
-          "created_at": "2023-10-27T10:00:00.000000",
-          "completed_at": null
-        }
-      ],
-      "total": 2
-    }
-    ```
+# Storage
+STORAGE_TYPE=local  # or 's3'
+S3_BUCKET_NAME=your-bucket-name
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+```
 
-### 4. Cancel Task
+## 🧪 Testing
 
--   **DELETE** `/research/{task_id}`
--   **Description**: Attempts to mark a task for cancellation. If the task is already running, it might complete before cancellation takes effect (soft cancellation). Queued tasks are directly marked as cancelled.
--   **Response (200 OK)**:
-    ```json
-    {
-        "task_id": "uuid-string-for-the-task",
-        "status": "cancelled|cancellation_requested",
-        "message": "Task cancellation processed."
-    }
-    ```
--   **Response (404 Not Found)**: If `task_id` does not exist.
--   **Response (409 Conflict)**: If task is already completed/failed and cannot be cancelled.
+Run tests with pytest:
 
-### 5. Health Check
+```bash
+poetry run pytest
+```
 
--   **GET** `/health`
--   **Description**: A simple endpoint to check if the API is running.
--   **Response (200 OK)**:
-    ```json
-    {
-      "status": "healthy",
-      "timestamp": "2023-10-27T10:15:00.000000"
-    }
-    ```
+For test coverage:
 
-## API Documentation
+```bash
+poetry run pytest --cov=app --cov-report=term-missing
+```
 
-Interactive API documentation is available via Swagger UI and ReDoc:
+## 🚀 Deployment
 
--   **Swagger UI**: `http://localhost:8000/docs`
--   **ReDoc**: `http://localhost:8000/redoc`
+### Production with Gunicorn
+
+```bash
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app
+```
+
+### Docker
+
+Build and run with Docker:
+
+```bash
+docker-compose up --build
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.

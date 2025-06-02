@@ -1,54 +1,109 @@
-# ResearchForge - AI-Powered Research Platform
+# ResearchForge Frontend
 
-ResearchForge is an advanced AI-powered research platform that transforms how you explore and analyze information. Built on top of the open-source DecipherIt project, ResearchForge enhances the experience with additional features and improvements while maintaining the core functionality that makes it a powerful research assistant.
+> The frontend for ResearchForge, built with Next.js 15, React 19, and TypeScript.
 
-## Features
+## 🚀 Getting Started
 
-- **Multi-Source Research** - Input any combination of documents, links, or topics. Our AI seamlessly integrates information from all your sources into a unified research space.
-- **AI-Powered Summaries** - Get instant, comprehensive summaries of your research materials. Our AI extracts key insights and presents them in clear, digestible formats.
-- **Interactive Q&A** - Chat with your research materials in natural language. Ask questions and get instant answers based on all your input sources.
-- **Smart FAQ Generation** - Automatically generate relevant FAQs from your research. Perfect for creating documentation, study guides, or knowledge bases.
+### Prerequisites
 
-## Tech Stack
+- Node.js 18+
+- pnpm 8+
+- PostgreSQL 14+ (for local development)
 
-- **Frontend**: Next.js 15, React 19, TailwindCSS 4
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **Authentication**: Better Auth with Prisma
-- **Database**: PostgreSQL with Prisma ORM
-- **Deployment**: Vercel
+### Installation
 
-## Getting Started
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/researchforge.git
+   cd researchforge/client
+   ```
 
-1. Clone the repository:
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-```bash
-git clone https://github.com/yourusername/researchforge.git
-cd researchforge/client
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your configuration
+   ```
+
+4. **Set up the database**
+   ```bash
+   pnpm prisma:generate
+   pnpm prisma:migrate:dev
+   ```
+
+5. **Start the development server**
+   ```bash
+   pnpm dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## 🛠 Development
+
+### Project Structure
+
+```
+client/
+├── app/                # Next.js app router pages
+│   ├── api/            # API routes
+│   ├── (auth)/         # Authentication pages
+│   └── (dashboard)/    # Authenticated app pages
+├── components/         # Reusable UI components
+│   ├── ui/            # shadcn/ui components
+│   └── shared/        # Shared components
+├── lib/               # Utilities and helpers
+│   ├── api/           # API client
+│   └── utils/         # Utility functions
+├── prisma/            # Database schema and migrations
+└── public/            # Static assets
 ```
 
-2. Install dependencies:
+### Available Scripts
 
-```bash
-npm install
-# or
-pnpm install
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint
+- `pnpm prisma:studio` - Open Prisma Studio
+- `pnpm test` - Run tests
+
+### Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/researchforge"
+
+# Authentication
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# API
+NEXT_PUBLIC_API_URL="http://localhost:8000"
 ```
 
-3. Configure environment variables:
-   Create a `.env` file with the following variables:
+## 📚 Documentation
 
-```
-DATABASE_URL="postgresql://username:password@localhost:5432/researchforge"
-```
+- [Next.js Documentation](https://nextjs.org/docs)
+- [shadcn/ui Documentation](https://ui.shadcn.com/)
+- [Prisma Documentation](https://www.prisma.io/docs/)
 
-4. Set up the database:
+## 🤝 Contributing
 
-```bash
-npm run prisma:generate
-npm run prisma:migrate:dev
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-5. Run the development server:
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
 
 ```bash
 npm run dev

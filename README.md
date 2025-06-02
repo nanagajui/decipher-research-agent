@@ -1,16 +1,5 @@
 # 🚀 ResearchForge - Advanced AI Research Assistant
 
-> **Note**: ResearchForge is a fork of the original [DecipherIt](https://github.com/mtwn105/decipher-research-agent) project by Amit Wani, enhanced with additional features and modifications to create a more powerful research platform.
-
-## 🚀 Enhanced Features in This Fork
-
-- **Firecrawl AI Integration**: Advanced web crawling and data extraction capabilities
-- **Enhanced PDF Reporting**: Generate comprehensive reports with images, graphics, and visualizations
-- **Improved Research Capabilities**: Expanded AI analysis and synthesis features
-- **Custom UI/UX Enhancements**: Streamlined user experience with additional tools
-
----
-
 <div align="center">
 
 ![ResearchForge Logo](https://img.shields.io/badge/ResearchForge-AI%20Research%20Platform-blue?style=for-the-badge&logo=lightbulb)
@@ -23,33 +12,62 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://typescriptlang.org/)
 
-[🚀 Get Started](#installation) • [📚 Documentation](#documentation) • [🤖 Features](#-key-features)
+[🚀 Get Started](#-quick-start) • [📚 Features](#-key-features) • [💻 Development](#-development)
 
 </div>
 
----
-
 ## ✨ Overview
 
-ResearchForge is a next-generation AI-powered research platform that transforms how professionals, academics, and students discover, analyze, and present information. Built on advanced AI and machine learning technologies, ResearchForge helps you turn complex data into actionable insights with beautiful reports, interactive visualizations, and intelligent summaries.
+ResearchForge is an AI-powered research platform that helps you discover, analyze, and present information efficiently. Built with modern web technologies, ResearchForge transforms complex data into actionable insights with beautiful reports and interactive visualizations.
 
-### The Problem ResearchForge Solves
+## 🚀 Quick Start
 
-Modern research faces significant challenges:
+### Prerequisites
 
-- **Information Overload**: Managing and making sense of vast amounts of data
-- **Time-Consuming Analysis**: Spending hours on manual data processing and synthesis
-- **Formatting Hassles**: Converting research into presentation-ready formats
-- **Collaboration Barriers**: Sharing and working together on research projects
-- **Knowledge Silos**: Disconnected tools and platforms for different research needs
+Before you begin, ensure you have the following installed:
 
-ResearchForge addresses these challenges by providing an integrated platform that combines powerful AI analysis with intuitive tools for knowledge management and presentation.
+- [Node.js](https://nodejs.org/) 18+
+- [Python](https://www.python.org/) 3.12+
+- [PostgreSQL](https://www.postgresql.org/) 14+
+- [Docker](https://www.docker.com/) (optional, for containerized deployment)
+- [pnpm](https://pnpm.io/) (recommended package manager)
 
-### 🎯 Key Features
+### Getting Started
 
-#### 🔍 Research & Analysis
-- **AI-Powered Research** - Leverage advanced AI to conduct comprehensive research with automated analysis and synthesis
-- **Multi-Source Integration** - Seamlessly work with documents (PDF, DOCX, PPTX), web content, and custom text inputs
+For detailed setup instructions, including environment configuration and database setup, please see our [Getting Started Guide](./GETTING-STARTED.md).
+
+### Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/researchforge.git
+   cd researchforge
+   ```
+
+2. **Start the development servers**
+   
+   In one terminal (backend):
+   ```bash
+   cd backend
+   poetry run uvicorn main:app --reload
+   ```
+   
+   In another terminal (frontend):
+   ```bash
+   cd client
+   pnpm dev
+   ```
+
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+For more detailed instructions, including environment setup and configuration, please refer to the [Getting Started Guide](./GETTING-STARTED.md).
+
+## 🎯 Key Features
+
+### 🔍 Research & Analysis
+- **AI-Powered Research** - Leverage advanced AI to conduct comprehensive research
+- **Multi-Source Integration** - Seamlessly work with web content and custom text inputs
+  - *Planned*: Document processing (PDF, DOCX, PPTX) for future implementation
 - **Advanced Analytics** - Gain deeper insights with intelligent data processing and visualization
 - **Semantic Search** - Find exactly what you need with AI-powered semantic search across all your research
 
@@ -67,6 +85,7 @@ ResearchForge addresses these challenges by providing an integrated platform tha
 - **Export Options** - Export your work in multiple formats (PDF, DOCX, Markdown)
 
 #### 🌐 Global Web Access** - Bypass geo-restrictions and bot detection using Bright Data's infrastructure
+  - *Note*: Future integration with Firecrawl is planned to provide additional web crawling options
 
 ### 🔍 Detailed Feature Overview
 
@@ -76,7 +95,8 @@ ResearchForge addresses these challenges by providing an integrated platform tha
 ResearchForge employs advanced AI agents to transform how you conduct research. Our system intelligently processes and synthesizes information from multiple sources, identifying key insights, trends, and connections that might otherwise be missed. The platform's AI understands context, extracts meaningful patterns, and presents information in a clear, actionable format.
 
 **🔍 Intelligent Content Processing**
-- Automatically extracts key information from various document formats
+- Extracts key information from web content and text inputs
+  - *Planned*: Future support for automated extraction from document formats
 - Identifies and connects related concepts across different sources
 - Generates structured data from unstructured text
 - Supports multiple languages and technical domains
